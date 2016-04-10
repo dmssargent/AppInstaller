@@ -72,50 +72,24 @@ Public Class Form1
     Private Sub install()
         Dim adbLocation As String = getAdbExec()
 
-        Dim adbWait As New Process()
-        adbWait.StartInfo.FileName = adbLocation
-        adbWait.StartInfo.Arguments = "wait-for-device"
-        adbWait.StartInfo.UseShellExecute = False
-        adbWait.StartInfo.CreateNoWindow = True
-        SetText(lblStatus, "Waiting for device.")
-        adbWait.Start()
+        ' Wait until an Android device is connected
+        waitForDevice(adbLocation)
 
-        Dim caret As Integer = 0
-        While Not adbWait.HasExited
-            UseWaitCursor = True
-            showProgressAnimation(True)
-            If caret = 0 Then
-                SetText(lblStatus, "Waiting for device.")
-            ElseIf caret = 1 Then
-                SetText(lblStatus, "Waiting for device..")
-            Else
-                SetText(lblStatus, "Waiting for device...")
-                caret = -1
-            End If
-            caret += 1
-
-            Threading.Thread.Sleep(1000)
-            Threading.Thread.Yield()
-            If Me.stopAll Then
-                MsgBox("The install has been aborted", MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, "APK Install Aborted")
-                Return
-            End If
-        End While
-        showProgressAnimation(False)
-        adbWait.Close()
-
+        ' Device Found, check if multiple devices are connected
+        Dim deviceId = getDeviceId()
 
         SetText(lblStatus, "Starting Installs...")
         Dim filesToInstall As String() = getFilesToInstall()
         'pgbStatus.Step = 100 / filesToInstall.Length
         Dim installStatus As String = ""
+        Dim installAborted = False
         For Each file As String In getFilesToInstall()
             Dim adb As New Process()
-            Dim arguments As String = "install "
+            Dim arguments As String = "-s " & deviceId & " install "
             If (chkReinstall.Checked) Then
-                arguments += "-r "
+                arguments += " - r "
             End If
-            adb.StartInfo.Arguments = arguments + file
+            adb.StartInfo.Arguments = arguments & """" & file & """"
             adb.StartInfo.CreateNoWindow = True
             adb.StartInfo.UseShellExecute = False
             adb.StartInfo.FileName = adbLocation
@@ -126,7 +100,7 @@ Public Class Form1
             SetText(lblStatus, installStatus)
             adb.Start()
             While Not adb.HasExited
-                Threading.Thread.Yield()
+                'Threading.Thread.Yield()
                 If Me.stopAll Then
                     MsgBox("The install has been aborted!", MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, "APK Install Aborted")
                     Return
@@ -134,17 +108,49 @@ Public Class Form1
             End While
             installStatus += adb.StandardOutput.ReadToEnd
             SetText(lblStatus, installStatus)
-            'pgbStatus.PerformStep()
+            'pgbStatus.PerformSep()
+            If Not adb.ExitCode = 0 Then
+                installStatus += adb.StandardOutput.ReadToEnd
+                Dim result As MsgBoxResult = MsgBox("The installation of """ & file & """ did not succeed." & vbCrLf & "Details: ADB exited with error code " & adb.ExitCode, MsgBoxStyle.Exclamation + MsgBoxStyle.AbortRetryIgnore)
+                If result = MsgBoxResult.Abort Then
+                    Exit For
+                ElseIf result = MsgBoxResult.Retry Then
+                    MsgBox("We are going to ignore this")
+                End If
+            End If
         Next
         UseWaitCursor = False
-        SetText(lblStatus, "Done!")
+        If Not installAborted Then
+            SetText(lblStatus, "Done!")
+        Else
+            SetText(lblStatus, "Failure! Details: " & vbCrLf & installStatus)
+        End If
+
 
         If singleInstall Then
             Me.Close()
         End If
 
-        MsgBox("The installation of the APK(s) has finished successfully!", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "APK Install Finished")
+        If Not installAborted Then
+            MsgBox("The installation of the APK(s) has finished successfully!", MsgBoxStyle.Information + MsgBoxStyle.OkOnly, "APK Install Finished")
+        End If
     End Sub
+
+    Private Function getDeviceId() As Object
+        Dim deviceChooser As New DeviceChooser()
+        Dim device As String = Nothing
+        If deviceChooser.getUserInput(getAdbExec) Then
+            While Not Threading.Thread.CurrentThread.ThreadState = Threading.ThreadState.StopRequested
+                If deviceChooser.isReady() Then
+                    device = deviceChooser.getDevice
+                End If
+            End While
+        Else
+            device = deviceChooser.getDevice
+        End If
+        MsgBox(device)
+        Return device
+    End Function
 
     Sub UnZip(zipName As String, path As String)
         Dim sc As New Shell32.Shell()
@@ -182,6 +188,8 @@ Public Class Form1
         If (adb.ExitCode = 0) Then
             Return "adb"
         End If
+
+        ' Fallback to app version
         Dim tempFileName As String = Path.GetTempFileName()
         File.Delete(tempFileName)
         Directory.CreateDirectory(tempFileName)
@@ -289,5 +297,39 @@ Public Class Form1
 
     Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         Me.stopAll = True
+    End Sub
+
+    Private Sub waitForDevice(adbLocation As String)
+        Dim adbWait As New Process()
+        adbWait.StartInfo.FileName = adbLocation
+        adbWait.StartInfo.Arguments = "wait-for-device"
+        adbWait.StartInfo.UseShellExecute = False
+        adbWait.StartInfo.CreateNoWindow = True
+        SetText(lblStatus, "Waiting for device.")
+        adbWait.Start()
+
+        Dim caret As Integer = 0
+        While Not adbWait.HasExited
+            UseWaitCursor = True
+            showProgressAnimation(True)
+            If caret = 0 Then
+                SetText(lblStatus, "Waiting for device.")
+            ElseIf caret = 1 Then
+                SetText(lblStatus, "Waiting for device..")
+            Else
+                SetText(lblStatus, "Waiting for device...")
+                caret = -1
+            End If
+            caret += 1
+
+            Threading.Thread.Sleep(1000)
+            'Threading.Thread.Yield()
+            If Me.stopAll Then
+                MsgBox("The install has been aborted", MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, "APK Install Aborted")
+                Return
+            End If
+        End While
+        showProgressAnimation(False)
+        adbWait.Close()
     End Sub
 End Class
