@@ -23,7 +23,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Public Sub New()
-            MyBase.New(Global.Microsoft.VisualBasic.ApplicationServices.AuthenticationMode.ApplicationDefined)
+            MyBase.New(Global.Microsoft.VisualBasic.ApplicationServices.AuthenticationMode.Windows)
             Me.IsSingleInstance = true
             Me.EnableVisualStyles = true
             Me.SaveMySettingsOnExit = true
@@ -32,7 +32,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.APKInstaller.Form1
+            Me.MainForm = Global.APKInstaller.Main
         End Sub
     End Class
 End Namespace
