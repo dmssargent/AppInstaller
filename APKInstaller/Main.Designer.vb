@@ -30,6 +30,7 @@ Partial Class Main
         Me.btnOpenFileDialogTrigger = New MaterialSkin.Controls.MaterialFlatButton()
         Me.btnInstall = New MaterialSkin.Controls.MaterialRaisedButton()
         Me.pgbStatus = New MaterialSkin.Controls.MaterialProgressBar()
+        Me.Label1 = New MaterialSkin.Controls.MaterialLabel()
         Me.SuspendLayout()
         '
         'lblStatus
@@ -141,13 +142,23 @@ Partial Class Main
         Me.pgbStatus.TabIndex = 6
         Me.pgbStatus.Visible = False
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(13, 531)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(12, 17)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = " "
+        '
         'Main
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom
-        Me.ClientSize = New System.Drawing.Size(846, 539)
+        Me.ClientSize = New System.Drawing.Size(846, 537)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.pgbStatus)
         Me.Controls.Add(Me.btnInstall)
         Me.Controls.Add(Me.btnOpenFileDialogTrigger)
@@ -170,4 +181,5 @@ Partial Class Main
     Friend WithEvents btnOpenFileDialogTrigger As MaterialSkin.Controls.MaterialFlatButton
     Friend WithEvents btnInstall As MaterialSkin.Controls.MaterialRaisedButton
     Friend WithEvents pgbStatus As MaterialSkin.Controls.MaterialProgressBar
+    Friend WithEvents Label1 As MaterialSkin.Controls.MaterialLabel
 End Class

@@ -87,17 +87,18 @@ Public Class dlgDeviceChoose
             updateDeviceListEntry(i, Nothing)
         Next i
 
-        If numberOfDevices > 1 Then
-            'MsgBox("More than one device detected")
-        Else
-            deviceIndex = 0
+        'If numberOfDevices > 1 Then
+        '    MsgBox("More than one device detected")
+
+        'End If
+        If numberOfDevices = 1 Then
+            lstDevices.SelectedIndex = 0
         End If
+
     End Sub
 
     Public Function getDevice() As String
         If isReady() Then
-            'Me.lstDevices.SelectedItems.
-
             Return cleanupOutput(lstDevices.SelectedItem.ToString)
         End If
 

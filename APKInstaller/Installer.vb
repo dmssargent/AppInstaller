@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Threading
-Imports APKInstaller
+Imports ICSharpCode.SharpZipLib.Zip
 
 Public Class Installer
     Private Delegate Sub deviceIdCallback(ByVal deviceId As String)
@@ -10,6 +10,7 @@ Public Class Installer
     Private stopRequested As Boolean = False
     Private update As Boolean = True
     Private showCompletionMessage As Boolean = True
+    Private adbCache As String
 
     Sub New(ByRef entry As Main, ByRef statusLabel As MaterialSkin.Controls.MaterialLabel, ByRef userInputTextbox As MaterialSkin.Controls.MaterialSingleLineTextField)
         GUI = entry
@@ -19,7 +20,7 @@ Public Class Installer
 
     Private Function GetShell32Folder(folderPath As String) As Shell32.Folder
         Dim shellAppType As Type = Type.GetTypeFromProgID("Shell.Application")
-        Dim Shell As Object = Activator.CreateInstance(shellAppType)
+        Dim Shell = Activator.CreateInstance(shellAppType)
         Return CType(shellAppType.InvokeMember("NameSpace", Reflection.BindingFlags.InvokeMethod, Nothing, Shell, New Object() {folderPath}), Shell32.Folder)
     End Function
 
@@ -46,11 +47,11 @@ Public Class Installer
             End If
             caret += 1
 
-            'Thread.Sleep(1000)
-            'Threading.Thread.Yield()
+            Thread.Sleep(1000)
+            Threading.Thread.Yield()
             If stopRequested Then
                 MsgBox("The install has been aborted", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
-                Return
+                Exit Sub
             End If
         End While
         GUI.ShowProgressAnimation(False)
@@ -58,6 +59,10 @@ Public Class Installer
     End Sub
 
     Function GetAdbExecutable() As String
+        If (adbCache IsNot Nothing) Then
+            Return adbCache
+        End If
+
         Dim adb As New Process
         adb.StartInfo.Arguments = "version"
         adb.StartInfo.FileName = "adb"
@@ -67,6 +72,7 @@ Public Class Installer
             adb.Start()
             adb.WaitForExit()
             If (adb.ExitCode = 0) Then
+                adbCache = "adb"
                 Return "adb"
             End If
         Catch ex As Exception
@@ -80,21 +86,36 @@ Public Class Installer
         Dim platformToolsZip As String = tempFileName + "\platform-tools.zip"
         File.WriteAllBytes(platformToolsZip, My.Resources.platform_tools_r23_1_0_windows)
         Dim androidPlatformTools As String = tempFileName + "\platform-tools"
-        UnZip(platformToolsZip, androidPlatformTools)
-
-        Return androidPlatformTools + "\platform-tools\adb.exe"
+        UnzipFromStream(New FileStream(platformToolsZip, FileMode.Open), androidPlatformTools)
+        adbCache = androidPlatformTools & "\platform-tools\adb.exe"
+        Return adbCache
     End Function
 
-    Private Sub UnZip(zipName As String, path As String)
-        Dim sc As New Shell32.Shell()
-        'Create directory in which you will unzip your files .
-        IO.Directory.CreateDirectory(path)
-        'Declare the folder where the files will be extracted
-        Dim output As Shell32.Folder = sc.NameSpace(path)
-        'Declare your input zip file as folder  .
-        Dim input As Shell32.Folder = sc.NameSpace(zipName)
-        'Extract the files from the zip file using the CopyHere command .
-        output.CopyHere(input.Items, 4)
+
+
+    Public Sub UnzipFromStream(zipStream As FileStream, outFolder As String)
+        Dim zipInputStream = New ZipInputStream(zipStream)
+        Dim zipEntry = zipInputStream.GetNextEntry()
+        Dim buffer(4096) As Byte    ' 4K Is optimum
+        While (zipEntry IsNot Nothing)
+            Dim entryFileName = zipEntry.Name
+            ' Convert UNIX paths to the current platform path
+            entryFileName = entryFileName.Replace("/", Path.DirectorySeparatorChar)
+            Dim fullZipToPath = Path.Combine(outFolder, entryFileName)
+            Dim directoryName = Path.GetDirectoryName(fullZipToPath)
+
+            If (directoryName.Length > 0) Then
+                Directory.CreateDirectory(directoryName)
+            End If
+            If Not (directoryName & "\").Equals(fullZipToPath) Then
+                Using _streamWriter As FileStream = File.Create(fullZipToPath)
+                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(zipInputStream, _streamWriter, buffer)
+                End Using
+            End If
+
+
+            zipEntry = zipInputStream.GetNextEntry()
+        End While
     End Sub
 
     Private Sub GetDeviceId(callback As deviceIdCallback)
@@ -168,6 +189,9 @@ Public Class Installer
 
         ' Wait until an Android device is connected
         WaitForDevice(adbLocation)
+        If stopRequested Then
+            Return
+        End If
 
         ' Device Found, check if multiple devices are connected, and figure out the device to install to
         Dim deviceId = ""

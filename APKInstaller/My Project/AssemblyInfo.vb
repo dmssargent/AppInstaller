@@ -9,11 +9,11 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("APK Installer")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("APKInstaller")>
-<Assembly: AssemblyCopyright("Copyright © David Sargent 2016")>
+<Assembly: AssemblyTitle("App Installer")>
+<Assembly: AssemblyDescription("Provides a means of quickly and reliably putting various Android apps on Android devices")>
+<Assembly: AssemblyCompany("FIRST Tech Challenge")>
+<Assembly: AssemblyProduct("APK Installer")>
+<Assembly: AssemblyCopyright("Copyright © 2016 David Sargent")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -32,6 +32,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("0.0.1.0")>
-<Assembly: AssemblyFileVersion("1.0.0.0")>
+<Assembly: AssemblyVersion("0.1.2.0")>
+<Assembly: AssemblyFileVersion("0.1.2.0")>
 <Assembly: NeutralResourcesLanguage("en-US")>
+<Assembly: AssemblyMetadata("SquirrelAwareVersion", "1")>

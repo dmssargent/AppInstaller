@@ -1,4 +1,7 @@
-﻿Imports MaterialSkin
+﻿Imports System.IO
+Imports System.Threading
+Imports MaterialSkin
+Imports Squirrel
 
 Public Class Main
     ' This delegate enables asynchronous calls for setting
@@ -8,6 +11,7 @@ Public Class Main
     Private singleInstall As Boolean = False
     Private stopAll As Boolean
     Private apkInstaller As Installer
+    Private updateMgr As AppUpdateManager = New AppUpdateManager(Me)
 
     Private Sub btnOpenFileDialogTrigger_Click(sender As Object, e As EventArgs) Handles btnOpenFileDialogTrigger.Click
         Dim fileDialog As OpenFileDialog = New OpenFileDialog()
@@ -78,43 +82,65 @@ Public Class Main
     End Sub
 
     Private Sub APKInstallerMain_Load(sender As Object, e As EventArgs) Handles Me.Load
+        AddHandler Application.ThreadException, AddressOf FatalErrorWasThrownHandlerTE
+        AddHandler AppDomain.CurrentDomain.UnhandledException, AddressOf FatalErrorWasThrownHandlerCD
+
+        AppUpdateManager.HandleEvents()
         Dim SkinManager As MaterialSkinManager = MaterialSkinManager.Instance
         SkinManager.AddFormToManage(Me)
         SkinManager.Theme = MaterialSkinManager.Themes.LIGHT
         SkinManager.ColorScheme = New ColorScheme(Primary.Orange700, Primary.Orange700, Primary.Orange100, Accent.LightBlue200, TextShade.WHITE)
 
-        'Are we launching as a click-once?
-        'If (Application.ApplicationDeployment.IsNetworkDeployed) Then
         Dim apkFile As String = ""
         apkInstaller = New Installer(Me, Me.lblStatus, Me.txtFileLocation)
-        Try
-            If Not (AppDomain.CurrentDomain.SetupInformation Is Nothing Or
-                        AppDomain.CurrentDomain.SetupInformation.ActivationArguments Is Nothing Or
-                        AppDomain.CurrentDomain.SetupInformation.ActivationArguments.ActivationData Is Nothing) Then
-                Dim urifile As String = New Uri(AppDomain.CurrentDomain.SetupInformation.ActivationArguments.ActivationData(0)).LocalPath
-                If urifile.Contains(".apk") Then
-                    If Not MsgBox("I am going to install the APK in the location """ & urifile & """", CType(MsgBoxStyle.Information + MsgBoxStyle.OkCancel, MsgBoxStyle)).Equals(MsgBoxResult.Ok) Then
-                        Me.Close()
-                        Return
-                    End If
-                    apkInstaller.AddFilesToInstall(New String() {urifile})
-                    apkFile = urifile
-                End If
-            End If
-        Catch ex As Exception
-            MsgBox("An error occurred with checking ClickOnce " & ex.ToString, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, MsgBoxStyle))
-        End Try
-        ' End If
 
+        updateMgr.UpdateLabel = Label1
+
+
+        Dim noPrompt = False
+        Dim appList As New List(Of String)
         For Each arg As String In My.Application.CommandLineArgs
+            If arg.StartsWith("--") Or arg.StartsWith("-") Then
+                If (arg.Equals("-f") Or arg.Equals("--force")) Then
+                    Me.chkForce.Checked = True
+                    Me.chkReinstall.Checked = False
+                    noPrompt = True
+                ElseIf (arg.Equals("-r") Or arg.Equals("--update") Or arg.Equals("--reinstall")) Then
+                    Me.chkReinstall.Checked = True
+                    Me.chkForce.Checked = False
+                    noPrompt = True
+                ElseIf (arg.Equals("/?") Or arg.Equals("--help") Or arg.Equals("/h") Or arg.Equals("-h")) Then
+                    MsgBox(My.Application.Info.ProductName & " v" & My.Application.Info.Version.ToString & vbCrLf & vbCrLf &
+                           "Usage Options: " & vbCrLf &
+                           "--force | -f:" & vbCrLf & vbTab & "Removes any existing application and wipes " & vbCrLf & vbTab & "any associated application data for that " & vbCrLf & vbTab & "application, before installing" & vbCrLf &
+                           "--update | --reinstall | -r:" & vbCrLf & vbTab & "Reinstalls the app represented by the given APK." & vbCrLf & vbTab & "Does nothing if the app is not already installed" & vbCrLf &
+                           "--no-prompt | -np:" & vbCrLf & vbTab & "Does not prompt user for settings" & vbCrLf & vbTab & " [Implicit with options: -r, -f]" & vbCrLf &
+                           "-!np | --prompt:" & vbCrLf & vbTab & "Prompts the user about options [Overrides: -np]",
+                            CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), "Usage")
+                    Me.Close()
+                ElseIf (arg.Equals("-np") Or arg.Equals("--no-prompt")) Then
+                    noPrompt = True
+                ElseIf (arg.Equals("--squirrel-firstrun")) Then
+                    'MsgBox("You shouldn't see this! This means something went wrong. But you can still ignore this", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle))
+                    SetText(lblStatus, "Welcome to the App Installer! Try dragging an APK on to me to start off with.")
+                ElseIf (arg.Equals("-!np") Or arg.Equals("--prompt")) Then
+                    noPrompt = False
+                End If
+
+                Continue For
+            End If
+
             If Not MsgBox("I am going to install the APK in the location """ & arg & """", CType(MsgBoxStyle.Information + MsgBoxStyle.OkCancel, MsgBoxStyle)).Equals(MsgBoxResult.Ok) Then
+                MsgBox("Install Aborted.", CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle))
                 Me.Close()
                 Return
+            Else
+                appList.Add(arg)
             End If
         Next
 
         Me.CenterToScreen()
-        Dim fileArgs As String() = My.Application.CommandLineArgs.ToArray
+        Dim fileArgs As String() = appList.ToArray
         If apkFile IsNot "" Then
             Dim filesToInstall(fileArgs.Length + 1) As String
             If (fileArgs.Length > 0) Then
@@ -137,6 +163,7 @@ Public Class Main
 
         End If
         apkInstaller.AddFilesToInstall(fileArgs)
+
         If Not (fileArgs.Length = 0) And txtFileLocation.Text.Length > 0 And btnInstall.Enabled Then
             Me.singleInstall = True
             btnInstaller_Click(btnInstall, e)
@@ -145,12 +172,17 @@ Public Class Main
             Me.btnOpenFileDialogTrigger.Visible = False
             Me.chkForce.Visible = False
             Me.chkReinstall.Visible = False
-            Me.chkReinstall.Checked = MsgBox("Would you like to update the installed package on the phone?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
-            If Not chkReinstall.Checked Then
-                Me.chkForce.Checked = MsgBox("Would you like to forcefully remove any existing package to prep for a clean re-installation?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
+            If Not noPrompt Then
+                Me.chkReinstall.Checked = MsgBox("Would you like to update the installed package on the phone?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
+                If Not chkReinstall.Checked Then
+                    Me.chkForce.Checked = MsgBox("Would you like to forcefully remove any existing package to prep for a clean re-installation?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
+                End If
             End If
         End If
+
     End Sub
+
+
 
     Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         apkInstaller.abort()
@@ -168,5 +200,31 @@ Public Class Main
         If chkForce.Checked Then
             chkForce.Checked = MsgBox("Are you really, absolutely sure you want to force the installation by any means necessary? This WILL be destructive if the app is currently installed on the phone.", CType(MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes
         End If
+
+    End Sub
+
+    Private Sub FatalErrorWasThrownHandler(sender As Object, e As Exception)
+        Dim details = ""
+        If (e IsNot Nothing) Then
+            details = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(e.Message & e.StackTrace))
+        End If
+        Dim sTempFileName As String = Path.GetTempFileName()
+        Dim fsTemp As New FileStream(sTempFileName, FileMode.Create)
+        Dim detailsDump As Byte() = System.Text.Encoding.Unicode.GetBytes(details)
+        fsTemp.Write(detailsDump, 0, details.Length)
+        fsTemp.Close()
+        MsgBox("An application error has been encountered." & vbCrLf &
+                (If(e Is Nothing, "", "The following file may be wanted by troubleshooters and/or ninja monkeys.:" & vbCrLf & sTempFileName & vbCrLf)) &
+                "Do you want to restart the application?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
+        FileIO.FileSystem.DeleteFile(sTempFileName)
+    End Sub
+
+    Private Sub FatalErrorWasThrownHandlerTE(sender As Object, e As ThreadExceptionEventArgs)
+        FatalErrorWasThrownHandler(sender, e.Exception)
+    End Sub
+
+    Private Sub FatalErrorWasThrownHandlerCD(sender As Object, e As UnhandledExceptionEventArgs)
+
+        FatalErrorWasThrownHandler(sender, CType(e.ExceptionObject, Exception))
     End Sub
 End Class
