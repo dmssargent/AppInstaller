@@ -27,14 +27,15 @@ Public Class AppUpdateManager
         End If
 
         SquirrelAwareApp.HandleEvents(
-                onInitialInstall:=Sub(v) updateManager.CreateShortcutForThisExe(),
+                onInitialInstall:=Sub(v) SquirrelInstall(),
                 onAppUpdate:=Sub(v) updateManager.CreateShortcutForThisExe(),
-                onAppUninstall:=Sub(v) updateManager.RemoveShortcutForThisExe(),
-                onFirstRun:=Sub() SquirrelFirstRun()
+                onAppUninstall:=Sub(v) updateManager.RemoveShortcutForThisExe()
             )
     End Sub
 
-    Private Shared Sub SquirrelFirstRun()
+    Private Shared Sub SquirrelInstall()
+        updateManager.CreateShortcutForThisExe()
+
         Dim icon = IO.Path.Combine(IO.Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
         My.Resources.android_app.Save(New IO.FileStream(icon, IO.FileMode.Create))
 
@@ -46,10 +47,6 @@ Public Class AppUpdateManager
         classes.CreateSubKey("Classes")
         classes = classes.OpenSubKey("Classes", True)
         Dim key1 = classes.CreateSubKey(APP_EXT)
-
-        If key1 Is Nothing Then
-            Exit Sub
-        End If
 
         'classes.CreateSubKey(APP_EXT)
         'key1 = classes.OpenSubKey(APP_EXT, True)
@@ -83,6 +80,23 @@ Public Class AppUpdateManager
         key3.Close()
     End Sub
 
+    Private Shared Sub SquirrelUninstall()
+        updateManager.RemoveShortcutForThisExe()
+
+        Dim icon = IO.Path.Combine(IO.Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
+        IO.File.Delete(icon)
+
+        Const APP_CLASS_KEY As String = "AppInstaller"
+
+        Dim classes = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", True)
+
+        classes.CreateSubKey("Classes")
+        classes = classes.OpenSubKey("Classes", True)
+
+        classes.DeleteSubKey(APP_CLASS_KEY)
+
+    End Sub
+
     Public Property UpdateLabel As MaterialLabel
         Get
             Return _updateLabel
@@ -98,7 +112,10 @@ Public Class AppUpdateManager
         End Set
     End Property
 
-    Public Async Sub StartUpdate()
+    Private Async Sub StartUpdate()
+        If updateManager Is Nothing Then
+            Exit Sub
+        End If
         Dim updateInfo = Await updateManager.CheckForUpdate
         If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
             Await updateManager.DownloadReleases(updateInfo.ReleasesToApply())
@@ -108,6 +125,11 @@ Public Class AppUpdateManager
                 NotifyOfUpdate()
             End If
         End If
+    End Sub
+
+    Public Sub Update()
+        Dim update = New Threading.Thread(New Threading.ThreadStart(AddressOf StartUpdate))
+        update.Start()
     End Sub
 
     Private Sub NotifyOfUpdate()
@@ -130,7 +152,7 @@ Public Class AppUpdateManager
 
     Private Sub UpdateClick(sender As Object, e As EventArgs)
         If (updateManager IsNot Nothing) Then
-            Squirrel.UpdateManager.RestartApp()
+            UpdateManager.RestartApp()
         End If
     End Sub
 End Class

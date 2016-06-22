@@ -11,6 +11,8 @@ Public Class Installer
     Private update As Boolean = True
     Private showCompletionMessage As Boolean = True
     Private adbCache As String
+    Private aaptLocation As String
+    Private force As Boolean
 
     Sub New(ByRef entry As Main, ByRef statusLabel As MaterialSkin.Controls.MaterialLabel, ByRef userInputTextbox As MaterialSkin.Controls.MaterialSingleLineTextField)
         GUI = entry
@@ -36,7 +38,7 @@ Public Class Installer
         Dim caret As Integer = 0
         While Not adbWait.HasExited
             GUI.UseWaitCursor = True
-            GUI.ShowProgressAnimation(True)
+            GUI.ShowProgressAnimation(True, False)
             If caret = 0 Then
                 GUI.SetText(lblStatus, "Waiting for device.")
             ElseIf caret = 1 Then
@@ -54,12 +56,12 @@ Public Class Installer
                 Exit Sub
             End If
         End While
-        GUI.ShowProgressAnimation(False)
+        GUI.ShowProgressAnimation(False, False)
         adbWait.Close()
     End Sub
 
     Function GetAdbExecutable() As String
-        If (adbCache IsNot Nothing) Then
+        If adbCache IsNot Nothing And (adbCache Is "adb" Or File.Exists(adbCache)) Then
             Return adbCache
         End If
 
@@ -138,7 +140,7 @@ Public Class Installer
         Dim location As String = ""
         If GetFilesToInstall.Length > 0 And GetFilesToInstall(0) IsNot "" Then
             If MsgBox("There are other APK files to install. Do you want to keep them and add this to install?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes Then
-                location = txtUserInput.Text + ";"
+                location = txtUserInput.Text & ";"
             End If
         End If
 
@@ -147,10 +149,20 @@ Public Class Installer
                 Continue For
             End If
 
-            If path.ToLower.EndsWith(".apk") Then
+            Dim invalidPackage = Not path.ToLower.EndsWith(".apk")
+
+            Try
+                If (Not invalidPackage And packageName(path) Is "") Then
+                    invalidPackage = True
+                End If
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+
+            If Not invalidPackage Then
                 location += path + ";"
             Else
-                MsgBox("""" + path + """" + " is not a valid Android app. Please verify that the file ends with "".APK"".", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "Invalid File")
+                MsgBox("""" & path & """" & " is not a valid Android app. Please verify that the file ends with "".APK"".", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "Invalid File")
             End If
         Next
 
@@ -161,7 +173,12 @@ Public Class Installer
     End Sub
 
     Function VerifyFilesToInstall() As Boolean
-        For Each apkfile As String In GetFilesToInstall()
+        Dim apkFiles = GetFilesToInstall()
+        If apkFiles.Length = 0 Then
+            Return False
+        End If
+
+        For Each apkfile As String In apkFiles
             Dim exists = File.Exists(apkfile)
             If Not exists Then
                 Return False
@@ -180,6 +197,10 @@ Public Class Installer
         update = enabled
     End Sub
 
+    Sub ConfigureForce(enabled As Boolean)
+        force = enabled
+    End Sub
+
     Sub ShowCompletionMessageWhenFinished(show As Boolean)
         showCompletionMessage = show
     End Sub
@@ -196,28 +217,34 @@ Public Class Installer
         ' Device Found, check if multiple devices are connected, and figure out the device to install to
         Dim deviceId = ""
         GUI.SetText(lblStatus, "Checking device(s)...This may be a moment or two")
-        GUI.ShowProgressAnimation(True)
+        GUI.ShowProgressAnimation(True, False)
         GetDeviceId(Sub(ByVal _DeviceId As String)
                         deviceId = _DeviceId
                     End Sub)
         While deviceId Is ""
             If (stopRequested) Then
                 GUI.SetText(lblStatus, "The install did not complete successfully :(")
-                GUI.ShowProgressAnimation(False)
+                GUI.ShowProgressAnimation(False, False)
                 Return
 
             End If
             Thread.Sleep(50)
         End While
-        GUI.ShowProgressAnimation(False)
+        GUI.ShowProgressAnimation(False, False)
 
         GUI.SetText(lblStatus, "Starting Installs...")
         Dim filesToInstall As String() = GetFilesToInstall()
         'pgbStatus.Step = 100 / filesToInstall.Length
         Dim installStatus As String = ""
         Dim installAborted = False
-        For Each file As String In GetFilesToInstall()
+        GUI.ShowProgressAnimation(True, True, CInt(100 / filesToInstall.Length))
+
+        For Each file As String In filesToInstall
             While True
+                If (force) Then
+                    ForceRemovePackage(file)
+                End If
+
                 Dim adb As New Process()
                 Dim arguments As String = "-s " & deviceId & " install "
                 If update Then
@@ -250,6 +277,8 @@ Public Class Installer
                     ElseIf result = MsgBoxResult.Retry Then
                         Continue While
                     End If
+                Else
+                    GUI.StepProgressBar()
                 End If
                 Exit While
             End While
@@ -273,4 +302,87 @@ Public Class Installer
     Sub abort()
         stopRequested = True
     End Sub
+
+    Function ForceRemovePackage(ByVal apkFile As String) As Boolean
+        Dim adb As New Process()
+        adb.StartInfo.FileName = GetAdbExecutable()
+        adb.StartInfo.Arguments = "uninstall " & packageName(apkFile)
+        adb.StartInfo.CreateNoWindow = True
+        adb.StartInfo.UseShellExecute = False
+        adb.Start()
+        adb.WaitForExit()
+
+        Return adb.ExitCode = 0
+    End Function
+
+    Function getAaptLocation() As String
+        If (aaptLocation IsNot Nothing) Then
+            If (File.Exists(aaptLocation)) Then
+                Return aaptLocation
+            End If
+        End If
+        Dim aapt = ""
+        While aapt Is ""
+            Try
+                Dim temp = Path.GetTempFileName()
+                File.Delete(temp)
+                Directory.CreateDirectory(temp)
+                aapt = Path.Combine(temp, "aapt.exe")
+            Catch ex As Exception
+
+            End Try
+        End While
+
+        File.WriteAllBytes(aapt, My.Resources.aapt_23_0_3_win)
+        If File.Exists(aapt) Then
+            aaptLocation = aapt
+            Return aapt
+        Else
+            Throw New IOException("Failed to build aapt.exe")
+        End If
+    End Function
+
+    Function packageName(ByVal apkFile As String) As String
+        Dim aapt As New Process()
+        aapt.StartInfo.FileName = getAaptLocation()
+        aapt.StartInfo.Arguments = "dump badging """ & apkFile & """"
+        aapt.StartInfo.CreateNoWindow = True
+        aapt.StartInfo.UseShellExecute = False
+        aapt.StartInfo.RedirectStandardOutput = True
+        aapt.Start()
+
+        Const parseFor = "package: name="
+        Dim package = ""
+        Dim line As String = aapt.StandardOutput.ReadLine
+        Try
+            While line IsNot Nothing
+                'Detect interrupts
+                Threading.Thread.Sleep(1)
+
+                line = line.Trim
+                If aapt.HasExited Then
+                    If Not aapt.ExitCode = 0 Then
+                        Throw New Exception("AAPT Failed. Exit: " & aapt.ExitCode)
+                    End If
+                End If
+                If line.Contains(parseFor) Then
+                    Dim versionName As String = line.Substring(line.IndexOf(parseFor) + parseFor.Length)
+                    package = versionName.Substring(versionName.IndexOf("'") + 1)
+                    package = package.Substring(0, package.IndexOf("'"))
+                    Exit While
+
+                End If
+                line = aapt.StandardOutput.ReadLine
+            End While
+            If aapt.HasExited Then
+                If Not aapt.ExitCode = 0 Then
+                    Throw New Exception("AAPT Failed. Exit: " & aapt.ExitCode)
+                End If
+            End If
+        Catch ex As Exception
+            Dim exception As New IOException("Failed to acquire package name", ex)
+            Throw exception
+        End Try
+        Return package
+    End Function
 End Class
