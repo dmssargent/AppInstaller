@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class dlgDeviceChoose
+Partial Class DeviceChooserDialog
     Inherits Form
 
     'Form overrides dispose to clean up the component list.

@@ -1,43 +1,25 @@
 ﻿Imports System.ComponentModel
-Imports System.Windows.Forms
 
-Public Class dlgDeviceChoose
-    Private Delegate Function userInputCallback(ByVal adb As String) As DialogResult
+Public Class DeviceChooserDialog
+    Private Delegate Function userInputCallback() As DialogResult
     Private Delegate Sub deviceListUpdateCallback(ByVal index As Integer, ByVal device As String)
     Private autoUpdateThread As Threading.Thread
 
     Private deviceIndex As Integer = -1
-    Private adbExec As String
+
+    Public ReadOnly Property Device As String
+        Get
+            If IsReady() Then
+                Return CleanupOutput(lstDevices.SelectedItem.ToString)
+            End If
+            Return Nothing
+        End Get
+    End Property
 
 
-    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
-        Me.DialogResult = DialogResult.OK
-        Me.Close()
-    End Sub
 
-    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Cancel_Button.Click
-        Me.DialogResult = DialogResult.Cancel
-        Me.Close()
-    End Sub
-
-    Private Sub lstDevices_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstDevices.SelectedIndexChanged
-        If lstDevices.SelectedIndices.Count > 0 Then
-            OK_Button.Enabled = True
-            deviceIndex = lstDevices.SelectedIndex
-        Else
-            OK_Button.Enabled = False
-        End If
-    End Sub
-
-    Private Sub updateDeviceList()
-        Dim adb As New Process
-        adb.StartInfo.FileName = adbExec
-        adb.StartInfo.Arguments = "devices"
-        adb.StartInfo.CreateNoWindow = True
-        adb.StartInfo.UseShellExecute = False
-        adb.StartInfo.RedirectStandardOutput = True
-        adb.Start()
-        adb.WaitForExit()
+    Private Sub UpdateDeviceList()
+        Dim adb = AndroidTools.RunAdb("devices", True, True, True)
 
         Dim numberOfDevicesLastFound = lstDevices.Items.Count
         Dim data = adb.StandardOutput.ReadLine
@@ -52,10 +34,10 @@ Public Class dlgDeviceChoose
                     data = adb.StandardOutput.ReadLine
                     Continue While
                 End If
-                Dim device = cleanupOutput(data)
+                Dim device = CleanupOutput(data)
                 Dim details = ""
-                Dim rcVersion = CheckForFtcRobotController(adbExec, device)
-                Dim dsVersion = CheckForFtcDriverStation(adbExec, device)
+                Dim rcVersion = CheckForFtcRobotController(device)
+                Dim dsVersion = CheckForFtcDriverStation(device)
                 If rcVersion > 0 Then
                     details &= "[FTC Robot Controller " & rcVersion
                 End If
@@ -72,7 +54,7 @@ Public Class dlgDeviceChoose
                 If Not details = "" Then
                     details &= "]"
                 End If
-                updateDeviceListEntry(numberOfDevices, device & vbTab & details)
+                UpdateDeviceListEntry(numberOfDevices, device & vbTab & details)
                 numberOfDevices += 1
             End If
 
@@ -84,7 +66,7 @@ Public Class dlgDeviceChoose
 
 
         For i As Integer = numberOfDevices To numberOfDevicesLastFound - 1
-            updateDeviceListEntry(i, Nothing)
+            UpdateDeviceListEntry(i, Nothing)
         Next i
 
         'If numberOfDevices > 1 Then
@@ -97,31 +79,23 @@ Public Class dlgDeviceChoose
 
     End Sub
 
-    Public Function getDevice() As String
-        If isReady() Then
-            Return cleanupOutput(lstDevices.SelectedItem.ToString)
-        End If
 
-        Return Nothing
-    End Function
 
-    Public Function getUserInput(adb As String) As DialogResult
-        If (adb Is Nothing) Then
-            Throw New ArgumentException("ADB Path not specified")
-        End If
-        If Me.InvokeRequired Then
-            Return CType(Me.Invoke(New userInputCallback(AddressOf getUserInput), New Object() {adb}), DialogResult)
+    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")>
+    Public Function GetUserInput() As DialogResult
+        If InvokeRequired Then
+            Return CType(Invoke(New userInputCallback(AddressOf GetUserInput)), DialogResult)
         Else
-            adbExec = adb
-            updateDeviceList()
-            If isReady() Then
+
+            UpdateDeviceList()
+            If IsReady() Then
                 Return Nothing
             End If
-            Return Me.ShowDialog()
+            Return ShowDialog()
         End If
     End Function
 
-    Public Function isReady() As Boolean
+    Public Function IsReady() As Boolean
         Return deviceIndex >= 0
     End Function
 
@@ -129,7 +103,7 @@ Public Class dlgDeviceChoose
         autoUpdateThread = New Threading.Thread(
             New Threading.ThreadStart(Sub()
                                           Do
-                                              updateDeviceList()
+                                              UpdateDeviceList()
                                               Try
                                                   Threading.Thread.Sleep(1000)
                                               Catch ex As Threading.ThreadInterruptedException
@@ -147,13 +121,13 @@ Public Class dlgDeviceChoose
         Me.CenterToScreen()
     End Sub
 
-    Private Sub updateDeviceListEntry(ByVal index As Integer, ByVal device As String)
+    Private Sub UpdateDeviceListEntry(ByVal index As Integer, ByVal device As String)
         If lstDevices.InvokeRequired Then
             Try
                 If Me.IsDisposed Then
                     Return
                 End If
-                Me.Invoke(New deviceListUpdateCallback(AddressOf updateDeviceListEntry), New Object() {index, device})
+                Me.Invoke(New deviceListUpdateCallback(AddressOf UpdateDeviceListEntry), New Object() {index, device})
             Catch ex As ObjectDisposedException
                 Return
             End Try
@@ -179,7 +153,7 @@ Public Class dlgDeviceChoose
         End If
     End Sub
 
-    Private Function cleanupOutput(ByVal inputValue As String) As String
+    Private Shared Function CleanupOutput(ByVal inputValue As String) As String
         If inputValue.Contains(" ") Then
             inputValue = inputValue.Substring(0, inputValue.IndexOf(" "))
         End If
@@ -191,46 +165,35 @@ Public Class dlgDeviceChoose
         Return inputValue
     End Function
 
-    Private Sub dlgDeviceChoose_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        autoUpdateThread.Interrupt()
-    End Sub
+
 
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <param name="adb"></param>
     ''' <param name="device"></param>
     ''' <returns></returns>
-    Public Shared Function CheckForFtcRobotController(ByVal adb As String, ByVal device As String) As Double
-        Return CheckPackageVersion(adb, device, "com.qualcomm.ftcrobotcontroller")
+    <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Ftc")>
+    Public Shared Function CheckForFtcRobotController(ByVal device As String) As Double
+        Return CheckPackageVersion(device, "com.qualcomm.ftcrobotcontroller")
     End Function
 
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <param name="adb"></param>
     ''' <param name="device"></param>
     ''' <returns></returns>
-    Public Shared Function CheckForFtcDriverStation(ByVal adb As String, ByVal device As String) As Double
-        Return CheckPackageVersion(adb, device, "com.qualcomm.ftcdriverstation")
+    Public Shared Function CheckForFtcDriverStation(ByVal device As String) As Double
+        Return CheckPackageVersion(device, "com.qualcomm.ftcdriverstation")
     End Function
 
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <param name="adbLocation"></param>
     ''' <param name="device"></param>
     ''' <param name="package"></param>
     ''' <returns></returns>
-    Public Shared Function CheckPackageVersion(ByVal adbLocation As String, ByVal device As String, ByVal package As String) As Double
-        Dim adb As New Process
-        adb.StartInfo.FileName = adbLocation
-        adb.StartInfo.Arguments = "-s " & device & " shell pm dump """ & package & """"
-        adb.StartInfo.CreateNoWindow = True
-        adb.StartInfo.UseShellExecute = False
-        adb.StartInfo.RedirectStandardOutput = True
-
-        adb.Start()
+    Public Shared Function CheckPackageVersion(ByVal device As String, ByVal package As String) As Double
+        Dim adb = AndroidTools.RunAdb("-s " & device & " shell pm dump """ & package & """", True, True, False)
 
         Const VERSION_NAME As String = "versionName="
         Dim version As Double = -1
@@ -256,15 +219,28 @@ Public Class dlgDeviceChoose
                 End If
                 line = adb.StandardOutput.ReadLine
             End While
-        Catch ex As Exception
+        Catch ex As IO.IOException
             Return version
         End Try
         Return version
     End Function
 
-    Private Sub dlgDeviceChoose_Closed(sender As Object, e As EventArgs) Handles Me.Closed
-        If DialogResult = DialogResult.None Or DialogResult = Nothing Then
-            DialogResult = DialogResult.Cancel
+    Private Sub OK_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OK_Button.Click
+        Me.DialogResult = DialogResult.OK
+        Me.Close()
+    End Sub
+
+    Private Sub Cancel_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Cancel_Button.Click
+        Me.DialogResult = DialogResult.Cancel
+        Me.Close()
+    End Sub
+
+    Private Sub lstDevices_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstDevices.SelectedIndexChanged
+        If lstDevices.SelectedIndices.Count > 0 Then
+            OK_Button.Enabled = True
+            deviceIndex = lstDevices.SelectedIndex
+        Else
+            OK_Button.Enabled = False
         End If
     End Sub
 
@@ -278,4 +254,16 @@ Public Class dlgDeviceChoose
         End Using
         e.DrawFocusRectangle()
     End Sub
+
+    Private Sub dlgDeviceChoose_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        autoUpdateThread.Interrupt()
+    End Sub
+
+    Private Sub dlgDeviceChoose_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        If DialogResult = DialogResult.None Or DialogResult = Nothing Then
+            DialogResult = DialogResult.Cancel
+        End If
+    End Sub
+
+
 End Class

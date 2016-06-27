@@ -177,18 +177,21 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppUpdateManager.vb" />
-    <Compile Include="DeviceChooserDialog.Designer.vb">
+    <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="src\AndroidTools.vb" />
+    <Compile Include="src\AppUpdateManager.vb" />
+    <Compile Include="src\DeviceChooserDialog.Designer.vb">
       <DependentUpon>DeviceChooserDialog.vb</DependentUpon>
     </Compile>
-    <Compile Include="DeviceChooserDialog.vb">
+    <Compile Include="src\DeviceChooserDialog.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Installer.vb" />
-    <Compile Include="Main.vb">
+    <Compile Include="src\Installer.vb" />
+    <Compile Include="src\IoUtils.vb" />
+    <Compile Include="src\Main.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.vb">
+    <Compile Include="src\Main.Designer.vb">
       <DependentUpon>Main.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
@@ -209,10 +212,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DeviceChooserDialog.resx">
+    <EmbeddedResource Include="src\DeviceChooserDialog.resx">
       <DependentUpon>DeviceChooserDialog.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
+    <EmbeddedResource Include="src\Main.resx">
       <DependentUpon>Main.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -224,6 +227,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="APKInstaller_TemporaryKey.pfx" />
+    <None Include="CustomDictionary.xml.vsspell" />
     <None Include="Installer.vb.vsspell" />
     <None Include="My Project\app.manifest">
       <SubType>Designer</SubType>
@@ -242,7 +246,8 @@
     <None Include="Resources\platform-tools_r23.1.0-windows.zip" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CInstaller.cs" />
+    <Content Include="src\CustomDictionary.xml" />
+    <Content Include="src\CInstaller.cs" />
     <Content Include="ic_android_black_24px.ico" />
     <None Include="Resources\aapt.exe" />
     <None Include="Resources\ic_android_black_24px.ico" />

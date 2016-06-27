@@ -10,7 +10,7 @@ Public Class Main
     Private Delegate Sub VisibilityCallback(visible As Boolean, ByVal useStep As Boolean, stepAmount As Integer)
     Private Delegate Sub StepProgressBarDelegate()
     Private singleInstall As Boolean = False
-    Private stopAll As Boolean
+    'Private stopAll As Boolean
     Private apkInstaller As Installer
     Private updateMgr As AppUpdateManager
 
@@ -26,13 +26,17 @@ Public Class Main
     End Sub
 
     Private Sub APKInstallerMain_Load(sender As Object, e As EventArgs) Handles Me.Load
-        ' Handle Fatal Errors for further diagnosics
+        ' Handle Fatal Errors for further diagnostics
         AddHandler Application.ThreadException, AddressOf FatalErrorWasThrownHandlerTE
         AddHandler AppDomain.CurrentDomain.UnhandledException, AddressOf FatalErrorWasThrownHandlerCD
 
         ' Configure app setup and updates
         AppUpdateManager.HandleEvents()
         updateMgr.Update()
+
+        ' temp
+        Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") & Path.PathSeparator & "C:\Users\Public\Android\sdk\platform-tools")
+        'Dim androidSdk = AndroidTools.MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("path"))
 
         'Configure GUI
         Dim SkinManager As MaterialSkinManager = MaterialSkinManager.Instance
@@ -131,13 +135,13 @@ Public Class Main
         fileDialog.Title = "Open Android APK files..."
         fileDialog.Multiselect = True
         fileDialog.ValidateNames = True
-        fileDialog.Filter = "APK Files (*.apk)|*.apk|All Files|*.*"
+        fileDialog.Filter = "Android App Packages (*.apk)|*.apk|All Files|*.*"
         fileDialog.ShowDialog()
 
         apkInstaller.AddFilesToInstall(fileDialog.FileNames)
     End Sub
 
-    Private Sub Me_DragDrop(sender As System.Object, e As DragEventArgs) Handles lblStatus.DragDrop, Me.DragDrop
+    Private Sub Me_DragDrop(sender As Object, e As DragEventArgs) Handles lblStatus.DragDrop, Me.DragDrop
         Dim files() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
         apkInstaller.AddFilesToInstall(files)
     End Sub
@@ -152,9 +156,11 @@ Public Class Main
 
     Private Sub btnInstaller_Click(sender As Object, e As EventArgs) Handles btnInstall.Click
         btnInstall.Visible = False
-        apkInstaller.ConfigureReInstall(Me.chkReinstall.Checked)
-        apkInstaller.ConfigureForce(chkForce.Enabled And chkForce.Checked)
-        apkInstaller.ShowCompletionMessageWhenFinished(Not singleInstall)
+
+        apkInstaller.Reinstall = chkReinstall.Checked
+        apkInstaller.Force = chkForce.Checked
+        apkInstaller.CompletionMessageWhenFinished = Not singleInstall
+
         Dim installerThread As New Thread(New ThreadStart(AddressOf apkInstaller.StartInstall))
         installerThread.Start()
     End Sub
@@ -187,11 +193,20 @@ Public Class Main
         End If
     End Sub
 
-    Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
-        apkInstaller.abort()
+    Private Sub Form1_Closing(sender As Object, e As EventArgs) Handles Me.Closing
+        apkInstaller.Abort()
     End Sub
 
+    Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        IOUtilities.Cleanup() ' Cleanup all of the tools we used
+    End Sub
+
+    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub SetText(ByRef label As Controls.MaterialLabel, ByVal text As String)
+        If label Is Nothing Then
+            Throw New ArgumentNullException(NameOf(label))
+        End If
+
         If label.InvokeRequired Then
             Dim d As New SetTextCallback(AddressOf SetText)
             Me.Invoke(d, New Object() {label, text})
@@ -200,6 +215,11 @@ Public Class Main
         End If
     End Sub
 
+    Sub ShowProgressAnimation(visible As Boolean, ByVal useStep As Boolean)
+        ShowProgressAnimation(visible, useStep, 0)
+    End Sub
+
+    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")>
     Sub ShowProgressAnimation(visible As Boolean, ByVal useStep As Boolean, Optional stepAmount As Integer = 0)
         If pgbStatus.InvokeRequired Then
             Dim d As New VisibilityCallback(AddressOf ShowProgressAnimation)
@@ -224,7 +244,7 @@ Public Class Main
         End If
     End Sub
 
-    Private Sub FatalErrorWasThrownHandler(sender As Object, e As Exception)
+    Private Shared Sub FatalErrorWasThrownHandler(e As Exception)
         Dim details = ""
         If (e IsNot Nothing) Then
             details = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(e.Message & e.StackTrace))
@@ -238,17 +258,23 @@ Public Class Main
                 (If(e Is Nothing, "", "The following file may be wanted by troubleshooters and/or ninja monkeys.:" & vbCrLf & sTempFileName & vbCrLf)) &
                 "Do you want to restart the application?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
         Try
-            FileIO.FileSystem.DeleteFile(sTempFileName)
-        Catch ex As Exception
+            File.Delete(sTempFileName)
+        Catch ex As Exception When TypeOf ex Is ArgumentException Or TypeOf ex Is ArgumentNullException
+            Throw New IOException("The diagnostics file name is invalid. This shouldn't happen ever." & vbCrLf &
+                                  "File name: " & sTempFileName)
+        Catch ex As Exception When TypeOf ex Is PathTooLongException Or TypeOf ex Is DirectoryNotFoundException _
+            Or TypeOf ex Is UnauthorizedAccessException Or TypeOf ex Is IOException
 
+            Throw New IOException("The diagnostic file can't be automatically removed at runtime.", ex)
         End Try
     End Sub
 
     Private Sub FatalErrorWasThrownHandlerTE(sender As Object, e As ThreadExceptionEventArgs)
-        FatalErrorWasThrownHandler(sender, e.Exception)
+        FatalErrorWasThrownHandler(e.Exception)
+
     End Sub
 
     Private Sub FatalErrorWasThrownHandlerCD(sender As Object, e As UnhandledExceptionEventArgs)
-        FatalErrorWasThrownHandler(sender, CType(e.ExceptionObject, Exception))
+        FatalErrorWasThrownHandler(CType(e.ExceptionObject, Exception))
     End Sub
 End Class
