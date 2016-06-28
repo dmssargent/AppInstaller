@@ -1,4 +1,5 @@
 ﻿
+Imports System.Resources
 Imports MaterialSkin.Controls
 Imports Squirrel
 
@@ -163,7 +164,7 @@ Public Class AppUpdateManager
         If (UpdateLabel.InvokeRequired) Then
             UpdateLabel.Invoke(New SetUpdateCallback(AddressOf NotifyOfUpdate))
         Else
-            UpdateLabel.Text = "Update Ready! Click to restart whenever you are ready"
+            UpdateLabel.Text = My.Resources.Strings.ResourceManager.GetString("updateReady")
             UpdateLabel.Font = New Font(UpdateLabel.Font, FontStyle.Underline)
             UpdateLabel.Visible = True
             If (Not GUI.InvokeRequired) Then

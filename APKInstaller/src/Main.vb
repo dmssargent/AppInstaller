@@ -115,7 +115,7 @@ Public Class Main
         ElseIf (arg.Equals("-np") Or arg.Equals("--no-prompt")) Then
             noPrompt = True
         ElseIf (arg.Equals("--squirrel-firstrun")) Then
-            SetText(lblStatus, "Welcome to the App Installer! Try dragging an APK on to me to start off with.")
+            SetText(lblStatus, My.Resources.Strings.firstRunMessage)
         ElseIf (arg.Equals("-!np") Or arg.Equals("--prompt")) Then
             noPrompt = False
         End If
@@ -135,10 +135,10 @@ Public Class Main
             fileDialog.AutoUpgradeEnabled = True
             fileDialog.CheckFileExists = True
             fileDialog.DefaultExt = ".apk"
-            fileDialog.Title = "Open Android APK files..."
+            fileDialog.Title = My.Resources.Strings.openFileDialogTitle
             fileDialog.Multiselect = True
             fileDialog.ValidateNames = True
-            fileDialog.Filter = "Android App Packages (*.apk)|*.apk|All Files|*.*"
+            fileDialog.Filter = My.Resources.Strings.openFileDialogFilter
             fileDialog.ShowDialog()
 
             apkInstaller.AddFilesToInstall(fileDialog.FileNames)
@@ -176,9 +176,9 @@ Public Class Main
 
         If apkInstaller.VerifyFilesToInstall Then
             btnInstall.Visible = apkInstaller.VerifyFilesToInstall
-            lblStatus.Text = "Ready to install? Click Install. Or just keep adding files"
+            lblStatus.Text = My.Resources.Strings.readyToInstall
         Else
-            lblStatus.Text = If(txtFileLocation.Text.Length = 0, "Drag an APK file here...", "Oops, it looks like at least one your APK files can't be installed")
+            lblStatus.Text = If(txtFileLocation.Text.Length = 0, My.Resources.Strings.dragFile, My.Resources.Strings.fileCanNotBeInstalled)
         End If
     End Sub
 

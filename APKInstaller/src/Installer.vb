@@ -164,7 +164,7 @@ Public Class Installer
         End If
 
         ' Begin device install sections
-        GUI.SetText(lblStatus, "Starting Installs...")
+        GUI.SetText(lblStatus, My.Resources.Strings.startingInstalls)
         Dim filesToInstall As String() = GetFilesToInstall()
         'pgbStatus.Step = 100 / filesToInstall.Length
         Dim installStatus As String = ""
@@ -199,7 +199,7 @@ Public Class Installer
                             Exit For ' Don't retry
                         Case Else
                             For second As Integer = 5 To 1 Step -1
-                                Dim message = "Retrying package in " & second & If(second = 1, "second", "seconds")
+                                Dim message = My.Resources.Strings.retryIn & second & If(second = 1, My.Resources.Strings.second, My.Resources.Strings.seconds)
                                 GUI.SetText(GUI.lblStatus, message)
                             Next second
                             ' Continue For
@@ -212,12 +212,12 @@ Public Class Installer
         Next file ' for each file
         GUI.UseWaitCursor = False
         If Not installAborted Then
-            GUI.SetText(lblStatus, "Done!")
+            GUI.SetText(lblStatus, My.Resources.Strings.done)
             If showCompletionMessage Then
-                MsgBox("The installation of the APK" & If(filesToInstall.Length = 1, "", "s") & " has finished successfully!", CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), "APK Install Finished")
+                MsgBox(My.Resources.Strings.installationOf & If(filesToInstall.Length = 1, My.Resources.Strings.apk, My.Resources.Strings.apks) & My.Resources.Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), My.Resources.Strings.apkInstallFinished)
             End If
         Else
-            GUI.SetText(lblStatus, "Failure! Details:  " & vbCrLf & installStatus)
+            GUI.SetText(lblStatus, My.Resources.Strings.failure & My.Resources.Strings.details & vbCrLf & installStatus)
         End If
         ' End device install section
     End Sub
@@ -231,19 +231,19 @@ Public Class Installer
         GUI.ShowProgressAnimation(True, False)
         While Not adbWait.HasExited
             If caret = 0 Then
-                GUI.SetText(lblStatus, "Waiting for device.")
+                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice1)
             ElseIf caret = 1 Then
-                GUI.SetText(lblStatus, "Waiting for device..")
+                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice2)
             Else
-                GUI.SetText(lblStatus, "Waiting for device...")
+                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice3)
                 caret = -1
             End If
             caret += 1
 
             Thread.Sleep(1000)
-            Threading.Thread.Yield()
+            Thread.Yield()
             If stopRequested Then
-                MsgBox("The install has been aborted", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
+                MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
                 Exit Sub
             End If
         End While
@@ -252,7 +252,7 @@ Public Class Installer
     End Sub
 
     Private Function AcquireDeviceId() As String
-        GUI.SetText(lblStatus, "Checking device(s)...This may be a moment or two")
+        GUI.SetText(lblStatus, My.Resources.Strings.checkDevices)
         GUI.ShowProgressAnimation(True, False)
 
         Dim deviceId = ""
@@ -261,7 +261,7 @@ Public Class Installer
                     End Sub)
         While deviceId Is ""
             If (stopRequested) Then
-                GUI.SetText(lblStatus, "The install did not complete successfully :(")
+                GUI.SetText(lblStatus, My.Resources.Strings.installAborted)
                 GUI.ShowProgressAnimation(False, False)
                 Return Nothing
 
@@ -280,7 +280,7 @@ Public Class Installer
         Using deviceChooser As New DeviceChooserDialog()
             Dim result = deviceChooser.GetUserInput()
             If result = DialogResult.OK Then
-                If (MsgBox("Is the device """ + deviceChooser.Device + """ correct?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes) Then
+                If (MsgBox(My.Resources.Strings.correctDevice1 + deviceChooser.Device + My.Resources.Strings.correctDevice2, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes) Then
                     callback(deviceChooser.Device)
                 Else
                     GetDeviceId(callback)
@@ -308,12 +308,12 @@ Public Class Installer
         Dim haltInstall = False
         While Not adb.HasExited
             If stopRequested Then
-                If MsgBox("Do you want to abort installing the current APK? The currently installing package will probably be unusable if you chose to abort.", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.No Then
+                If MsgBox(My.Resources.Strings.abortCurrentApk, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.No Then
                     haltInstall = True
                     stopRequested = False
                 Else
                     adb.Kill()
-                    MsgBox("The install has been aborted!", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
+                    MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
                     Return Nothing
                 End If
 
@@ -322,7 +322,7 @@ Public Class Installer
         End While
 
         If haltInstall Then
-            MsgBox("The install has been aborted!", CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
+            MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), My.Resources.Strings.installAborted)
             Return Nothing
         End If
 
@@ -330,7 +330,7 @@ Public Class Installer
     End Function
 
     Private Shared Function HandleInstallFailure(file As String, adb As Process) As MsgBoxResult
-        Dim result As MsgBoxResult = MsgBox("The installation of """ & file & """ did not succeed." & vbCrLf & "Details: ADB exited with error code " & adb.ExitCode, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.AbortRetryIgnore, MsgBoxStyle))
+        Dim result As MsgBoxResult = MsgBox(My.Resources.Strings.unsuccessfulInstall1 & file & My.Resources.Strings.unsuccessfulInstall2 & vbCrLf & My.Resources.Strings.details & My.Resources.Strings.adbExitErrorCode & adb.ExitCode, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.AbortRetryIgnore, MsgBoxStyle))
         Return result
     End Function
 
