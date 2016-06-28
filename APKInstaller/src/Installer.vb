@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 Imports System.Threading
 
+''' <summary>
+''' Handler of installing Android packages
+''' </summary>
 Public Class Installer
     Private Delegate Sub deviceIdCallback(ByVal deviceId As String)
     Private GUI As Main
@@ -11,6 +14,12 @@ Public Class Installer
     Private showCompletionMessage As Boolean = True
     Private pForce As Boolean = False
 
+    ''' <summary>
+    ''' Creates a new installer instance
+    ''' </summary>
+    ''' <param name="entry">The main GUI of the application</param>
+    ''' <param name="statusLabel">The label to use as installer statuses</param>
+    ''' <param name="userInputTextBox">The user input textbox</param>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="2#")>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="1#")>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
@@ -20,6 +29,10 @@ Public Class Installer
         txtUserInput = userInputTextBox
     End Sub
 
+    ''' <summary>
+    ''' Determines if the operations performed are update (reinstall) operations, or not
+    ''' </summary>
+    ''' <returns>true if the packages are going to be reinstalled; otherwise false</returns>
     Property Reinstall As Boolean
         Get
             Return update
@@ -29,6 +42,10 @@ Public Class Installer
         End Set
     End Property
 
+    ''' <summary>
+    ''' Whether to force the package installation or not
+    ''' </summary>
+    ''' <returns>true if the packages will be forcibly installed</returns>
     Property Force As Boolean
         Get
             Return pForce
@@ -38,6 +55,10 @@ Public Class Installer
         End Set
     End Property
 
+    ''' <summary>
+    ''' Shows a completion message after the installation of all packages is finished
+    ''' </summary>
+    ''' <returns>if a completion message will be shown after the installation job is finished</returns>
     Property CompletionMessageWhenFinished As Boolean
         Get
             Return showCompletionMessage
@@ -47,6 +68,10 @@ Public Class Installer
         End Set
     End Property
 
+    ''' <summary>
+    ''' Adds files to be installed
+    ''' </summary>
+    ''' <param name="files">files to be installed</param>
     Sub AddFilesToInstall(files() As String)
         If files Is Nothing Then
             Throw New ArgumentNullException(NameOf(files))
@@ -94,6 +119,10 @@ Public Class Installer
         txtUserInput.Text = location
     End Sub
 
+    ''' <summary>
+    ''' Verifies that all of the files to be installed exist
+    ''' </summary>
+    ''' <returns></returns>
     Function VerifyFilesToInstall() As Boolean
         Dim apkFiles = GetFilesToInstall()
         If apkFiles.Length = 0 Then
@@ -110,12 +139,17 @@ Public Class Installer
         Return True
     End Function
 
+    ''' <summary>
+    ''' Starts the install of the APK files
+    ''' </summary>
     Sub StartInstall()
         Dim thread As New Thread(New ThreadStart(AddressOf Install))
         thread.Start()
     End Sub
 
-
+    ''' <summary>
+    ''' Installs the APK packages
+    ''' </summary>
     Private Sub Install()
         ' Wait until an Android device is connected
         WaitForDevice()
@@ -148,7 +182,7 @@ Public Class Installer
                 End If
 
                 GUI.SetText(GUI.lblStatus, installStatus)
-                Dim adb As Process = InstallSinglePackage(deviceId, installStatus, file)
+                Dim adb As Process = InstallSinglePackage(deviceId, file)
                 If adb Is Nothing Then
                     Return
                 End If
@@ -243,19 +277,20 @@ Public Class Installer
 
 
     Private Sub GetDeviceId(callback As deviceIdCallback)
-        Dim deviceChooser As New DeviceChooserDialog()
-        Dim result = deviceChooser.GetUserInput()
-        If result = DialogResult.OK Then
-            If (MsgBox("Is the device """ + deviceChooser.Device + """ correct?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes) Then
-                callback(deviceChooser.Device)
+        Using deviceChooser As New DeviceChooserDialog()
+            Dim result = deviceChooser.GetUserInput()
+            If result = DialogResult.OK Then
+                If (MsgBox("Is the device """ + deviceChooser.Device + """ correct?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes) Then
+                    callback(deviceChooser.Device)
+                Else
+                    GetDeviceId(callback)
+                End If
+            ElseIf result = DialogResult.Cancel Then
+                Abort()
             Else
-                GetDeviceId(callback)
+                callback(deviceChooser.Device)
             End If
-        ElseIf result = DialogResult.Cancel Then
-            Abort()
-        Else
-            callback(deviceChooser.Device)
-        End If
+        End Using
     End Sub
 
     Function GetFilesToInstall() As String()
@@ -267,7 +302,7 @@ Public Class Installer
         Return adb.ExitCode = 0
     End Function
 
-    Private Function InstallSinglePackage(deviceId As String, installStatus As String, file As String) As Process
+    Private Function InstallSinglePackage(deviceId As String, file As String) As Process
         Dim adb = AndroidTools.RunAdb("-s " & deviceId & " install " & If(update, "-r ", "") & """" & file & """", True, True, False)
 
         Dim haltInstall = False
@@ -299,6 +334,9 @@ Public Class Installer
         Return result
     End Function
 
+    ''' <summary>
+    ''' Aborts the install
+    ''' </summary>
     Sub Abort()
         stopRequested = True
     End Sub

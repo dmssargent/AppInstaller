@@ -2,7 +2,9 @@
 Imports System.Threading
 Imports MaterialSkin
 
-
+''' <summary>
+''' The main GUI of the application
+''' </summary>
 Public Class Main
     ' This delegate enables asynchronous calls for setting
     ' the text property on a TextBox control.
@@ -13,6 +15,7 @@ Public Class Main
     'Private stopAll As Boolean
     Private apkInstaller As Installer
     Private updateMgr As AppUpdateManager
+
 
     Sub New()
         ' This call is required by the designer.
@@ -121,24 +124,25 @@ Public Class Main
     End Function
 
     Private Sub btnOpenFileDialogTrigger_Click(sender As Object, e As EventArgs) Handles btnOpenFileDialogTrigger.Click
-        Dim fileDialog As OpenFileDialog = New OpenFileDialog()
-        If (txtFileLocation.Text.Length > 0) Then
-            If txtFileLocation.Text.Contains(";") Then
-                fileDialog.FileName = txtFileLocation.Text.Substring(txtFileLocation.Text.LastIndexOf(";"), txtFileLocation.Text.Length - txtFileLocation.Text.LastIndexOf(";"))
-            Else
-                fileDialog.FileName = txtFileLocation.Text
+        Using fileDialog As OpenFileDialog = New OpenFileDialog()
+            If (txtFileLocation.Text.Length > 0) Then
+                If txtFileLocation.Text.Contains(";") Then
+                    fileDialog.FileName = txtFileLocation.Text.Substring(txtFileLocation.Text.LastIndexOf(";"), txtFileLocation.Text.Length - txtFileLocation.Text.LastIndexOf(";"))
+                Else
+                    fileDialog.FileName = txtFileLocation.Text
+                End If
             End If
-        End If
-        fileDialog.AutoUpgradeEnabled = True
-        fileDialog.CheckFileExists = True
-        fileDialog.DefaultExt = ".apk"
-        fileDialog.Title = "Open Android APK files..."
-        fileDialog.Multiselect = True
-        fileDialog.ValidateNames = True
-        fileDialog.Filter = "Android App Packages (*.apk)|*.apk|All Files|*.*"
-        fileDialog.ShowDialog()
+            fileDialog.AutoUpgradeEnabled = True
+            fileDialog.CheckFileExists = True
+            fileDialog.DefaultExt = ".apk"
+            fileDialog.Title = "Open Android APK files..."
+            fileDialog.Multiselect = True
+            fileDialog.ValidateNames = True
+            fileDialog.Filter = "Android App Packages (*.apk)|*.apk|All Files|*.*"
+            fileDialog.ShowDialog()
 
-        apkInstaller.AddFilesToInstall(fileDialog.FileNames)
+            apkInstaller.AddFilesToInstall(fileDialog.FileNames)
+        End Using
     End Sub
 
     Private Sub Me_DragDrop(sender As Object, e As DragEventArgs) Handles lblStatus.DragDrop, Me.DragDrop
@@ -250,23 +254,24 @@ Public Class Main
             details = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(e.Message & e.StackTrace))
         End If
         Dim sTempFileName As String = Path.GetTempFileName()
-        Dim fsTemp As New FileStream(sTempFileName, FileMode.Create)
-        Dim detailsDump As Byte() = System.Text.Encoding.Unicode.GetBytes(details)
-        fsTemp.Write(detailsDump, 0, details.Length)
-        fsTemp.Close()
+        Using fsTemp As New FileStream(sTempFileName, FileMode.Create)
+            Dim detailsDump As Byte() = System.Text.Encoding.Unicode.GetBytes(details)
+            fsTemp.Write(detailsDump, 0, details.Length)
+        End Using
         MsgBox("An application error has been encountered." & vbCrLf &
-                (If(e Is Nothing, "", "The following file may be wanted by troubleshooters and/or ninja monkeys.:" & vbCrLf & sTempFileName & vbCrLf)) &
-                "Do you want to restart the application?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
+                    (If(e Is Nothing, "", "The following file may be wanted by troubleshooters and/or ninja monkeys.:" & vbCrLf & sTempFileName & vbCrLf)) &
+                    "Do you want to restart the application?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
         Try
             File.Delete(sTempFileName)
         Catch ex As Exception When TypeOf ex Is ArgumentException Or TypeOf ex Is ArgumentNullException
             Throw New IOException("The diagnostics file name is invalid. This shouldn't happen ever." & vbCrLf &
-                                  "File name: " & sTempFileName)
+                                    "File name: " & sTempFileName)
         Catch ex As Exception When TypeOf ex Is PathTooLongException Or TypeOf ex Is DirectoryNotFoundException _
             Or TypeOf ex Is UnauthorizedAccessException Or TypeOf ex Is IOException
 
             Throw New IOException("The diagnostic file can't be automatically removed at runtime.", ex)
         End Try
+
     End Sub
 
     Private Sub FatalErrorWasThrownHandlerTE(sender As Object, e As ThreadExceptionEventArgs)

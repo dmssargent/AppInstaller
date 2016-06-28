@@ -74,7 +74,9 @@ Public Class AppUpdateManager
 
         ' Create a default icon
         Dim icon = IO.Path.Combine(IO.Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
-        My.Resources.android_app.Save(New IO.FileStream(icon, IO.FileMode.Create))
+        Using file As New IO.FileStream(icon, IO.FileMode.Create)
+            My.Resources.android_app.Save(file)
+        End Using
 
         ' Register the APK extension to this app
         Const APP_CLASS_KEY As String = "AppInstaller"

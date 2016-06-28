@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 Imports System.Threading
 
+''' <summary>
+''' Provided utilities for operating on Android devices, such as adb and aapt
+''' </summary>
 Public NotInheritable Class AndroidTools
     Private Shared aaptCache As String
     Private Shared adbCache As String
@@ -9,6 +12,11 @@ Public NotInheritable Class AndroidTools
         SetupIfPossible()
     End Sub
 
+    ''' <summary>
+    ''' Returns the location of adb to be executed, if adb is in the system path the function may return the location of adb as
+    ''' "adb" This automatically setups up adb if adb can't be found
+    ''' </summary>
+    ''' <returns>the location of adb or "adb"</returns>
     Shared ReadOnly Property Adb As String
         Get
             If adbCache IsNot Nothing And (adbCache Is "adb" Or File.Exists(adbCache)) Then
@@ -23,6 +31,10 @@ Public NotInheritable Class AndroidTools
         End Get
     End Property
 
+    ''' <summary>
+    ''' Returns the location of aapt; this function may setup aapt if necessary
+    ''' </summary>
+    ''' <returns>location of aapt</returns>
     <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Aapt")>
     Shared ReadOnly Property Aapt As String
         Get
@@ -40,6 +52,9 @@ Public NotInheritable Class AndroidTools
         End Get
     End Property
 
+    ''' <summary>
+    ''' Sets up both ADB and AAPT for later use
+    ''' </summary>
     Public Shared Sub SetupIfPossible()
         If Not File.Exists(aaptCache) Then
             aaptCache = Nothing
@@ -61,21 +76,22 @@ Public NotInheritable Class AndroidTools
     Private Shared Function SetupAdb() As String
         Dim windir = Environment.GetEnvironmentVariable("windir")
         If Not (File.Exists(Path.Combine(windir, "adb.exe")) Or File.Exists(Path.Combine(windir, "system32", "adb.exe"))) Then
-            Dim adb As New Process
-            adb.StartInfo.Arguments = "version"
-            adb.StartInfo.FileName = "adb"
-            adb.StartInfo.CreateNoWindow = True
-            adb.StartInfo.UseShellExecute = False
-            Try
-                adb.Start()
-                adb.WaitForExit()
-                If (adb.ExitCode = 0) Then
-                    adbCache = "adb"
-                    Return "adb"
-                End If
-            Catch ex As Exception
-                ' Continue on
-            End Try
+            Using adb As New Process
+                adb.StartInfo.Arguments = "version"
+                adb.StartInfo.FileName = "adb"
+                adb.StartInfo.CreateNoWindow = True
+                adb.StartInfo.UseShellExecute = False
+                Try
+                    adb.Start()
+                    adb.WaitForExit()
+                    If (adb.ExitCode = 0) Then
+                        adbCache = "adb"
+                        Return "adb"
+                    End If
+                Catch ex As Exception
+                    ' Continue on
+                End Try
+            End Using
         End If
 
         Dim androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME")
@@ -99,21 +115,23 @@ Public NotInheritable Class AndroidTools
 
         If androidHome IsNot Nothing Then
             Dim adbLocation = Path.Combine(androidHome, "platform-tools", "adb")
-            Dim adb As New Process
-            adb.StartInfo.Arguments = "version"
-            adb.StartInfo.FileName = adbLocation
-            adb.StartInfo.CreateNoWindow = True
-            adb.StartInfo.UseShellExecute = False
-            Try
-                adb.Start()
-                adb.WaitForExit()
-                If (adb.ExitCode = 0) Then
-                    adbCache = adbLocation
-                    Return adbLocation
-                End If
-            Catch ex As Exception
-                ' Continue on
-            End Try
+            Using adb As New Process
+
+                adb.StartInfo.Arguments = "version"
+                adb.StartInfo.FileName = adbLocation
+                adb.StartInfo.CreateNoWindow = True
+                adb.StartInfo.UseShellExecute = False
+                Try
+                    adb.Start()
+                    adb.WaitForExit()
+                    If (adb.ExitCode = 0) Then
+                        adbCache = adbLocation
+                        Return adbLocation
+                    End If
+                Catch ex As Exception
+                    ' Continue on
+                End Try
+            End Using
         End If
 
         ' Fall-back to app version
@@ -121,7 +139,9 @@ Public NotInheritable Class AndroidTools
         Dim platformToolsZip As String = tempFileName + "\platform-tools.zip"
         File.WriteAllBytes(platformToolsZip, My.Resources.platform_tools_r23_1_0_windows)
         Dim androidPlatformTools As String = tempFileName + "\platform-tools"
-        IOUtilities.UnzipFromStream(New FileStream(platformToolsZip, FileMode.Open), androidPlatformTools)
+        Using stream As New FileStream(platformToolsZip, FileMode.Open)
+            IOUtilities.UnzipFromStream(stream, androidPlatformTools)
+        End Using
         adbCache = androidPlatformTools & "\platform-tools\adb.exe"
         Return adbCache
     End Function
@@ -147,6 +167,21 @@ Public NotInheritable Class AndroidTools
         End If
     End Function
 
+
+    ''' <summary>
+    ''' Gets an instance of an "adb" process to customize and use. Callers should use this in a using block or dispose of the generate
+    ''' process
+    ''' 
+    ''' Example:
+    ''' Using adb = RunAapt("version", True, True, True)
+    '''     ' Your code here
+    ''' End Using
+    ''' </summary>
+    ''' <param name="args">adb arguments</param>
+    ''' <param name="redirectStdOut">whether or not to redirect the standard output stream</param>
+    ''' <param name="run">run this program before returning</param>
+    ''' <param name="waitToReturn">wait for this program to return, run parameter must be true</param>
+    ''' <returns>an adb process</returns>
     Public Shared Function RunAdb(args As String, redirectStdOut As Boolean, run As Boolean, waitToReturn As Boolean) As Process
         SetupIfPossible()
         Dim pAdb As New Process
@@ -166,6 +201,19 @@ Public NotInheritable Class AndroidTools
         Return pAdb
     End Function
 
+    ''' <summary>
+    ''' Gets an instance of an "aapt" process to customize and use. Callers should use this in a using block or dispose of the generate
+    ''' process
+    ''' 
+    ''' Example:
+    ''' Using aapt = RunAapt("-help", True)
+    '''     aapt.Start()
+    '''     aapt.WaitForExit()
+    ''' End Using
+    ''' </summary>
+    ''' <param name="args">aapt arguments</param>
+    ''' <param name="redirectStdOut">true if the standard output stream should be redirected, otherwise false</param>
+    ''' <returns>an instance of an aapt process, not started</returns>
     Friend Shared Function RunAapt(args As String, redirectStdOut As Boolean) As Process
         SetupIfPossible()
         Dim pAapt As New Process()
@@ -178,7 +226,16 @@ Public NotInheritable Class AndroidTools
         Return pAapt
     End Function
 
+    ''' <summary>
+    ''' Returns the package name of a given APK file
+    ''' </summary>
+    ''' <param name="apkFile">the location of the APK file</param>
+    ''' <returns>The package name of the APK file, or nothing on failure</returns>
     Shared Function PackageName(ByVal apkFile As String) As String
+        If apkFile Is Nothing Then
+            Throw New ArgumentNullException(NameOf(apkFile))
+        End If
+
         Dim aapt = RunAapt("dump badging """ & apkFile & """", True)
         aapt.Start()
 
@@ -227,11 +284,30 @@ Public NotInheritable Class AndroidTools
         End If
     End Function
 
+    ''' <summary>
+    ''' Returns the most likely Android SDK out of a set of locations, or a single location. A set of locations is delimited by the IO.Path.PathSeperator
+    ''' character. The parents of the given path(s) are also checked.
+    ''' </summary>
+    ''' <param name="path">a delimited list of paths, or a single path location</param>
+    ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
     Shared Function MostLikelyAndroidSdk(path As String) As String
+        If path Is Nothing Then
+            Throw New ArgumentNullException(NameOf(path))
+        End If
         Return MostLikelyAndroidSdk(path.Split(IO.Path.PathSeparator.ToString.ToArray))
     End Function
 
+    ''' <summary>
+    ''' Returns the most likely Android SDK out of a set of locations, this function checks both the given location and the parents of the given location
+    ''' for the Android SDK location
+    ''' </summary>
+    ''' <param name="paths">the locations in a string format</param>
+    ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
     Shared Function MostLikelyAndroidSdk(paths As String()) As String
+        If paths Is Nothing Then
+            Throw New ArgumentNullException(NameOf(paths))
+        End If
+
         Dim possibleSdkPaths As New List(Of String)
         Dim androidSdkPaths As String() = {"add-ons", "build-tools", "docs", "extras", "licenses", "ndk-bundle", "platforms", "platform-tools", "samples", "skins", "sources", "system-images", "temp", "tools"}
         For Each path In paths

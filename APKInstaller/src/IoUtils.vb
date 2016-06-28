@@ -1,11 +1,19 @@
 ﻿Imports System.IO
 Imports ICSharpCode.SharpZipLib.Zip
 
+''' <summary>
+''' Provides utilities for performing various common IO tasks
+''' </summary>
 Public Class IOUtilities : Implements IDisposable
+    ''' <summary>
+    ''' Unzips a file from a file stream into a folder
+    ''' </summary>
+    ''' <param name="zipStream">the stream from a zip file</param>
+    ''' <param name="outFolder">the path of the destination directory</param>
     Public Shared Sub UnzipFromStream(zipStream As Stream, outFolder As String)
         Dim zipInputStream = New ZipInputStream(zipStream)
         Dim zipEntry = zipInputStream.GetNextEntry()
-        Dim buffer(4096) As Byte    ' 4K Is optimum
+        Dim buffer(4096) As Byte ' 4K Is optimum
         While (zipEntry IsNot Nothing)
             Dim entryFileName = zipEntry.Name
             ' Convert UNIX paths to the current platform path
@@ -33,8 +41,9 @@ Public Class IOUtilities : Implements IDisposable
     Private sessions As New List(Of String)
     Private tempFilePath As String
 
-
-
+    ''' <summary>
+    ''' Prepares the IOUtils to do operations
+    ''' </summary>
     Public Shared Sub Prepare()
         If (instance IsNot Nothing) Then
             instance._Prepare()
@@ -43,7 +52,7 @@ Public Class IOUtilities : Implements IDisposable
     End Sub
 
     Private Sub _Prepare()
-        If (isReady) Then
+        If isReady Then
             Exit Sub
         End If
 
@@ -54,6 +63,11 @@ Public Class IOUtilities : Implements IDisposable
         isReady = True
     End Sub
 
+    ''' <summary>
+    ''' Creates a new temp session, and returns the path to that temp session
+    ''' </summary>
+    ''' <param name="name">the name of the temp session</param>
+    ''' <returns>the path of the temp session</returns>
     Public Shared Function CreateTempSession(name As String) As String
         Prepare()
         If name Is Nothing Then
@@ -75,10 +89,17 @@ Public Class IOUtilities : Implements IDisposable
         Return session
     End Function
 
+    ''' <summary>
+    ''' Disposes of the current IO Utilities
+    ''' </summary>
     Public Shared Sub Cleanup()
         instance.Dispose()
     End Sub
 
+    ''' <summary>
+    ''' Removes a specified temp session
+    ''' </summary>
+    ''' <param name="name">the name of a previous created temp session</param>
     Public Shared Sub RemoveTempSession(name As String)
 
         If name Is Nothing Then
@@ -131,11 +152,11 @@ Public Class IOUtilities : Implements IDisposable
     End Sub
 
     ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.
-    'Protected Overrides Sub Finalize()
-    '    ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-    '    Dispose(False)
-    '    MyBase.Finalize()
-    'End Sub
+    Protected Overrides Sub Finalize()
+        ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
+        Dispose(False)
+        MyBase.Finalize()
+    End Sub
 
     ' This code added by Visual Basic to correctly implement the disposable pattern.
     Public Sub Dispose() Implements IDisposable.Dispose

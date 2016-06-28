@@ -1,5 +1,8 @@
 ﻿Imports System.ComponentModel
 
+''' <summary>
+''' Provides a list of devices if more than one Android phone is connected
+''' </summary>
 Public Class DeviceChooserDialog
     Private Delegate Function userInputCallback() As DialogResult
     Private Delegate Sub deviceListUpdateCallback(ByVal index As Integer, ByVal device As String)
@@ -7,6 +10,10 @@ Public Class DeviceChooserDialog
 
     Private deviceIndex As Integer = -1
 
+    ''' <summary>
+    ''' The selected device
+    ''' </summary>
+    ''' <returns>the string identifier of a Android device</returns>
     Public ReadOnly Property Device As String
         Get
             If IsReady() Then
@@ -15,8 +22,6 @@ Public Class DeviceChooserDialog
             Return Nothing
         End Get
     End Property
-
-
 
     Private Sub UpdateDeviceList()
         Dim adb = AndroidTools.RunAdb("devices", True, True, True)
@@ -39,21 +44,13 @@ Public Class DeviceChooserDialog
                 Dim rcVersion = CheckForFtcRobotController(device)
                 Dim dsVersion = CheckForFtcDriverStation(device)
                 If rcVersion > 0 Then
-                    details &= "[FTC Robot Controller " & rcVersion
+                    details &= "[FTC Robot Controller " & rcVersion & "]"
                 End If
 
                 If dsVersion > 0 Then
-                    If details = "" Then
-                        details &= "["
-                    Else
-                        details &= ";"
-                    End If
-                    details &= " FTC Driver Station " & dsVersion
+                    details = If(details = "", "[", "; ") & " FTC Driver Station " & dsVersion & "]"
                 End If
 
-                If Not details = "" Then
-                    details &= "]"
-                End If
                 UpdateDeviceListEntry(numberOfDevices, device & vbTab & details)
                 numberOfDevices += 1
             End If
@@ -61,6 +58,7 @@ Public Class DeviceChooserDialog
             If (data.Trim = "List of devices attached") Then
                 parserInDeviceList = True
             End If
+
             data = adb.StandardOutput.ReadLine
         End While
 
@@ -69,10 +67,6 @@ Public Class DeviceChooserDialog
             UpdateDeviceListEntry(i, Nothing)
         Next i
 
-        'If numberOfDevices > 1 Then
-        '    MsgBox("More than one device detected")
-
-        'End If
         If numberOfDevices = 1 Then
             lstDevices.SelectedIndex = 0
         End If
@@ -80,7 +74,10 @@ Public Class DeviceChooserDialog
     End Sub
 
 
-
+    ''' <summary>
+    ''' Gets the user input if necessary, otherwise provides the only attached device to be used
+    ''' </summary>
+    ''' <returns>Nothing if no user input is needed, otherwise a DialogResult is returned from the GUI</returns>
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")>
     Public Function GetUserInput() As DialogResult
         If InvokeRequired Then
@@ -95,6 +92,10 @@ Public Class DeviceChooserDialog
         End If
     End Function
 
+    ''' <summary>
+    ''' If the device chooser dialog has finished
+    ''' </summary>
+    ''' <returns>true if a device has been selected, false otherwise</returns>
     Public Function IsReady() As Boolean
         Return deviceIndex >= 0
     End Function
@@ -116,7 +117,6 @@ Public Class DeviceChooserDialog
         Me.lblDevices.Font = MaterialSkin.MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
         lstDevices.DrawMode = DrawMode.OwnerDrawFixed
 
-        'SkinManager.AddFormToManage(Me)
         Me.Focus()
         Me.CenterToScreen()
     End Sub
@@ -168,30 +168,30 @@ Public Class DeviceChooserDialog
 
 
     ''' <summary>
-    ''' 
+    ''' Checks the given device for the FTC Robot Controller
     ''' </summary>
-    ''' <param name="device"></param>
-    ''' <returns></returns>
+    ''' <param name="device">adb device specifier</param>
+    ''' <returns>0 if no FTC Robot Controller can be found or the version name</returns>
     <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Ftc")>
     Public Shared Function CheckForFtcRobotController(ByVal device As String) As Double
         Return CheckPackageVersion(device, "com.qualcomm.ftcrobotcontroller")
     End Function
 
     ''' <summary>
-    ''' 
+    ''' Checks the given device for the FTC Robot Controller
     ''' </summary>
-    ''' <param name="device"></param>
-    ''' <returns></returns>
+    ''' <param name="device">adb device specifier</param>
+    ''' <returns>0 if no FTC Driver Station can be found or the version name</returns>
     Public Shared Function CheckForFtcDriverStation(ByVal device As String) As Double
         Return CheckPackageVersion(device, "com.qualcomm.ftcdriverstation")
     End Function
 
     ''' <summary>
-    ''' 
+    ''' Checks the package version of a given app installed on a specified device
     ''' </summary>
-    ''' <param name="device"></param>
-    ''' <param name="package"></param>
-    ''' <returns></returns>
+    ''' <param name="device">adb device specifier</param>
+    ''' <param name="package">package name of the app</param>
+    ''' <returns>0 upon error, or the package version</returns>
     Public Shared Function CheckPackageVersion(ByVal device As String, ByVal package As String) As Double
         Dim adb = AndroidTools.RunAdb("-s " & device & " shell pm dump """ & package & """", True, True, False)
 
@@ -264,6 +264,4 @@ Public Class DeviceChooserDialog
             DialogResult = DialogResult.Cancel
         End If
     End Sub
-
-
 End Class
