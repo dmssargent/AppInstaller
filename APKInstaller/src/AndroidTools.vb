@@ -101,7 +101,7 @@ Public NotInheritable Class AndroidTools
                 If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
                     "Do you want to correct those configuration issues?" & vbCrLf &
                     "Details: ANDROID_HOME is not defined, when valid Android SDK is present", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
-
+                    Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome) ' Change the environment variable for this process as well as the user
                     Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome, EnvironmentVariableTarget.User)
                 End If
             End If
@@ -112,6 +112,7 @@ Public NotInheritable Class AndroidTools
                     If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
                            "Do you want to correct those configuration issues?" & vbCrLf &
                             "Details: Invalid SDK defined, when valid SDK can be found", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
+                        Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2) ' Change the environment variable for this process as well as the user
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2, EnvironmentVariableTarget.User)
                     End If
                 End If
