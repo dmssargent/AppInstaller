@@ -98,17 +98,21 @@ Public NotInheritable Class AndroidTools
         If androidHome Is Nothing Then
             androidHome = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome IsNot Nothing Then
-                MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
+                If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
                     "Do you want to correct those configuration issues?" & vbCrLf &
-                    "Details: ANDROID_HOME is not defined, when valid Android SDK is present")
+                    "Details: ANDROID_HOME is not defined, when valid Android SDK is present", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
+                    Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome, EnvironmentVariableTarget.User)
+                End If
             End If
         ElseIf Not IsAndroidSdk(androidHome) Then
             Dim androidHome2 = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome2 IsNot Nothing Then
                 If Not androidHome = androidHome2 Then
-                    MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
+                    If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
                            "Do you want to correct those configuration issues?" & vbCrLf &
-                            "Details: Invalid SDK defined, when valid SDK can be found")
+                            "Details: Invalid SDK defined, when valid SDK can be found", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
+                        Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2, EnvironmentVariableTarget.User)
+                    End If
                 End If
             End If
         End If
