@@ -16,6 +16,7 @@ Public Class AppUpdateManager
     Private Shared updateManager As UpdateManager
     Private _updateLabel As MaterialLabel = Nothing
     Private GUI As Form
+    Private updatesEnabled As Boolean
 
     ''' <summary>
     ''' The label that update notification should be applied to; must be a child of the GUI form used when creating the instance
@@ -43,7 +44,10 @@ Public Class AppUpdateManager
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub New(ByRef gui As Form)
         Try
-            updateManager = New UpdateManager("C:\SquirrelTest\AppInstaller")
+            Const updatePath = "C:\SquirrelTest\AppInstaller"
+            updatesEnabled = IO.Directory.Exists(updatePath)
+            updateManager = New UpdateManager(updatePath)
+
         Catch e As Exception
 
         End Try
@@ -135,9 +139,10 @@ Public Class AppUpdateManager
 
 
     Private Async Sub StartUpdate()
-        If updateManager Is Nothing Then
+        If updateManager Is Nothing Or Not updatesEnabled Then
             Exit Sub
         End If
+
         Dim updateInfo = Await updateManager.CheckForUpdate
         If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
             Await updateManager.UpdateApp()

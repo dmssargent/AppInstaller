@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Globalization
 
 ''' <summary>
 ''' Provides a list of devices if more than one Android phone is connected
@@ -6,6 +7,7 @@
 Public Class DeviceChooserDialog
     Private Delegate Function userInputCallback() As DialogResult
     Private Delegate Sub deviceListUpdateCallback(ByVal index As Integer, ByVal device As String)
+    Private Delegate Sub chkNoPromptSingleDeviceVisibleCallback(visible As Boolean)
     Private autoUpdateThread As Threading.Thread
 
     Private deviceIndex As Integer = -1
@@ -24,53 +26,60 @@ Public Class DeviceChooserDialog
     End Property
 
     Private Sub UpdateDeviceList()
-        Dim adb = AndroidTools.RunAdb("devices", True, True, True)
+        Using adb = AndroidTools.RunAdb("devices", True, True, True)
 
-        Dim numberOfDevicesLastFound = lstDevices.Items.Count
-        Dim data = adb.StandardOutput.ReadLine
-        Dim output = ""
-        Dim numberOfDevices = 0
-        Dim parserInDeviceList = False
-        While (data IsNot Nothing)
-            data = data.Trim()
-            output &= data & vbCrLf
-            If parserInDeviceList Then
-                If data Is "" Then
-                    data = adb.StandardOutput.ReadLine
-                    Continue While
-                End If
-                Dim device = CleanupOutput(data)
-                Dim details = ""
-                Dim rcVersion = CheckForFtcRobotController(device)
-                Dim dsVersion = CheckForFtcDriverStation(device)
-                If rcVersion > 0 Then
-                    details &= "[FTC Robot Controller " & rcVersion & "]"
+            Dim numberOfDevicesLastFound = lstDevices.Items.Count
+            Dim data = adb.StandardOutput.ReadLine
+            Dim output = ""
+            Dim numberOfDevices = 0
+            Dim parserInDeviceList = False
+            While (data IsNot Nothing)
+                data = data.Trim()
+                output &= data & vbCrLf
+                If parserInDeviceList Then
+                    If data Is "" Then
+                        data = adb.StandardOutput.ReadLine
+                        Continue While
+                    End If
+                    Dim device = CleanupOutput(data)
+                    Dim details = ""
+                    Dim rcVersion = CheckForFtcRobotController(device)
+                    Dim dsVersion = CheckForFtcDriverStation(device)
+                    If rcVersion > 0 Then
+                        details &= "[FTC Robot Controller " & rcVersion & "]"
+                    End If
+
+                    If dsVersion > 0 Then
+                        details = If(details = "", "[", "; ") & " FTC Driver Station " & dsVersion & "]"
+                    End If
+
+                    UpdateDeviceListEntry(numberOfDevices, device & vbTab & details)
+                    numberOfDevices += 1
                 End If
 
-                If dsVersion > 0 Then
-                    details = If(details = "", "[", "; ") & " FTC Driver Station " & dsVersion & "]"
+                If (data.Trim = "List of devices attached") Then
+                    parserInDeviceList = True
                 End If
 
-                UpdateDeviceListEntry(numberOfDevices, device & vbTab & details)
-                numberOfDevices += 1
+                data = adb.StandardOutput.ReadLine
+            End While
+
+
+
+            For i As Integer = numberOfDevices To numberOfDevicesLastFound - 1
+                UpdateDeviceListEntry(i, Nothing)
+            Next i
+
+            If numberOfDevices = 1 Then
+                If Not Me.InvokeRequired Then
+                    lstDevices.SelectedIndex = 0
+                End If
+
+                SetVisibilityForNoPromptSingleDevice(True)
+            Else
+                SetVisibilityForNoPromptSingleDevice(False)
             End If
-
-            If (data.Trim = "List of devices attached") Then
-                parserInDeviceList = True
-            End If
-
-            data = adb.StandardOutput.ReadLine
-        End While
-
-
-        For i As Integer = numberOfDevices To numberOfDevicesLastFound - 1
-            UpdateDeviceListEntry(i, Nothing)
-        Next i
-
-        If numberOfDevices = 1 Then
-            lstDevices.SelectedIndex = 0
-        End If
-
+        End Using
     End Sub
 
 
@@ -85,7 +94,7 @@ Public Class DeviceChooserDialog
         Else
 
             UpdateDeviceList()
-            If IsReady() Then
+            If IsReady() And My.Settings.noPromptSingleDevice Then
                 Return Nothing
             End If
             Return ShowDialog()
@@ -113,6 +122,7 @@ Public Class DeviceChooserDialog
                                           Loop While Me.Visible
                                       End Sub))
         autoUpdateThread.Start()
+        Me.chkNoPromptSingleDevice.Checked = My.Settings.noPromptSingleDevice
         Me.lstDevices.Font = MaterialSkin.MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
         Me.lblDevices.Font = MaterialSkin.MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
         lstDevices.DrawMode = DrawMode.OwnerDrawFixed
@@ -136,7 +146,6 @@ Public Class DeviceChooserDialog
 
             Dim oldIndex = lstDevices.SelectedIndex
 
-
             If lstDevices.Items.Count > index Then
                 lstDevices.Items.RemoveAt(index)
             End If
@@ -153,13 +162,21 @@ Public Class DeviceChooserDialog
         End If
     End Sub
 
+    Private Sub SetVisibilityForNoPromptSingleDevice(visible As Boolean)
+        If chkNoPromptSingleDevice.InvokeRequired Then
+            Me.Invoke(New chkNoPromptSingleDeviceVisibleCallback(AddressOf SetVisibilityForNoPromptSingleDevice), visible)
+        Else
+            chkNoPromptSingleDevice.Visible = visible
+        End If
+    End Sub
+
     Private Shared Function CleanupOutput(ByVal inputValue As String) As String
         If inputValue.Contains(" ") Then
-            inputValue = inputValue.Substring(0, inputValue.IndexOf(" "))
+            inputValue = inputValue.Substring(0, inputValue.IndexOf(" ", StringComparison.CurrentCulture))
         End If
 
         If inputValue.Contains(vbTab) Then
-            inputValue = inputValue.Substring(0, inputValue.IndexOf(vbTab))
+            inputValue = inputValue.Substring(0, inputValue.IndexOf(vbTab, StringComparison.CurrentCulture))
         End If
 
         Return inputValue
@@ -193,36 +210,42 @@ Public Class DeviceChooserDialog
     ''' <param name="package">package name of the app</param>
     ''' <returns>0 upon error, or the package version</returns>
     Public Shared Function CheckPackageVersion(ByVal device As String, ByVal package As String) As Double
-        Dim adb = AndroidTools.RunAdb("-s " & device & " shell pm dump """ & package & """", True, True, False)
+        Using adb = AndroidTools.RunAdb("-s " & device & " shell pm dump """ & package & """", True, True, False)
 
-        Const VERSION_NAME As String = "versionName="
-        Dim version As Double = -1
-        Dim inSection As Boolean = False
-        Dim line As String = adb.StandardOutput.ReadLine
-        Try
-            While line IsNot Nothing
-                'Detect interrupts
-                Threading.Thread.Sleep(1)
+            Const VERSION_NAME As String = "versionName="
+            Dim version As Double = -1
+            Dim inSection As Boolean = False
+            Dim line As String = adb.StandardOutput.ReadLine
+            Try
+                While line IsNot Nothing
+                    'Detect interrupts
+                    Try
+                        line = line.Trim
+                        If adb.HasExited Then
+                            If Not adb.ExitCode = 0 Then
+                                Return -2
+                            End If
+                        End If
+                    Catch ex As Threading.ThreadInterruptedException
+                        Return version
+                    End Try
 
-                line = line.Trim
-                If adb.HasExited Then
-                    If Not adb.ExitCode = 0 Then
-                        Return -2
+
+                    If inSection And line.Contains(VERSION_NAME) Then
+                        Dim versionName As String = line.Substring(line.IndexOf(VERSION_NAME, StringComparison.Ordinal) + VERSION_NAME.Length)
+                        version = Double.Parse(versionName, CultureInfo.InvariantCulture)
+                        Exit While
+                    ElseIf line.Contains(package) And line.Contains("Package ") Then
+                        inSection = True
                     End If
-                End If
-                If inSection And line.Contains(VERSION_NAME) Then
-                    Dim versionName As String = line.Substring(line.IndexOf(VERSION_NAME) + VERSION_NAME.Length)
-                    version = Double.Parse(versionName)
-                    Exit While
-                ElseIf line.Contains(package) And line.Contains("Package ") Then
-                    inSection = True
-                End If
-                line = adb.StandardOutput.ReadLine
-            End While
-        Catch ex As IO.IOException
+                    line = adb.StandardOutput.ReadLine
+                End While
+            Catch ex As IO.IOException
+                Return version
+            End Try
+
             Return version
-        End Try
-        Return version
+        End Using
     End Function
 
     Private Sub OK_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OK_Button.Click
@@ -250,7 +273,10 @@ Public Class DeviceChooserDialog
             e.Graphics.FillRectangle(MaterialSkin.MaterialSkinManager.Instance.ColorScheme.AccentBrush, e.Bounds)
         End If
         Using b As New SolidBrush(e.ForeColor)
-            e.Graphics.DrawString(lstDevices.GetItemText(lstDevices.Items(e.Index)), e.Font, b, e.Bounds)
+            If e.Index >= 0 Then
+                e.Graphics.DrawString(lstDevices.GetItemText(lstDevices.Items(e.Index)), e.Font, b, e.Bounds)
+            End If
+
         End Using
         e.DrawFocusRectangle()
     End Sub
@@ -263,5 +289,9 @@ Public Class DeviceChooserDialog
         If DialogResult = DialogResult.None Or DialogResult = Nothing Then
             DialogResult = DialogResult.Cancel
         End If
+    End Sub
+
+    Private Sub chkNoPromptSingleDevice_CheckedChanged(sender As Object, e As EventArgs) Handles chkNoPromptSingleDevice.CheckedChanged
+        My.Settings.noPromptSingleDevice = chkNoPromptSingleDevice.Checked
     End Sub
 End Class

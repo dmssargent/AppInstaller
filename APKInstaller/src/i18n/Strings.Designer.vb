@@ -110,11 +110,38 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to An application error has been encountered..
+        '''</summary>
+        Friend Shared ReadOnly Property appError() As String
+            Get
+                Return ResourceManager.GetString("appError", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to The following file may be wanted by troubleshooters and/or ninja monkeys:.
+        '''</summary>
+        Friend Shared ReadOnly Property appErrorFileWanted() As String
+            Get
+                Return ResourceManager.GetString("appErrorFileWanted", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Checking device(s)...This may be a moment or two.
         '''</summary>
         Friend Shared ReadOnly Property checkDevices() As String
             Get
                 Return ResourceManager.GetString("checkDevices", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Do you want to correct those configuration issues?.
+        '''</summary>
+        Friend Shared ReadOnly Property correctConfigIssue() As String
+            Get
+                Return ResourceManager.GetString("correctConfigIssue", resourceCulture)
             End Get
         End Property
         
@@ -182,7 +209,16 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Welcome to the App Installer! Try dragging an APK on to me to start off with..
+        '''  Looks up a localized string similar to doesn&apos;t seem to exist at this moment. You may want to try that file again in a moment or two..
+        '''</summary>
+        Friend Shared ReadOnly Property fileDoesNotExist() As String
+            Get
+                Return ResourceManager.GetString("fileDoesNotExist", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Welcome to the FIRST App Installer! Try dragging an APK file on me to install or use the Browse button below..
         '''</summary>
         Friend Shared ReadOnly Property firstRunMessage() As String
             Get
@@ -191,7 +227,25 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to has finished successfully!.
+        '''  Looks up a localized string similar to Are you really, absolutely sure you want to force the installation by any means necessary? This WILL be destructive if the app is currently installed on the phone.&quot;.
+        '''</summary>
+        Friend Shared ReadOnly Property forceConfirm() As String
+            Get
+                Return ResourceManager.GetString("forceConfirm", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Would you like to forcefully remove any existing package to prep for a clean re-installation?.
+        '''</summary>
+        Friend Shared ReadOnly Property forceQuestion() As String
+            Get
+                Return ResourceManager.GetString("forceQuestion", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to  has finished successfully!.
         '''</summary>
         Friend Shared ReadOnly Property hasFinishedSucess() As String
             Get
@@ -209,11 +263,56 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to The installation of the.
+        '''  Looks up a localized string similar to I am going to install the APK in the location .
+        '''</summary>
+        Friend Shared ReadOnly Property installApkAtConfirm() As String
+            Get
+                Return ResourceManager.GetString("installApkAtConfirm", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to The installation of the .
         '''</summary>
         Friend Shared ReadOnly Property installationOf() As String
             Get
                 Return ResourceManager.GetString("installationOf", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to The Android SDK is not completely correctly configured at this moment..
+        '''</summary>
+        Friend Shared ReadOnly Property invalidAndroidSdkConfig() As String
+            Get
+                Return ResourceManager.GetString("invalidAndroidSdkConfig", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to is not a valid Android app. Please verify that the file ends with &quot;.APK&quot;..
+        '''</summary>
+        Friend Shared ReadOnly Property invalidApk() As String
+            Get
+                Return ResourceManager.GetString("invalidApk", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Invalid SDK defined, when valid SDK can be found.
+        '''</summary>
+        Friend Shared ReadOnly Property invalidSdkDefinedValidPresent() As String
+            Get
+                Return ResourceManager.GetString("invalidSdkDefinedValidPresent", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to is a directory. Unfortunately, this app can&apos;t handle installing directories, for now..
+        '''</summary>
+        Friend Shared ReadOnly Property isDirError() As String
+            Get
+                Return ResourceManager.GetString("isDirError", resourceCulture)
             End Get
         End Property
         
@@ -245,11 +344,29 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Ready to install? Click Install. Or just keep adding files.
+        '''  Looks up a localized string similar to There are other APK files to install. Do you want to keep them and add this to install?.
+        '''</summary>
+        Friend Shared ReadOnly Property otherApkFiles() As String
+            Get
+                Return ResourceManager.GetString("otherApkFiles", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Ready to install? Click Install. If not, you can drag and drop some more files.
         '''</summary>
         Friend Shared ReadOnly Property readyToInstall() As String
             Get
                 Return ResourceManager.GetString("readyToInstall", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Want to install another app or install on a different device?.
+        '''</summary>
+        Friend Shared ReadOnly Property readyToInstallBatch() As String
+            Get
+                Return ResourceManager.GetString("readyToInstallBatch", resourceCulture)
             End Get
         End Property
         
@@ -290,6 +407,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to The Android device can&apos;t be found in a reasonable amount of time..
+        '''</summary>
+        Friend Shared ReadOnly Property timeoutWaiting() As String
+            Get
+                Return ResourceManager.GetString("timeoutWaiting", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to The installation of &quot;.
         '''</summary>
         Friend Shared ReadOnly Property unsuccessfulInstall1() As String
@@ -308,11 +434,38 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Would you like to update the installed package on the phone?.
+        '''</summary>
+        Friend Shared ReadOnly Property updateQuestion() As String
+            Get
+                Return ResourceManager.GetString("updateQuestion", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Update Ready! Click to restart whenever you are ready.
         '''</summary>
         Friend Shared ReadOnly Property updateReady() As String
             Get
                 Return ResourceManager.GetString("updateReady", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Make sure the device that want to use is connected, uses Android,.
+        '''</summary>
+        Friend Shared ReadOnly Property userTroubleshootingA1() As String
+            Get
+                Return ResourceManager.GetString("userTroubleshootingA1", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to has Developer Options enabled, and the device is in Debug mode..
+        '''</summary>
+        Friend Shared ReadOnly Property userTroubleshootingA2() As String
+            Get
+                Return ResourceManager.GetString("userTroubleshootingA2", resourceCulture)
             End Get
         End Property
         
@@ -340,6 +493,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property waitForDevice3() As String
             Get
                 Return ResourceManager.GetString("waitForDevice3", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Do you want to restart the app?.
+        '''</summary>
+        Friend Shared ReadOnly Property wantToRestart() As String
+            Get
+                Return ResourceManager.GetString("wantToRestart", resourceCulture)
             End Get
         End Property
     End Class

@@ -11,10 +11,13 @@ Public Class Main
     Private Delegate Sub SetTextCallback(ByRef label As Controls.MaterialLabel, ByVal [text] As String)
     Private Delegate Sub VisibilityCallback(visible As Boolean, ByVal useStep As Boolean, stepAmount As Integer)
     Private Delegate Sub StepProgressBarDelegate()
+    Private Delegate Sub ResetGUICallback(message As String)
     Private singleInstall As Boolean = False
     'Private stopAll As Boolean
     Private apkInstaller As Installer
     Private updateMgr As AppUpdateManager
+
+    Private dialogLock As Boolean = False
 
 
     Sub New()
@@ -37,10 +40,6 @@ Public Class Main
         AppUpdateManager.HandleEvents()
         updateMgr.Update()
 
-        ' temp
-        Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") & Path.PathSeparator & "C:\Users\Public\Android\sdk\platform-tools")
-        'Dim androidSdk = AndroidTools.MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("path"))
-
         'Configure GUI
         Dim SkinManager As MaterialSkinManager = MaterialSkinManager.Instance
         SkinManager.AddFormToManage(Me)
@@ -51,13 +50,19 @@ Public Class Main
         ' Start parsing the arguments
         Dim noPrompt = False
         Dim appList As New List(Of String)
+        Dim enableFileArg = True
         For Each arg As String In My.Application.CommandLineArgs
-            If arg.StartsWith("--") Or arg.StartsWith("-") Then
+            If arg.StartsWith("--", StringComparison.Ordinal) Or arg.StartsWith("-", StringComparison.Ordinal) Then
+                If arg.Contains("squirrel") Then
+                    enableFileArg = False
+                End If
                 noPrompt = ParseNonFileArgument(noPrompt, arg)
                 Continue For
             End If
 
-            ParseFileArgument(appList, arg)
+            If enableFileArg Then
+                ParseFileArgument(appList, arg)
+            End If
         Next
 
         Dim fileArgs As String() = appList.ToArray
@@ -75,9 +80,9 @@ Public Class Main
         Me.chkForce.Visible = False
         Me.chkReinstall.Visible = False
         If Not noPrompt Then
-            Me.chkReinstall.Checked = MsgBox("Would you like to update the installed package on the phone?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
+            Me.chkReinstall.Checked = MsgBox(My.Resources.Strings.updateQuestion, CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
             If Not chkReinstall.Checked Then
-                Me.chkForce.Checked = MsgBox("Would you like to forcefully remove any existing package to prep for a clean re-installation?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
+                Me.chkForce.Checked = MsgBox(My.Resources.Strings.forceQuestion, CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)).Equals(MsgBoxResult.Yes)
             End If
         End If
 
@@ -85,8 +90,8 @@ Public Class Main
     End Sub
 
     Private Sub ParseFileArgument(appList As List(Of String), arg As String)
-        If Not MsgBox("I am going to install the APK in the location """ & arg & """", CType(MsgBoxStyle.Information + MsgBoxStyle.OkCancel, MsgBoxStyle)).Equals(MsgBoxResult.Ok) Then
-            MsgBox("Install Aborted.", CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle))
+        If Not MsgBox(My.Resources.Strings.installApkAtConfirm & """" & arg & """", CType(MsgBoxStyle.Information + MsgBoxStyle.OkCancel, MsgBoxStyle)).Equals(MsgBoxResult.Ok) Then
+            MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle))
             Me.Close()
 
         Else
@@ -105,11 +110,11 @@ Public Class Main
             noPrompt = True
         ElseIf (arg.Equals("/?") Or arg.Equals("--help") Or arg.Equals("/h") Or arg.Equals("-h")) Then
             MsgBox(My.Application.Info.ProductName & " v" & My.Application.Info.Version.ToString & vbCrLf & vbCrLf &
-                   "Usage Options: " & vbCrLf &
-                   "--force | -f:" & vbCrLf & vbTab & "Removes any existing application and wipes " & vbCrLf & vbTab & "any associated application data for that " & vbCrLf & vbTab & "application, before installing" & vbCrLf &
-                   "--update | --reinstall | -r:" & vbCrLf & vbTab & "Reinstalls the app represented by the given APK." & vbCrLf & vbTab & "Does nothing if the app is not already installed" & vbCrLf &
-                   "--no-prompt | -np:" & vbCrLf & vbTab & "Does not prompt user for settings" & vbCrLf & vbTab & " [Implicit with options: -r, -f]" & vbCrLf &
-                   "-!np | --prompt:" & vbCrLf & vbTab & "Prompts the user about options [Overrides: -np]",
+                   "Usage Options " & vbCrLf &
+                   "--force | -f" & vbCrLf & vbTab & "Removes any existing application And wipes " & vbCrLf & vbTab & "any associated application data for that " & vbCrLf & vbTab & "application, before installing" & vbCrLf &
+                   "--update | --reinstall | -r" & vbCrLf & vbTab & "Reinstalls the app represented by the given APK." & vbCrLf & vbTab & "Does nothing if the app Is Not already installed" & vbCrLf &
+                   "--no-prompt | -np" & vbCrLf & vbTab & "Does Not prompt user for settings" & vbCrLf & vbTab & " [Implicit with options: -r, -f]" & vbCrLf &
+                   "-!np | --prompt" & vbCrLf & vbTab & "Prompts the user about options [Overrides: -np]",
                     CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), "Usage")
             Me.Close()
         ElseIf (arg.Equals("-np") Or arg.Equals("--no-prompt")) Then
@@ -126,8 +131,9 @@ Public Class Main
     Private Sub btnOpenFileDialogTrigger_Click(sender As Object, e As EventArgs) Handles btnOpenFileDialogTrigger.Click
         Using fileDialog As OpenFileDialog = New OpenFileDialog()
             If (txtFileLocation.Text.Length > 0) Then
-                If txtFileLocation.Text.Contains(";") Then
-                    fileDialog.FileName = txtFileLocation.Text.Substring(txtFileLocation.Text.LastIndexOf(";"), txtFileLocation.Text.Length - txtFileLocation.Text.LastIndexOf(";"))
+                If txtFileLocation.Text.Contains(Path.PathSeparator) Then
+                    fileDialog.FileName = txtFileLocation.Text.Substring(txtFileLocation.Text.LastIndexOf(Path.PathSeparator.ToString, StringComparison.OrdinalIgnoreCase),
+                                                                         txtFileLocation.Text.Length - txtFileLocation.Text.LastIndexOf(Path.PathSeparator.ToString, StringComparison.OrdinalIgnoreCase))
                 Else
                     fileDialog.FileName = txtFileLocation.Text
                 End If
@@ -182,6 +188,25 @@ Public Class Main
         End If
     End Sub
 
+    Friend Sub ResetGUI(done As String)
+        If Me.InvokeRequired Then
+            Me.Invoke(New ResetGUICallback(AddressOf ResetGUI), done)
+        Else
+            Dim message = ""
+            If apkInstaller.VerifyFilesToInstall Then
+                btnInstall.Visible = apkInstaller.VerifyFilesToInstall
+                message = My.Resources.Strings.readyToInstall
+            Else
+                message = If(txtFileLocation.Text.Length = 0, My.Resources.Strings.dragFile, My.Resources.Strings.fileCanNotBeInstalled)
+            End If
+            lblStatus.Text = If(done Is Nothing, message, done & vbCrLf & message)
+            chkForce.Visible = True
+            chkReinstall.Visible = True
+            UseWaitCursor = False
+            apkInstaller.Reset()
+        End If
+    End Sub
+
     Private Sub chkReinstall_CheckedChanged(sender As Object, e As EventArgs) Handles chkReinstall.CheckedChanged
         If chkReinstall.Checked Then
             chkForce.Checked = False
@@ -193,7 +218,7 @@ Public Class Main
 
     Private Sub chkForce_CheckedChanged(sender As Object, e As EventArgs) Handles chkForce.CheckedChanged
         If chkForce.Checked Then
-            chkForce.Checked = MsgBox("Are you really, absolutely sure you want to force the installation by any means necessary? This WILL be destructive if the app is currently installed on the phone.", CType(MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes
+            chkForce.Checked = MsgBox(My.Resources.Strings.forceConfirm, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes
         End If
     End Sub
 
@@ -258,9 +283,9 @@ Public Class Main
             Dim detailsDump As Byte() = System.Text.Encoding.Unicode.GetBytes(details)
             fsTemp.Write(detailsDump, 0, details.Length)
         End Using
-        MsgBox("An application error has been encountered." & vbCrLf &
-                    (If(e Is Nothing, "", "The following file may be wanted by troubleshooters and/or ninja monkeys.:" & vbCrLf & sTempFileName & vbCrLf)) &
-                    "Do you want to restart the application?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
+        MsgBox(My.Resources.Strings.appError & vbCrLf &
+                    (If(e Is Nothing, "", My.Resources.Strings.appErrorFileWanted & vbCrLf & sTempFileName & vbCrLf)) &
+                    My.Resources.Strings.wantToRestart, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Critical, MsgBoxStyle))
         Try
             File.Delete(sTempFileName)
         Catch ex As Exception When TypeOf ex Is ArgumentException Or TypeOf ex Is ArgumentNullException
@@ -282,4 +307,59 @@ Public Class Main
     Private Sub FatalErrorWasThrownHandlerCD(sender As Object, e As UnhandledExceptionEventArgs)
         FatalErrorWasThrownHandler(CType(e.ExceptionObject, Exception))
     End Sub
+
+    Private Sub txtFileLocation_GotFocus(sender As Object, e As EventArgs) Handles txtFileLocation.GotFocus
+        If apkInstaller IsNot Nothing Then
+            If apkInstaller.UseMultiFileDialog Then
+                txtFileLocation.Enabled = False
+
+                Dim test = ""
+                For Each file In apkInstaller.GetFilesToInstall
+                    test &= file & Path.PathSeparator
+                Next file
+
+                Dim dialog = MultiPackageDialog.Create(apkInstaller.GetFilesToInstall)
+                If Not dialogLock Then
+                    dialogLock = True
+                    If dialog.ShowDialog = DialogResult.OK Then
+                        apkInstaller.AddFilesToInstall(dialog.GetFiles(), True)
+                    End If
+                    dialogLock = False
+                End If
+
+                'MsgBox("Use multifile dialog" & test)
+            End If
+        End If
+    End Sub
+
+    Private Sub txtFileLocation_LostFocus(sender As Object, e As EventArgs) Handles txtFileLocation.LostFocus
+        If apkInstaller IsNot Nothing AndAlso apkInstaller.UseMultiFileDialog Then
+            txtFileLocation.Enabled = True
+        Else
+            Dim files = New List(Of String)
+            txtFileLocation.Text.Replace("...", "")
+            If txtFileLocation.Text.Contains(",") Then
+                files.AddRange(txtFileLocation.Text.Split(CType(",", Char)))
+            End If
+            If txtFileLocation.Text.Contains(Path.PathSeparator) Then
+                files.AddRange(txtFileLocation.Text.Split(Path.PathSeparator))
+            End If
+            If apkInstaller IsNot Nothing AndAlso Not apkInstaller.UseMultiFileDialog Then
+                apkInstaller.AddFilesToInstall(files.ToArray)
+            End If
+        End If
+    End Sub
+
+    Private Sub txtFileLocation_DoubleClick(sender As Object, e As EventArgs) Handles txtFileLocation.DoubleClick
+        Dim dialog = MultiPackageDialog.Create(apkInstaller.GetFilesToInstall)
+        If Not dialogLock Then
+            dialogLock = True
+            If dialog.ShowDialog = DialogResult.OK Then
+                apkInstaller.AddFilesToInstall(dialog.GetFiles(), True)
+            End If
+            dialogLock = False
+        End If
+    End Sub
+
+
 End Class

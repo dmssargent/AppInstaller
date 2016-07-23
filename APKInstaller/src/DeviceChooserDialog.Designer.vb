@@ -22,97 +22,79 @@ Partial Class DeviceChooserDialog
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(DeviceChooserDialog))
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.OK_Button = New MaterialSkin.Controls.MaterialRaisedButton()
         Me.Cancel_Button = New MaterialSkin.Controls.MaterialFlatButton()
-        Me.lblDevices = New System.Windows.Forms.Label()
+        Me.lblDevices = New MaterialSkin.Controls.MaterialLabel()
         Me.lstDevices = New System.Windows.Forms.ListBox()
+        Me.chkNoPromptSingleDevice = New MaterialSkin.Controls.MaterialCheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'TableLayoutPanel1
         '
-        Me.TableLayoutPanel1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel1.ColumnCount = 2
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        resources.ApplyResources(Me.TableLayoutPanel1, "TableLayoutPanel1")
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(369, 337)
-        Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 1
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(195, 36)
-        Me.TableLayoutPanel1.TabIndex = 0
         '
         'OK_Button
         '
-        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        resources.ApplyResources(Me.OK_Button, "OK_Button")
         Me.OK_Button.Depth = 0
-        Me.OK_Button.Location = New System.Drawing.Point(101, 4)
-        Me.OK_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.OK_Button.MouseState = MaterialSkin.MouseState.HOVER
         Me.OK_Button.Name = "OK_Button"
         Me.OK_Button.Primary = True
-        Me.OK_Button.Size = New System.Drawing.Size(89, 28)
-        Me.OK_Button.TabIndex = 0
-        Me.OK_Button.Text = "OK"
         '
         'Cancel_Button
         '
-        Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Cancel_Button.AutoSize = True
-        Me.Cancel_Button.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        resources.ApplyResources(Me.Cancel_Button, "Cancel_Button")
         Me.Cancel_Button.Depth = 0
         Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Location = New System.Drawing.Point(9, 4)
-        Me.Cancel_Button.Margin = New System.Windows.Forms.Padding(4)
         Me.Cancel_Button.MouseState = MaterialSkin.MouseState.HOVER
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Primary = False
-        Me.Cancel_Button.Size = New System.Drawing.Size(78, 28)
-        Me.Cancel_Button.TabIndex = 1
-        Me.Cancel_Button.Text = "Cancel"
         '
         'lblDevices
         '
-        Me.lblDevices.AutoSize = True
-        Me.lblDevices.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblDevices.Location = New System.Drawing.Point(22, 13)
+        resources.ApplyResources(Me.lblDevices, "lblDevices")
+        Me.lblDevices.Depth = 0
+        Me.lblDevices.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lblDevices.MouseState = MaterialSkin.MouseState.HOVER
         Me.lblDevices.Name = "lblDevices"
-        Me.lblDevices.Size = New System.Drawing.Size(159, 25)
-        Me.lblDevices.TabIndex = 4
-        Me.lblDevices.Text = "Choose Device"
         '
         'lstDevices
         '
-        Me.lstDevices.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        resources.ApplyResources(Me.lstDevices, "lstDevices")
         Me.lstDevices.FormattingEnabled = True
-        Me.lstDevices.ItemHeight = 25
-        Me.lstDevices.Location = New System.Drawing.Point(27, 42)
         Me.lstDevices.Name = "lstDevices"
-        Me.lstDevices.Size = New System.Drawing.Size(532, 279)
-        Me.lstDevices.TabIndex = 5
         '
-        'dlgDeviceChoose
+        'chkNoPromptSingleDevice
+        '
+        resources.ApplyResources(Me.chkNoPromptSingleDevice, "chkNoPromptSingleDevice")
+        Me.chkNoPromptSingleDevice.Depth = 0
+        Me.chkNoPromptSingleDevice.MouseLocation = New System.Drawing.Point(-1, -1)
+        Me.chkNoPromptSingleDevice.MouseState = MaterialSkin.MouseState.HOVER
+        Me.chkNoPromptSingleDevice.Name = "chkNoPromptSingleDevice"
+        Me.chkNoPromptSingleDevice.Ripple = True
+        Me.chkNoPromptSingleDevice.UseVisualStyleBackColor = True
+        '
+        'DeviceChooserDialog
         '
         Me.AcceptButton = Me.OK_Button
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(580, 388)
+        Me.Controls.Add(Me.chkNoPromptSingleDevice)
         Me.Controls.Add(Me.lstDevices)
         Me.Controls.Add(Me.lblDevices)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
-        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "dlgDeviceChoose"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Choose Device"
+        Me.Name = "DeviceChooserDialog"
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
         Me.ResumeLayout(False)
@@ -122,6 +104,7 @@ Partial Class DeviceChooserDialog
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents OK_Button As MaterialSkin.Controls.MaterialRaisedButton
     Friend WithEvents Cancel_Button As MaterialSkin.Controls.MaterialFlatButton
-    Friend WithEvents lblDevices As Label
+    Friend WithEvents lblDevices As MaterialSkin.Controls.MaterialLabel
     Friend WithEvents lstDevices As ListBox
+    Friend WithEvents chkNoPromptSingleDevice As MaterialSkin.Controls.MaterialCheckBox
 End Class

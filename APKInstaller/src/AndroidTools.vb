@@ -98,7 +98,7 @@ Public NotInheritable Class AndroidTools
         If androidHome Is Nothing Then
             androidHome = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome IsNot Nothing Then
-                If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
+                If MsgBox(My.Resources.Strings.invalidAndroidSdkConfig & vbCrLf &
                     "Do you want to correct those configuration issues?" & vbCrLf &
                     "Details: ANDROID_HOME is not defined, when valid Android SDK is present", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
                     Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome) ' Change the environment variable for this process as well as the user
@@ -109,9 +109,9 @@ Public NotInheritable Class AndroidTools
             Dim androidHome2 = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome2 IsNot Nothing Then
                 If Not androidHome = androidHome2 Then
-                    If MsgBox("The Android SDK is not completely correctly configured at this moment." & vbCrLf &
-                           "Do you want to correct those configuration issues?" & vbCrLf &
-                            "Details: Invalid SDK defined, when valid SDK can be found", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
+                    If MsgBox(My.Resources.Strings.invalidAndroidSdkConfig & vbCrLf &
+                           My.Resources.Strings.correctConfigIssue & vbCrLf &
+                           My.Resources.Strings.details & My.Resources.Strings.invalidAndroidSdkConfig, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2) ' Change the environment variable for this process as well as the user
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2, EnvironmentVariableTarget.User)
                     End If
@@ -242,35 +242,37 @@ Public NotInheritable Class AndroidTools
             Throw New ArgumentNullException(NameOf(apkFile))
         End If
 
-        Dim aapt = RunAapt("dump badging """ & apkFile & """", True)
-        aapt.Start()
+        Using aapt = RunAapt("dump badging """ & apkFile & """", True)
+            aapt.Start()
 
-        Const parseFor = "package: name="
-        Dim package As String = Nothing
-        Try
-            Dim line As String = aapt.StandardOutput.ReadLine.Trim
-            While line IsNot Nothing
-                'Detect interrupts
-                Thread.Sleep(1)
+            Const parseFor = "package: name="
+            Dim package As String = Nothing
+            Try
+                Dim line As String = aapt.StandardOutput.ReadLine.Trim
+                While line IsNot Nothing
+                    'Detect interrupts
+                    Thread.Sleep(1)
 
-                If line.Contains(parseFor) Then
-                    Dim versionName As String = line.Substring(line.IndexOf(parseFor) + parseFor.Length)
-                    package = versionName.Substring(versionName.IndexOf("'") + 1)
-                    package = package.Substring(0, package.IndexOf("'"))
-                    Exit While
+                    If line.Contains(parseFor) Then
+                        Dim versionName As String = line.Substring(line.IndexOf(parseFor, StringComparison.Ordinal) + parseFor.Length)
+                        package = versionName.Substring(versionName.IndexOf("'", StringComparison.Ordinal) + 1)
+                        package = package.Substring(0, package.IndexOf("'", StringComparison.Ordinal))
+                        Exit While
+                    End If
+                    line = aapt.StandardOutput.ReadLine.Trim
+                End While
+
+                If aapt.HasExited Then
+                    If Not aapt.ExitCode = 0 Then
+                        Throw New IOException("AAPT Failed. Exit: " & aapt.ExitCode)
+                    End If
                 End If
-                line = aapt.StandardOutput.ReadLine.Trim
-            End While
 
-            If aapt.HasExited Then
-                If Not aapt.ExitCode = 0 Then
-                    Throw New IOException("AAPT Failed. Exit: " & aapt.ExitCode)
-                End If
-            End If
-        Catch ex As Exception
-            Throw New IOException("Failed to acquire package name", ex)
-        End Try
-        Return package
+            Catch ex As Exception
+                Throw New IOException("Failed to acquire package name", ex)
+            End Try
+            Return package
+        End Using
     End Function
 
     Shared Function IsAndroidSdk(path As String) As Boolean
@@ -322,7 +324,7 @@ Public NotInheritable Class AndroidTools
             Else
                 For Each sdkPath In androidSdkPaths
                     If path.Contains(sdkPath) Then
-                        Dim path2 = path.Substring(0, path.IndexOf(IO.Path.DirectorySeparatorChar & sdkPath))
+                        Dim path2 = path.Substring(0, path.IndexOf(IO.Path.DirectorySeparatorChar & sdkPath, StringComparison.OrdinalIgnoreCase))
                         If IsAndroidSdk(path2) Then
                             possibleSdkPaths.Add(path2)
                         End If

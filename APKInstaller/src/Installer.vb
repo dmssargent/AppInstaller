@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Threading
+Imports Microsoft.VisualBasic.Devices
 
 ''' <summary>
 ''' Handler of installing Android packages
@@ -13,6 +14,8 @@ Public Class Installer
     Private update As Boolean = True
     Private showCompletionMessage As Boolean = True
     Private pForce As Boolean = False
+    Private filesToInstall As LinkedList(Of String) = New LinkedList(Of String)
+    Private multiFileDialog As Boolean = False
 
     ''' <summary>
     ''' Creates a new installer instance
@@ -68,26 +71,46 @@ Public Class Installer
         End Set
     End Property
 
+    Public Property UseMultiFileDialog As Boolean
+        Get
+            Return multiFileDialog
+        End Get
+        Set(value As Boolean)
+            multiFileDialog = value
+        End Set
+    End Property
+
     ''' <summary>
     ''' Adds files to be installed
     ''' </summary>
     ''' <param name="files">files to be installed</param>
-    Sub AddFilesToInstall(files() As String)
+    Sub AddFilesToInstall(files() As String, Optional clear As Boolean = False)
         If files Is Nothing Then
             Throw New ArgumentNullException(NameOf(files))
         End If
 
         Dim location As String = ""
 
+        If clear Then
+            filesToInstall.Clear()
+        End If
+
         ' Check for already present files
-        If GetFilesToInstall.Length > 0 And GetFilesToInstall(0) IsNot "" Then
-            If MsgBox("There are other APK files to install. Do you want to keep them and add this to install?", CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes Then
-                location = txtUserInput.Text & Path.PathSeparator
-            End If
+        If GetFilesToInstall.Length > 0 AndAlso GetFilesToInstall(0) IsNot "" Then
+            'If MsgBox(My.Resources.Strings.otherApkFiles, CType(MsgBoxStyle.Question + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes Then
+            ''location = txtUserInput.Text & Path.PathSeparator
+            ' Else
+            'filesToInstall.Clear()
+            'End If
         End If
 
         For Each path As String In files
             If path Is Nothing Then ' Prevent bugs in detection routine
+                Continue For
+            End If
+            path = path.Trim()
+
+            If filesToInstall.Contains(path) Then
                 Continue For
             End If
 
@@ -95,17 +118,19 @@ Public Class Installer
                 ' Check to see if the file exists
                 If Not File.Exists(path) Then
                     MsgBox("""" & path & """ " & If(Directory.Exists(path),
-                           "is a directory. Unfortunately, this app can't handle installing directories, for now.",
-                           "doesn't seem to exist at this moment. You may want to try that file again in a moment or two."))
+                           My.Resources.Strings.isDirError,
+                           My.Resources.Strings.fileDoesNotExist))
                     Continue For
                 End If
 
                 ' Check for the correct extension and that the file can be correctly parsed as an APK
-                If path.ToLower.EndsWith(".apk") And AndroidTools.PackageName(path) Is "" Then
-                    MsgBox("""" & path & """" & " is not a valid Android app. Please verify that the file ends with "".APK"".",
+                If path.ToUpper(Globalization.CultureInfo.CurrentCulture).EndsWith(".APK", StringComparison.CurrentCultureIgnoreCase) And
+                    AndroidTools.PackageName(path) Is "" Then
+                    MsgBox("""" & path & """" & My.Resources.Strings.invalidApk,
                            CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "Invalid File")
                 Else
-                    location &= path & IO.Path.PathSeparator
+                    'location &= path & IO.Path.PathSeparator
+                    filesToInstall.AddLast(path)
                 End If
             Catch ex As IOException
                 MsgBox(ex.Message)
@@ -113,11 +138,24 @@ Public Class Installer
         Next path
 
         ' Prevent verify errors by removing path separator
-        If location.EndsWith(Path.PathSeparator) Then
-            location = location.Substring(0, location.Length - 1)
+        If location.EndsWith(Path.PathSeparator, StringComparison.OrdinalIgnoreCase) Then
+            'location = location.Substring(0, location.Length - 1)
         End If
-        txtUserInput.Text = location
+        txtUserInput.Text = GenerateFileListSummary()
     End Sub
+
+    Private Function GenerateFileListSummary() As String
+        If filesToInstall.Count = 0 Then
+            multiFileDialog = False
+            Return ""
+        ElseIf filesToInstall.Count = 1 Then
+            multiFileDialog = False
+            Return filesToInstall.First.Value
+        Else
+            multiFileDialog = True
+            Return filesToInstall.ElementAt(0) & ", " & filesToInstall.ElementAt(1) & If(filesToInstall.Count > 2, "...", "")
+        End If
+    End Function
 
     ''' <summary>
     ''' Verifies that all of the files to be installed exist
@@ -152,14 +190,23 @@ Public Class Installer
     ''' </summary>
     Private Sub Install()
         ' Wait until an Android device is connected
-        WaitForDevice()
-        If stopRequested Then
+        Dim waitForDeviceReturn = WaitForDevice()
+        If Not waitForDeviceReturn = 0 Then
+            If waitForDeviceReturn = 2 Then
+                GUI.ResetGUI(My.Resources.Strings.timeoutWaiting & vbCrLf &
+                                    My.Resources.Strings.userTroubleshootingA1 & vbCrLf &
+                                    My.Resources.Strings.userTroubleshootingA2)
+            ElseIf waitForDeviceReturn = 1 Then
+                GUI.ResetGUI(My.Resources.Strings.installAborted)
+            End If
             Return
         End If
+
 
         ' Device Found, check if multiple devices are connected, and figure out the device to install to
         Dim deviceId = AcquireDeviceId()
         If deviceId Is Nothing Then
+            GUI.ResetGUI(My.Resources.Strings.installAborted)
             Return
         End If
 
@@ -182,74 +229,87 @@ Public Class Installer
                 End If
 
                 GUI.SetText(GUI.lblStatus, installStatus)
-                Dim adb As Process = InstallSinglePackage(deviceId, file)
-                If adb Is Nothing Then
-                    Return
-                End If
+                Using adb As Process = InstallSinglePackage(deviceId, file)
+                    If adb Is Nothing Then
+                        Return
+                    End If
 
-                ' Configure GUI to show last install
-                installStatus += adb.StandardOutput.ReadToEnd
-                GUI.SetText(GUI.lblStatus, installStatus)
+                    ' Configure GUI to show last install
+                    'installStatus += adb.StandardOutput.ReadToEnd
+                    'GUI.SetText(GUI.lblStatus, installStatus)
 
-                If Not adb.ExitCode = 0 Then
-                    Select Case HandleInstallFailure(file, adb)
-                        Case MsgBoxResult.Abort
-                            installAborted = True
-                        Case MsgBoxResult.Ignore
-                            Exit For ' Don't retry
-                        Case Else
-                            For second As Integer = 5 To 1 Step -1
-                                Dim message = My.Resources.Strings.retryIn & second & If(second = 1, My.Resources.Strings.second, My.Resources.Strings.seconds)
-                                GUI.SetText(GUI.lblStatus, message)
-                            Next second
-                            ' Continue For
-                    End Select
-                Else
-                    GUI.StepProgressBar()
-                    Exit For ' Go to next file b/c this file is a success
-                End If
+                    If Not adb.ExitCode = 0 Then
+                        Select Case HandleInstallFailure(file, adb)
+                            Case MsgBoxResult.Abort
+                                installAborted = True
+                            Case MsgBoxResult.Ignore
+                                Exit For ' Don't retry
+                            Case Else
+                                For second As Integer = 5 To 1 Step -1
+                                    Dim message = My.Resources.Strings.retryIn & second & If(second = 1, My.Resources.Strings.second, My.Resources.Strings.seconds)
+                                    GUI.SetText(GUI.lblStatus, message)
+                                Next second
+                                ' Continue For
+                        End Select
+                    Else
+                        GUI.StepProgressBar()
+                        Exit For ' Go to next file b/c this file is a success
+                    End If
+                End Using
             Next retry ' End retry loop
         Next file ' for each file
         GUI.UseWaitCursor = False
         If Not installAborted Then
-            GUI.SetText(lblStatus, My.Resources.Strings.done)
             If showCompletionMessage Then
                 MsgBox(My.Resources.Strings.installationOf & If(filesToInstall.Length = 1, My.Resources.Strings.apk, My.Resources.Strings.apks) & My.Resources.Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), My.Resources.Strings.apkInstallFinished)
             End If
+            GUI.ResetGUI(My.Resources.Strings.done)
         Else
-            GUI.SetText(lblStatus, My.Resources.Strings.failure & My.Resources.Strings.details & vbCrLf & installStatus)
+            GUI.ResetGUI(My.Resources.Strings.failure & My.Resources.Strings.details & vbCrLf & installStatus)
         End If
         ' End device install section
     End Sub
 
-    Private Sub WaitForDevice()
-        Dim adbWait = AndroidTools.RunAdb("wait-for-device", False, True, False)
-        ' GUI.SetText(lblStatus, "Waiting for device.")
+    Private Function WaitForDevice() As Integer
+        Dim counter = 0
+        Using adbWait = AndroidTools.RunAdb("wait-for-device", False, True, False)
+            ' GUI.SetText(lblStatus, "Waiting for device.")
 
-        Dim caret As Integer = 0
-        GUI.UseWaitCursor = True
-        GUI.ShowProgressAnimation(True, False)
-        While Not adbWait.HasExited
-            If caret = 0 Then
-                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice1)
-            ElseIf caret = 1 Then
-                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice2)
-            Else
-                GUI.SetText(lblStatus, My.Resources.Strings.waitForDevice3)
-                caret = -1
-            End If
-            caret += 1
+            Dim caret As Integer = 0
+            GUI.UseWaitCursor = True
+            GUI.ShowProgressAnimation(True, False)
+            While Not adbWait.HasExited
+                Dim currentMessage = ""
+                If caret = 0 Then
+                    currentMessage = My.Resources.Strings.waitForDevice1
+                ElseIf caret = 1 Then
+                    currentMessage = My.Resources.Strings.waitForDevice2
+                Else
+                    currentMessage = My.Resources.Strings.waitForDevice3
+                    caret = -1
+                End If
+                caret += 1
+                If counter > 10 Then
+                    currentMessage &= vbCrLf & My.Resources.Strings.userTroubleshootingA1 & vbCrLf &
+                                                My.Resources.Strings.userTroubleshootingA2
+                End If
+                GUI.SetText(lblStatus, currentMessage)
 
-            Thread.Sleep(1000)
-            Thread.Yield()
-            If stopRequested Then
-                MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
-                Exit Sub
-            End If
-        End While
-        GUI.ShowProgressAnimation(False, False)
-        adbWait.Close()
-    End Sub
+                Thread.Sleep(1000)
+                Thread.Yield()
+                If stopRequested Then
+                    MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
+                    Return 1
+                End If
+                counter += 1
+                If counter > 60 Then
+                    Return 2
+                End If
+            End While
+            GUI.ShowProgressAnimation(False, False)
+        End Using
+        Return 0
+    End Function
 
     Private Function AcquireDeviceId() As String
         GUI.SetText(lblStatus, My.Resources.Strings.checkDevices)
@@ -277,9 +337,10 @@ Public Class Installer
 
 
     Private Sub GetDeviceId(callback As deviceIdCallback)
-        Using deviceChooser As New DeviceChooserDialog()
-            Dim result = deviceChooser.GetUserInput()
-            If result = DialogResult.OK Then
+        'Using 
+        Dim deviceChooser As New DeviceChooserDialog()
+        Dim result = deviceChooser.GetUserInput()
+            If result = DialogResult.OK Or result = Nothing Then
                 If (MsgBox(My.Resources.Strings.correctDevice1 + deviceChooser.Device + My.Resources.Strings.correctDevice2, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes) Then
                     callback(deviceChooser.Device)
                 Else
@@ -290,29 +351,38 @@ Public Class Installer
             Else
                 callback(deviceChooser.Device)
             End If
-        End Using
+        'End Using
     End Sub
 
     Function GetFilesToInstall() As String()
-        Return txtUserInput.Text.Split(CType(Path.PathSeparator.ToString, Char()))
+        Return filesToInstall.ToArray
     End Function
 
     Shared Function ForceRemovePackage(ByVal apkFile As String) As Boolean
-        Dim adb = AndroidTools.RunAdb("uninstall " & AndroidTools.PackageName(apkFile), False, True, True)
-        Return adb.ExitCode = 0
+        Using adb = AndroidTools.RunAdb("uninstall " & AndroidTools.PackageName(apkFile), False, True, True)
+            Return adb.ExitCode = 0
+        End Using
     End Function
 
     Private Function InstallSinglePackage(deviceId As String, file As String) As Process
         Dim adb = AndroidTools.RunAdb("-s " & deviceId & " install " & If(update, "-r ", "") & """" & file & """", True, True, False)
 
         Dim haltInstall = False
+        Dim t = ""
         While Not adb.HasExited
+            t &= adb.StandardOutput.ReadToEnd
             If stopRequested Then
                 If MsgBox(My.Resources.Strings.abortCurrentApk, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.No Then
                     haltInstall = True
                     stopRequested = False
                 Else
-                    adb.Kill()
+                    Try
+                        If adb.HasExited Then
+                            adb.Kill()
+                        End If
+                    Catch ex As InvalidOperationException
+
+                    End Try
                     MsgBox(My.Resources.Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
                     Return Nothing
                 End If
@@ -339,5 +409,9 @@ Public Class Installer
     ''' </summary>
     Sub Abort()
         stopRequested = True
+    End Sub
+
+    Sub Reset()
+        stopRequested = False
     End Sub
 End Class

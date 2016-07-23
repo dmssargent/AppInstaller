@@ -82,8 +82,7 @@
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Resources\ic_android_black_24px.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>FAE373A5676A291309343F1D3BCB00CF8AA9F4C4</ManifestCertificateThumbprint>
@@ -216,6 +215,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="src\MultiPackageDialog.Designer.vb">
+      <DependentUpon>MultiPackageDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="src\MultiPackageDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="src\DeviceChooserDialog.resx">
@@ -234,6 +239,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="src\MultiPackageDialog.resx">
+      <DependentUpon>MultiPackageDialog.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
