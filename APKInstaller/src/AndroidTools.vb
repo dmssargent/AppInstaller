@@ -143,7 +143,7 @@ Public NotInheritable Class AndroidTools
         ' Fall-back to app version
         Dim tempFileName = IOUtilities.CreateTempSession("adb")
         Dim platformToolsZip As String = tempFileName + "\platform-tools.zip"
-        File.WriteAllBytes(platformToolsZip, My.Resources.platform_tools_r23_1_0_windows)
+        File.WriteAllBytes(platformToolsZip, My.Resources.platform_tools_r24_windows)
         Dim androidPlatformTools As String = tempFileName + "\platform-tools"
         Using stream As New FileStream(platformToolsZip, FileMode.Open)
             IOUtilities.UnzipFromStream(stream, androidPlatformTools)

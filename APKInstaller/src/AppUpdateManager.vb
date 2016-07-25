@@ -44,10 +44,11 @@ Public Class AppUpdateManager
     <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub New(ByRef gui As Form)
         Try
-            Const updatePath = "C:\SquirrelTest\AppInstaller"
-            updatesEnabled = IO.Directory.Exists(updatePath)
-            updateManager = New UpdateManager(updatePath)
-
+            Const updatePath = "https://github.com/dmssargent/AppInstaller"
+            'updatesEnabled = IO.Directory.Exists(updatePath)
+            Dim githubMgr = UpdateManager.GitHubUpdateManager(updatePath)
+            githubMgr.Start()
+            updateManager = githubMgr.Result
         Catch e As Exception
 
         End Try

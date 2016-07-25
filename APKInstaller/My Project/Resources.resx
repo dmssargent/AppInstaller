@@ -124,7 +124,7 @@
   <data name="android_app" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ic_android_black_24px.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="platform_tools_r23_1_0_windows" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\platform-tools_r23.1.0-windows.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="platform_tools_r24_windows" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\platform-tools_r24-windows.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
