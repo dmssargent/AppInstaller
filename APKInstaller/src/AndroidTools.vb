@@ -1,12 +1,15 @@
-﻿Imports System.IO
+﻿Imports System.Diagnostics.CodeAnalysis
+Imports System.IO
 Imports System.Threading
+Imports APKInstaller.My.Resources
+Imports PostSharp.Patterns.Diagnostics
 
 ''' <summary>
 ''' Provided utilities for operating on Android devices, such as adb and aapt
 ''' </summary>
 Public NotInheritable Class AndroidTools
-    Private Shared aaptCache As String
-    Private Shared adbCache As String
+    Private Shared _aaptCache As String
+    Private Shared _adbCache As String
 
     Private Sub New()
         SetupIfPossible()
@@ -19,8 +22,8 @@ Public NotInheritable Class AndroidTools
     ''' <returns>the location of adb or "adb"</returns>
     Shared ReadOnly Property Adb As String
         Get
-            If adbCache IsNot Nothing And (adbCache Is "adb" Or File.Exists(adbCache)) Then
-                Return adbCache
+            If _adbCache IsNot Nothing And (_adbCache Is "adb" Or File.Exists(_adbCache)) Then
+                Return _adbCache
             End If
 
             Try
@@ -35,12 +38,12 @@ Public NotInheritable Class AndroidTools
     ''' Returns the location of aapt; this function may setup aapt if necessary
     ''' </summary>
     ''' <returns>location of aapt</returns>
-    <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Aapt")>
+    <SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Aapt")>
     Shared ReadOnly Property Aapt As String
         Get
-            If (aaptCache IsNot Nothing) Then
-                If (File.Exists(aaptCache)) Then
-                    Return aaptCache
+            If (_aaptCache IsNot Nothing) Then
+                If (File.Exists(_aaptCache)) Then
+                    Return _aaptCache
                 End If
             End If
 
@@ -55,37 +58,40 @@ Public NotInheritable Class AndroidTools
     ''' <summary>
     ''' Sets up both ADB and AAPT for later use
     ''' </summary>
+    <Log("App Installer Debug")>
     Public Shared Sub SetupIfPossible()
-        If Not File.Exists(aaptCache) Then
-            aaptCache = Nothing
+        If Not File.Exists(_aaptCache) Then
+            _aaptCache = Nothing
         End If
 
-        If adbCache IsNot "adb" And Not File.Exists(adbCache) Then
-            adbCache = Nothing
+        If _adbCache IsNot "adb" And Not File.Exists(_adbCache) Then
+            _adbCache = Nothing
         End If
 
-        If (adbCache Is Nothing) Then
+        If (_adbCache Is Nothing) Then
             SetupAdb()
         End If
-        If aaptCache Is Nothing Then
+        If _aaptCache Is Nothing Then
             SetupAapt()
         End If
 
     End Sub
 
+    <Log("App Installer Debug")>
     Private Shared Function SetupAdb() As String
         Dim windir = Environment.GetEnvironmentVariable("windir")
         If Not (File.Exists(Path.Combine(windir, "adb.exe")) Or File.Exists(Path.Combine(windir, "system32", "adb.exe"))) Then
-            Using adb As New Process
-                adb.StartInfo.Arguments = "version"
-                adb.StartInfo.FileName = "adb"
-                adb.StartInfo.CreateNoWindow = True
-                adb.StartInfo.UseShellExecute = False
+            Using process As New Process
+                process.StartInfo.Arguments = "version"
+                process.StartInfo.FileName = "adb"
+                process.StartInfo.CreateNoWindow = True
+                process.StartInfo.UseShellExecute = False
                 Try
-                    adb.Start()
-                    adb.WaitForExit()
-                    If (adb.ExitCode = 0) Then
-                        adbCache = "adb"
+                    process.Start()
+                    process.WaitForExit()
+
+                    If process.ExitCode = 0 Then
+                        _adbCache = "adb"
                         Return "adb"
                     End If
                 Catch ex As Exception
@@ -98,9 +104,9 @@ Public NotInheritable Class AndroidTools
         If androidHome Is Nothing Then
             androidHome = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome IsNot Nothing Then
-                If MsgBox(My.Resources.Strings.invalidAndroidSdkConfig & vbCrLf &
-                    "Do you want to correct those configuration issues?" & vbCrLf &
-                    "Details: ANDROID_HOME is not defined, when valid Android SDK is present", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
+                If MsgBox(Strings.invalidAndroidSdkConfig & vbCrLf &
+                    Strings.correctConfigIssue & vbCrLf & Strings.details &
+                    "ANDROID_HOME is not defined, when valid Android SDK is present", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
                     Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome) ' Change the environment variable for this process as well as the user
                     Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome, EnvironmentVariableTarget.User)
                 End If
@@ -109,9 +115,8 @@ Public NotInheritable Class AndroidTools
             Dim androidHome2 = MostLikelyAndroidSdk(Environment.GetEnvironmentVariable("PATH"))
             If androidHome2 IsNot Nothing Then
                 If Not androidHome = androidHome2 Then
-                    If MsgBox(My.Resources.Strings.invalidAndroidSdkConfig & vbCrLf &
-                           My.Resources.Strings.correctConfigIssue & vbCrLf &
-                           My.Resources.Strings.details & My.Resources.Strings.invalidAndroidSdkConfig, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
+                    If MsgBox(Strings.invalidAndroidSdkConfig & vbCrLf &
+                            Strings.invalidAndroidSdkConfig, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.Yes Then
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2) ' Change the environment variable for this process as well as the user
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2, EnvironmentVariableTarget.User)
                     End If
@@ -121,17 +126,17 @@ Public NotInheritable Class AndroidTools
 
         If androidHome IsNot Nothing Then
             Dim adbLocation = Path.Combine(androidHome, "platform-tools", "adb")
-            Using adb As New Process
+            Using process As New Process
 
-                adb.StartInfo.Arguments = "version"
-                adb.StartInfo.FileName = adbLocation
-                adb.StartInfo.CreateNoWindow = True
-                adb.StartInfo.UseShellExecute = False
+                process.StartInfo.Arguments = "version"
+                process.StartInfo.FileName = adbLocation
+                process.StartInfo.CreateNoWindow = True
+                process.StartInfo.UseShellExecute = False
                 Try
-                    adb.Start()
-                    adb.WaitForExit()
-                    If (adb.ExitCode = 0) Then
-                        adbCache = adbLocation
+                    process.Start()
+                    process.WaitForExit()
+                    If (process.ExitCode = 0) Then
+                        _adbCache = adbLocation
                         Return adbLocation
                     End If
                 Catch ex As Exception
@@ -141,33 +146,33 @@ Public NotInheritable Class AndroidTools
         End If
 
         ' Fall-back to app version
-        Dim tempFileName = IOUtilities.CreateTempSession("adb")
+        Dim tempFileName = IoUtilities.CreateTempSession("adb")
         Dim platformToolsZip As String = tempFileName + "\platform-tools.zip"
-        File.WriteAllBytes(platformToolsZip, My.Resources.platform_tools_r24_windows)
+        File.WriteAllBytes(platformToolsZip, platform_tools_r24_windows)
         Dim androidPlatformTools As String = tempFileName + "\platform-tools"
         Using stream As New FileStream(platformToolsZip, FileMode.Open)
-            IOUtilities.UnzipFromStream(stream, androidPlatformTools)
+            IoUtilities.UnzipFromStream(stream, androidPlatformTools)
         End Using
-        adbCache = androidPlatformTools & "\platform-tools\adb.exe"
-        Return adbCache
+        _adbCache = androidPlatformTools & "\platform-tools\adb.exe"
+        Return _adbCache
     End Function
 
-    <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId:="aapt")>
+    <SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId:="aapt")>
+    <Log("App Installer Debug")>
     Private Shared Function SetupAapt() As String
-        Dim aapt = ""
+        Dim aaptPath = ""
 
         Try
-            Dim temp = IOUtilities.CreateTempSession("aapt")
-            aapt = Path.Combine(temp, "aapt.exe")
+            Dim temp = IoUtilities.CreateTempSession("aapt")
+            aaptPath = Path.Combine(temp, "aapt.exe")
         Catch ex As Exception
 
         End Try
 
-
-        File.WriteAllBytes(aapt, My.Resources.aapt_23_0_3_win)
-        If File.Exists(aapt) Then
-            aaptCache = aapt
-            Return aapt
+        File.WriteAllBytes(aaptPath, aapt_23_0_3_win)
+        If File.Exists(aaptPath) Then
+            _aaptCache = aaptPath
+            Return aaptPath
         Else
             Throw New IOException("Failed to build aapt.exe")
         End If
@@ -188,6 +193,8 @@ Public NotInheritable Class AndroidTools
     ''' <param name="run">run this program before returning</param>
     ''' <param name="waitToReturn">wait for this program to return, run parameter must be true</param>
     ''' <returns>an adb process</returns>
+    <SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
+    <Log("App Installer Debug")>
     Public Shared Function RunAdb(args As String, redirectStdOut As Boolean, run As Boolean, waitToReturn As Boolean) As Process
         SetupIfPossible()
         Dim pAdb As New Process
@@ -220,6 +227,7 @@ Public NotInheritable Class AndroidTools
     ''' <param name="args">aapt arguments</param>
     ''' <param name="redirectStdOut">true if the standard output stream should be redirected, otherwise false</param>
     ''' <returns>an instance of an aapt process, not started</returns>
+    <Log("App Installer Debug")>
     Friend Shared Function RunAapt(args As String, redirectStdOut As Boolean) As Process
         SetupIfPossible()
         Dim pAapt As New Process()
@@ -237,18 +245,19 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="apkFile">the location of the APK file</param>
     ''' <returns>The package name of the APK file, or nothing on failure</returns>
+    <Log("App Installer Debug")>
     Shared Function PackageName(ByVal apkFile As String) As String
         If apkFile Is Nothing Then
             Throw New ArgumentNullException(NameOf(apkFile))
         End If
 
-        Using aapt = RunAapt("dump badging """ & apkFile & """", True)
-            aapt.Start()
+        Using process = RunAapt("dump badging """ & apkFile & """", True)
+            process.Start()
 
             Const parseFor = "package: name="
             Dim package As String = Nothing
             Try
-                Dim line As String = aapt.StandardOutput.ReadLine
+                Dim line As String = process.StandardOutput.ReadLine
                 While line IsNot Nothing
                     'Detect interrupts
                     Thread.Sleep(1)
@@ -259,12 +268,12 @@ Public NotInheritable Class AndroidTools
                         package = package.Substring(0, package.IndexOf("'", StringComparison.Ordinal))
                         Exit While
                     End If
-                    line = aapt.StandardOutput.ReadLine.Trim
+                    line = process.StandardOutput.ReadLine.Trim
                 End While
 
-                If aapt.HasExited Then
-                    If Not aapt.ExitCode = 0 Then
-                        Throw New IOException("AAPT Failed. Exit: " & aapt.ExitCode)
+                If process.HasExited Then
+                    If Not process.ExitCode = 0 Then
+                        Throw New IOException("AAPT Failed. Exit: " & process.ExitCode)
                     End If
                 End If
 
@@ -275,14 +284,15 @@ Public NotInheritable Class AndroidTools
         End Using
     End Function
 
+    <Log("App Installer Debug")>
     Shared Function IsAndroidSdk(path As String) As Boolean
         Dim platformTools = IO.Path.Combine(path, "platform-tools")
         Dim tools = IO.Path.Combine(path, "tools")
 
         If Directory.Exists(tools) And Directory.Exists(platformTools) Then
-            Dim adb = IO.Path.Combine(platformTools, "adb.exe")
+            Dim adbPath = IO.Path.Combine(platformTools, "adb.exe")
             Dim androidBat = IO.Path.Combine(tools, "android.bat")
-            If File.Exists(adb) And File.Exists(androidBat) Then
+            If File.Exists(adbPath) And File.Exists(androidBat) Then
                 Return True
             Else
                 Return False
@@ -298,6 +308,7 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="path">a delimited list of paths, or a single path location</param>
     ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
+    <Log("App Installer Debug")>
     Shared Function MostLikelyAndroidSdk(path As String) As String
         If path Is Nothing Then
             Throw New ArgumentNullException(NameOf(path))
@@ -311,6 +322,7 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="paths">the locations in a string format</param>
     ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
+    <Log("App Installer Debug")>
     Shared Function MostLikelyAndroidSdk(paths As String()) As String
         If paths Is Nothing Then
             Throw New ArgumentNullException(NameOf(paths))
@@ -340,12 +352,7 @@ Public NotInheritable Class AndroidTools
         Dim highScoreLocation As String = Nothing
 
         For Each path In possibleSdkPaths
-            Dim currentScore = 0
-            For Each sdkPath In androidSdkPaths
-                If Directory.Exists(IO.Path.Combine(path, sdkPath)) Then
-                    currentScore += 1
-                End If
-            Next sdkPath
+            Dim currentScore = androidSdkPaths.Count(Function(sdkPath) Directory.Exists(IO.Path.Combine(path, sdkPath)))
 
             If currentScore > highScore Then
                 highScore = currentScore

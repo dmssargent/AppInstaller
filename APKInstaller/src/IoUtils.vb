@@ -1,10 +1,11 @@
 ﻿Imports System.IO
+Imports ICSharpCode.SharpZipLib.Core
 Imports ICSharpCode.SharpZipLib.Zip
 
 ''' <summary>
 ''' Provides utilities for performing various common IO tasks
 ''' </summary>
-Public Class IOUtilities : Implements IDisposable
+Public Class IoUtilities : Implements IDisposable
     ''' <summary>
     ''' Unzips a file from a file stream into a folder
     ''' </summary>
@@ -25,8 +26,8 @@ Public Class IOUtilities : Implements IDisposable
                 Directory.CreateDirectory(directoryName)
             End If
             If Not (directoryName & Path.DirectorySeparatorChar).Equals(fullZipToPath) Then
-                Using _streamWriter As FileStream = File.Create(fullZipToPath)
-                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(zipInputStream, _streamWriter, buffer)
+                Using streamWriter As FileStream = File.Create(fullZipToPath)
+                    StreamUtils.Copy(zipInputStream, streamWriter, buffer)
                 End Using
             End If
 
@@ -35,32 +36,32 @@ Public Class IOUtilities : Implements IDisposable
         End While
     End Sub
 #Region "IDisposable Support"
-    Private Shared instance As New IOUtilities
-    Private isReady As Boolean = False
+    Private Shared _instance As New IoUtilities
+    Private _isReady As Boolean = False
     ' Private tempFile As File
-    Private sessions As New List(Of String)
-    Private tempFilePath As String
+    Private _sessions As New List(Of String)
+    Private _tempFilePath As String
 
     ''' <summary>
     ''' Prepares the IOUtils to do operations
     ''' </summary>
     Public Shared Sub Prepare()
-        If (instance IsNot Nothing) Then
-            instance._Prepare()
+        If (_instance IsNot Nothing) Then
+            _instance._Prepare()
         End If
 
     End Sub
 
     Private Sub _Prepare()
-        If isReady Then
+        If _isReady Then
             Exit Sub
         End If
 
-        tempFilePath = Path.GetTempFileName()
-        File.Delete(tempFilePath)
-        Directory.CreateDirectory(tempFilePath)
+        _tempFilePath = Path.GetTempFileName()
+        File.Delete(_tempFilePath)
+        Directory.CreateDirectory(_tempFilePath)
 
-        isReady = True
+        _isReady = True
     End Sub
 
     ''' <summary>
@@ -74,8 +75,8 @@ Public Class IOUtilities : Implements IDisposable
             Throw New ArgumentNullException(NameOf(name))
         End If
 
-        Dim session = Path.Combine(instance.tempFilePath, name)
-        If (instance.sessions.Exists(New Predicate(Of String)(
+        Dim session = Path.Combine(_instance._tempFilePath, name)
+        If (_instance._sessions.Exists(New Predicate(Of String)(
                                      Function(test As String) As Boolean
                                          Return name.Equals(test)
                                      End Function))) Then
@@ -93,7 +94,7 @@ Public Class IOUtilities : Implements IDisposable
     ''' Disposes of the current IO Utilities
     ''' </summary>
     Public Shared Sub Cleanup()
-        instance.Dispose()
+        _instance.Dispose()
     End Sub
 
     ''' <summary>
@@ -106,8 +107,8 @@ Public Class IOUtilities : Implements IDisposable
             Throw New ArgumentNullException(NameOf(name))
         End If
 
-        Dim session = Path.Combine(instance.tempFilePath, name)
-        If (instance.sessions.Exists(New Predicate(Of String)(
+        Dim session = Path.Combine(_instance._tempFilePath, name)
+        If (_instance._sessions.Exists(New Predicate(Of String)(
                                      Function(test As String) As Boolean
                                          Return name.Equals(test)
                                      End Function))) Then
@@ -120,21 +121,21 @@ Public Class IOUtilities : Implements IDisposable
     End Sub
 
 
-    Private disposedValue As Boolean ' To detect redundant calls
+    Private _disposedValue As Boolean ' To detect redundant calls
 
     ' IDisposable
     Protected Overridable Sub Dispose(disposing As Boolean)
-        If Not disposedValue Then
-            Dim temp = tempFilePath
+        If Not _disposedValue Then
+            Dim temp = _tempFilePath
             If disposing Then
                 ' TODO: dispose managed state (managed objects).
-                isReady = False
-                instance = Nothing
+                _isReady = False
+                _instance = Nothing
 
                 'tempFile = Nothing
-                sessions.Clear()
-                sessions = Nothing
-                tempFilePath = Nothing
+                _sessions.Clear()
+                _sessions = Nothing
+                _tempFilePath = Nothing
             End If
 
             If (File.Exists(temp)) Then
@@ -148,7 +149,7 @@ Public Class IOUtilities : Implements IDisposable
             ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
             ' TODO: set large fields to null.
         End If
-        disposedValue = True
+        _disposedValue = True
     End Sub
 
     ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.

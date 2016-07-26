@@ -264,4 +264,10 @@
   <data name="wantToRestart" xml:space="preserve">
     <value>Do you want to restart the app?</value>
   </data>
+  <data name="Modify" xml:space="preserve">
+    <value>Modify</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
 </root>

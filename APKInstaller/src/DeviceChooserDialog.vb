@@ -1,16 +1,20 @@
 ﻿Imports System.ComponentModel
+Imports System.Diagnostics.CodeAnalysis
 Imports System.Globalization
+Imports System.IO
+Imports System.Threading
+Imports MaterialSkin
 
 ''' <summary>
 ''' Provides a list of devices if more than one Android phone is connected
 ''' </summary>
 Public Class DeviceChooserDialog
-    Private Delegate Function userInputCallback() As DialogResult
-    Private Delegate Sub deviceListUpdateCallback(ByVal index As Integer, ByVal device As String)
-    Private Delegate Sub chkNoPromptSingleDeviceVisibleCallback(visible As Boolean)
-    Private autoUpdateThread As Threading.Thread
+    Private Delegate Function UserInputCallback() As DialogResult
+    Private Delegate Sub DeviceListUpdateCallback(ByVal index As Integer, ByVal device As String)
+    Private Delegate Sub ChkNoPromptSingleDeviceVisibleCallback(visible As Boolean)
+    Private _autoUpdateThread As Thread
 
-    Private deviceIndex As Integer = -1
+    Private _deviceIndex As Integer = -1
 
     ''' <summary>
     ''' The selected device
@@ -30,21 +34,18 @@ Public Class DeviceChooserDialog
 
             Dim numberOfDevicesLastFound = lstDevices.Items.Count
             Dim data = adb.StandardOutput.ReadLine
-            Dim output = ""
             Dim numberOfDevices = 0
             Dim parserInDeviceList = False
             While (data IsNot Nothing)
                 data = data.Trim()
-                output &= data & vbCrLf
                 If parserInDeviceList Then
                     If data Is "" Then
                         data = adb.StandardOutput.ReadLine
                         Continue While
                     End If
-                    Dim device = CleanupOutput(data)
                     Dim details = ""
-                    Dim rcVersion = CheckForFtcRobotController(device)
-                    Dim dsVersion = CheckForFtcDriverStation(device)
+                    Dim rcVersion = CheckForFtcRobotController(CleanupOutput(data))
+                    Dim dsVersion = CheckForFtcDriverStation(CleanupOutput(data))
                     If rcVersion > 0 Then
                         details &= "[FTC Robot Controller " & rcVersion & "]"
                     End If
@@ -53,7 +54,7 @@ Public Class DeviceChooserDialog
                         details = If(details = "", "[", "; ") & " FTC Driver Station " & dsVersion & "]"
                     End If
 
-                    UpdateDeviceListEntry(numberOfDevices, device & vbTab & details)
+                    UpdateDeviceListEntry(numberOfDevices, CleanupOutput(data) & vbTab & details)
                     numberOfDevices += 1
                 End If
 
@@ -71,7 +72,7 @@ Public Class DeviceChooserDialog
             Next i
 
             If numberOfDevices = 1 Then
-                If Not Me.InvokeRequired Then
+                If Not InvokeRequired Then
                     lstDevices.SelectedIndex = 0
                 End If
 
@@ -87,10 +88,10 @@ Public Class DeviceChooserDialog
     ''' Gets the user input if necessary, otherwise provides the only attached device to be used
     ''' </summary>
     ''' <returns>Nothing if no user input is needed, otherwise a DialogResult is returned from the GUI</returns>
-    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")>
+    <SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")>
     Public Function GetUserInput() As DialogResult
         If InvokeRequired Then
-            Return CType(Invoke(New userInputCallback(AddressOf GetUserInput)), DialogResult)
+            Return CType(Invoke(New UserInputCallback(AddressOf GetUserInput)), DialogResult)
         Else
 
             UpdateDeviceList()
@@ -106,38 +107,38 @@ Public Class DeviceChooserDialog
     ''' </summary>
     ''' <returns>true if a device has been selected, false otherwise</returns>
     Public Function IsReady() As Boolean
-        Return deviceIndex >= 0
+        Return _deviceIndex >= 0
     End Function
 
     Private Sub DeviceChooser_Load(sender As Object, e As EventArgs) Handles Me.Load
-        autoUpdateThread = New Threading.Thread(
-            New Threading.ThreadStart(Sub()
-                                          Do
-                                              UpdateDeviceList()
-                                              Try
-                                                  Threading.Thread.Sleep(1000)
-                                              Catch ex As Threading.ThreadInterruptedException
-                                                  Exit Do
-                                              End Try
-                                          Loop While Me.Visible
-                                      End Sub))
-        autoUpdateThread.Start()
-        Me.chkNoPromptSingleDevice.Checked = My.Settings.noPromptSingleDevice
-        Me.lstDevices.Font = MaterialSkin.MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
-        Me.lblDevices.Font = MaterialSkin.MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
+        _autoUpdateThread = New Thread(
+            New ThreadStart(Sub()
+                                Do
+                                    UpdateDeviceList()
+                                    Try
+                                        Thread.Sleep(1000)
+                                    Catch ex As ThreadInterruptedException
+                                        Exit Do
+                                    End Try
+                                Loop While Visible
+                            End Sub))
+        _autoUpdateThread.Start()
+        chkNoPromptSingleDevice.Checked = My.Settings.noPromptSingleDevice
+        lstDevices.Font = MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
+        lblDevices.Font = MaterialSkinManager.Instance.ROBOTO_MEDIUM_12
         lstDevices.DrawMode = DrawMode.OwnerDrawFixed
 
-        Me.Focus()
-        Me.CenterToScreen()
+        Focus()
+        CenterToScreen()
     End Sub
 
-    Private Sub UpdateDeviceListEntry(ByVal index As Integer, ByVal device As String)
+    Private Sub UpdateDeviceListEntry(ByVal index As Integer, deviceName As String)
         If lstDevices.InvokeRequired Then
             Try
-                If Me.IsDisposed Then
+                If IsDisposed Then
                     Return
                 End If
-                Me.Invoke(New deviceListUpdateCallback(AddressOf UpdateDeviceListEntry), New Object() {index, device})
+                Invoke(New DeviceListUpdateCallback(AddressOf UpdateDeviceListEntry), New Object() {index, deviceName})
             Catch ex As ObjectDisposedException
                 Return
             End Try
@@ -150,8 +151,8 @@ Public Class DeviceChooserDialog
                 lstDevices.Items.RemoveAt(index)
             End If
 
-            If device IsNot Nothing Then
-                lstDevices.Items.Insert(index, device)
+            If deviceName IsNot Nothing Then
+                lstDevices.Items.Insert(index, deviceName)
             End If
 
             If oldIndex < lstDevices.Items.Count Then
@@ -162,11 +163,11 @@ Public Class DeviceChooserDialog
         End If
     End Sub
 
-    Private Sub SetVisibilityForNoPromptSingleDevice(visible As Boolean)
+    Private Sub SetVisibilityForNoPromptSingleDevice(isVisible As Boolean)
         If chkNoPromptSingleDevice.InvokeRequired Then
-            Me.Invoke(New chkNoPromptSingleDeviceVisibleCallback(AddressOf SetVisibilityForNoPromptSingleDevice), visible)
+            Invoke(New ChkNoPromptSingleDeviceVisibleCallback(AddressOf SetVisibilityForNoPromptSingleDevice), isVisible)
         Else
-            chkNoPromptSingleDevice.Visible = visible
+            chkNoPromptSingleDevice.Visible = isVisible
         End If
     End Sub
 
@@ -189,7 +190,7 @@ Public Class DeviceChooserDialog
     ''' </summary>
     ''' <param name="device">adb device specifier</param>
     ''' <returns>0 if no FTC Robot Controller can be found or the version name</returns>
-    <CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Ftc")>
+    <SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId:="Ftc")>
     Public Shared Function CheckForFtcRobotController(ByVal device As String) As Double
         Return CheckPackageVersion(device, "com.qualcomm.ftcrobotcontroller")
     End Function
@@ -212,7 +213,7 @@ Public Class DeviceChooserDialog
     Public Shared Function CheckPackageVersion(ByVal device As String, ByVal package As String) As Double
         Using adb = AndroidTools.RunAdb("-s " & device & " shell pm dump """ & package & """", True, True, False)
 
-            Const VERSION_NAME As String = "versionName="
+            Const versionName = "versionName="
             Dim version As Double = -1
             Dim inSection As Boolean = False
             Dim line As String = adb.StandardOutput.ReadLine
@@ -226,21 +227,21 @@ Public Class DeviceChooserDialog
                                 Return -2
                             End If
                         End If
-                    Catch ex As Threading.ThreadInterruptedException
+                    Catch ex As ThreadInterruptedException
                         Return version
                     End Try
 
 
-                    If inSection And line.Contains(VERSION_NAME) Then
-                        Dim versionName As String = line.Substring(line.IndexOf(VERSION_NAME, StringComparison.Ordinal) + VERSION_NAME.Length)
-                        version = Double.Parse(versionName, CultureInfo.InvariantCulture)
+                    If inSection And line.Contains(versionName) Then
+                        Dim versionTemp = line.Substring(line.IndexOf(versionName, StringComparison.Ordinal) + versionName.Length)
+                        version = Double.Parse(versionTemp, CultureInfo.InvariantCulture)
                         Exit While
                     ElseIf line.Contains(package) And line.Contains("Package ") Then
                         inSection = True
                     End If
                     line = adb.StandardOutput.ReadLine
                 End While
-            Catch ex As IO.IOException
+            Catch ex As IOException
                 Return version
             End Try
 
@@ -249,19 +250,19 @@ Public Class DeviceChooserDialog
     End Function
 
     Private Sub OK_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OK_Button.Click
-        Me.DialogResult = DialogResult.OK
-        Me.Close()
+        DialogResult = DialogResult.OK
+        Close()
     End Sub
 
     Private Sub Cancel_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Cancel_Button.Click
-        Me.DialogResult = DialogResult.Cancel
-        Me.Close()
+        DialogResult = DialogResult.Cancel
+        Close()
     End Sub
 
     Private Sub lstDevices_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstDevices.SelectedIndexChanged
         If lstDevices.SelectedIndices.Count > 0 Then
             OK_Button.Enabled = True
-            deviceIndex = lstDevices.SelectedIndex
+            _deviceIndex = lstDevices.SelectedIndex
         Else
             OK_Button.Enabled = False
         End If
@@ -270,7 +271,7 @@ Public Class DeviceChooserDialog
     Private Sub listBox1_DrawItem(sender As Object, e As DrawItemEventArgs) Handles lstDevices.DrawItem
         e.DrawBackground()
         If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
-            e.Graphics.FillRectangle(MaterialSkin.MaterialSkinManager.Instance.ColorScheme.AccentBrush, e.Bounds)
+            e.Graphics.FillRectangle(MaterialSkinManager.Instance.ColorScheme.AccentBrush, e.Bounds)
         End If
         Using b As New SolidBrush(e.ForeColor)
             If e.Index >= 0 Then
@@ -282,7 +283,7 @@ Public Class DeviceChooserDialog
     End Sub
 
     Private Sub dlgDeviceChoose_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        autoUpdateThread.Interrupt()
+        _autoUpdateThread.Interrupt()
     End Sub
 
     Private Sub dlgDeviceChoose_Closed(sender As Object, e As EventArgs) Handles Me.Closed

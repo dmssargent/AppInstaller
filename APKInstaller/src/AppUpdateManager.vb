@@ -1,6 +1,10 @@
 ﻿
-Imports System.Resources
+Imports System.Diagnostics.CodeAnalysis
+Imports System.IO
+Imports System.Threading
+Imports APKInstaller.My.Resources
 Imports MaterialSkin.Controls
+Imports Microsoft.Win32
 Imports Squirrel
 
 ''' <summary>
@@ -13,10 +17,10 @@ Imports Squirrel
 ''' </summary>
 Public Class AppUpdateManager
     Private Delegate Sub SetUpdateCallback()
-    Private Shared updateManager As UpdateManager
+    Private Shared _updateManager As UpdateManager
     Private _updateLabel As MaterialLabel = Nothing
-    Private GUI As Form
-    Private updatesEnabled As Boolean
+    Private ReadOnly _gui As Form
+    'Private _updatesEnabled As Boolean
 
     ''' <summary>
     ''' The label that update notification should be applied to; must be a child of the GUI form used when creating the instance
@@ -41,14 +45,14 @@ Public Class AppUpdateManager
     ''' Creates a new AppUpdateManager instance binded to a specific GUI
     ''' </summary>
     ''' <param name="gui">The main window form, and contains UpdateLabel, cannot be null</param>
-    <CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
+    <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub New(ByRef gui As Form)
         Try
             Const updatePath = "https://github.com/dmssargent/AppInstaller"
             'updatesEnabled = IO.Directory.Exists(updatePath)
             Dim githubMgr = UpdateManager.GitHubUpdateManager(updatePath)
             githubMgr.Start()
-            updateManager = githubMgr.Result
+            _updateManager = githubMgr.Result
         Catch e As Exception
 
         End Try
@@ -56,50 +60,50 @@ Public Class AppUpdateManager
         If gui Is Nothing Then
             Throw New ArgumentNullException(NameOf(gui))
         End If
-        Me.GUI = gui
+        _gui = gui
     End Sub
 
     ''' <summary>
     ''' Handles installer events, some of which may result in termination without the main form being loaded
     ''' </summary>
     Shared Sub HandleEvents()
-        If (updateManager Is Nothing) Then
+        If (_updateManager Is Nothing) Then
             Return
         End If
 
         SquirrelAwareApp.HandleEvents(
                 onInitialInstall:=Sub(v) SquirrelInstall(),
-                onAppUpdate:=Sub(v) updateManager.CreateShortcutForThisExe(),
+                onAppUpdate:=Sub(v) _updateManager.CreateShortcutForThisExe(),
                 onAppUninstall:=Sub(v) SquirrelUninstall()
             )
 
     End Sub
 
     Private Shared Sub SquirrelInstall()
-        updateManager.CreateShortcutForThisExe()
+        _updateManager.CreateShortcutForThisExe()
 
         ' Create a default icon
-        Dim icon = IO.Path.Combine(IO.Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
-        Using file As New IO.FileStream(icon, IO.FileMode.Create)
-            My.Resources.android_app.Save(file)
+        Dim icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
+        Using file As New FileStream(icon, FileMode.Create)
+            android_app.Save(file)
         End Using
 
         ' Register the APK extension to this app
-        Const APP_CLASS_KEY As String = "AppInstaller"
-        Const APP_EXT As String = ".apk"
+        Const classKey = "AppInstaller"
+        Const appExt = ".apk"
 
-        Dim classes = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", True)
+        Dim classes = Registry.CurrentUser.OpenSubKey("Software", True)
 
         classes.CreateSubKey("Classes")
         classes = classes.OpenSubKey("Classes", True)
-        Dim appExtKey = classes.CreateSubKey(APP_EXT)
+        Dim appExtKey = classes.CreateSubKey(appExt)
 
-        appExtKey.SetValue("", APP_CLASS_KEY) 'Set Default key value
+        appExtKey.SetValue("", classKey) 'Set Default key value
         appExtKey.Close()
 
 
-        classes.CreateSubKey(APP_CLASS_KEY)
-        Dim appClassKey = classes.OpenSubKey(APP_CLASS_KEY, True)
+        classes.CreateSubKey(classKey)
+        Dim appClassKey = classes.OpenSubKey(classKey, True)
 
         appClassKey.CreateSubKey("DefaultIcon")
         appClassKey = appClassKey.OpenSubKey("DefaultIcon", True)
@@ -121,32 +125,32 @@ Public Class AppUpdateManager
     End Sub
 
     Private Shared Sub SquirrelUninstall()
-        updateManager.RemoveShortcutForThisExe()
+        _updateManager.RemoveShortcutForThisExe()
 
-        Dim icon = IO.Path.Combine(IO.Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
-        IO.File.Delete(icon)
+        Dim icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
+        File.Delete(icon)
 
-        Const APP_CLASS_KEY As String = "AppInstaller"
+        Const appClassKey = "AppInstaller"
 
-        Dim classes = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software", True)
+        Dim classes = Registry.CurrentUser.OpenSubKey("Software", True)
 
         classes.CreateSubKey("Classes")
         classes = classes.OpenSubKey("Classes", True)
 
         ' According to MSDN, do not delete the file extension key, only delete the Class that the file extension is registered with
-        classes.DeleteSubKey(APP_CLASS_KEY)
+        classes.DeleteSubKey(appClassKey)
     End Sub
 
 
 
     Private Async Sub StartUpdate()
-        If updateManager Is Nothing Or Not updatesEnabled Then
+        If _updateManager Is Nothing Then
             Exit Sub
         End If
 
-        Dim updateInfo = Await updateManager.CheckForUpdate
+        Dim updateInfo = Await _updateManager.CheckForUpdate
         If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
-            Await updateManager.UpdateApp()
+            Await _updateManager.UpdateApp()
 
             If (_updateLabel IsNot Nothing) Then
                 NotifyOfUpdate()
@@ -158,7 +162,7 @@ Public Class AppUpdateManager
     ''' Updates the current app asynchronously
     ''' </summary>
     Public Sub Update()
-        Dim update = New Threading.Thread(New Threading.ThreadStart(AddressOf StartUpdate))
+        Dim update = New Thread(New ThreadStart(AddressOf StartUpdate))
         update.Start()
     End Sub
 
@@ -170,18 +174,18 @@ Public Class AppUpdateManager
         If (UpdateLabel.InvokeRequired) Then
             UpdateLabel.Invoke(New SetUpdateCallback(AddressOf NotifyOfUpdate))
         Else
-            UpdateLabel.Text = My.Resources.Strings.ResourceManager.GetString("updateReady")
+            UpdateLabel.Text = Strings.ResourceManager.GetString("updateReady")
             UpdateLabel.Font = New Font(UpdateLabel.Font, FontStyle.Underline)
             UpdateLabel.Visible = True
-            If (Not GUI.InvokeRequired) Then
-                GUI.Height += 20
+            If (Not _gui.InvokeRequired) Then
+                _gui.Height += 20
             End If
         End If
 
     End Sub
 
     Private Sub UpdateClick(sender As Object, e As EventArgs)
-        If (updateManager IsNot Nothing) Then
+        If (_updateManager IsNot Nothing) Then
             UpdateManager.RestartApp()
         End If
     End Sub

@@ -137,6 +137,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Confirm.
+        '''</summary>
+        Friend Shared ReadOnly Property Confirm() As String
+            Get
+                Return ResourceManager.GetString("Confirm", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Do you want to correct those configuration issues?.
         '''</summary>
         Friend Shared ReadOnly Property correctConfigIssue() As String
@@ -313,6 +322,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property isDirError() As String
             Get
                 Return ResourceManager.GetString("isDirError", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Modify.
+        '''</summary>
+        Friend Shared ReadOnly Property Modify() As String
+            Get
+                Return ResourceManager.GetString("Modify", resourceCulture)
             End Get
         End Property
         
