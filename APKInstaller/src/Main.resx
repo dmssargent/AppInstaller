@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lblStatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="lblStatus.Font" type="System.Drawing.Font, System.Drawing">
     <value>Roboto, 11pt</value>
@@ -149,11 +153,14 @@
   <data name="&gt;&gt;lblStatus.ZOrder" xml:space="preserve">
     <value>7</value>
   </data>
+  <data name="txtFileLocation.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
   <data name="txtFileLocation.Location" type="System.Drawing.Point, System.Drawing">
     <value>13, 496</value>
   </data>
   <data name="txtFileLocation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>960, 28</value>
+    <value>704, 28</value>
   </data>
   <data name="txtFileLocation.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -170,6 +177,9 @@
   <data name="&gt;&gt;txtFileLocation.ZOrder" xml:space="preserve">
     <value>6</value>
   </data>
+  <data name="chkReinstall.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
   <data name="chkReinstall.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -179,7 +189,6 @@
   <data name="chkReinstall.Location" type="System.Drawing.Point, System.Drawing">
     <value>13, 454</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chkReinstall.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
@@ -203,6 +212,9 @@
   </data>
   <data name="&gt;&gt;chkReinstall.ZOrder" xml:space="preserve">
     <value>5</value>
+  </data>
+  <data name="chkForce.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
   </data>
   <data name="chkForce.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -237,6 +249,9 @@
   <data name="&gt;&gt;chkForce.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
+  <data name="btnOpenFileDialogTrigger.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
   <data name="btnOpenFileDialogTrigger.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -244,7 +259,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Location" type="System.Drawing.Point, System.Drawing">
-    <value>750, 488</value>
+    <value>762, 488</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -269,6 +284,9 @@
   </data>
   <data name="&gt;&gt;btnOpenFileDialogTrigger.ZOrder" xml:space="preserve">
     <value>3</value>
+  </data>
+  <data name="btnInstall.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
   </data>
   <data name="btnInstall.Font" type="System.Drawing.Font, System.Drawing">
     <value>Open Sans Extrabold, 18pt, style=Bold</value>
@@ -301,7 +319,7 @@
     <value>2</value>
   </data>
   <data name="pgbStatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
+    <value>Bottom, Left, Right</value>
   </data>
   <data name="pgbStatus.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 410</value>

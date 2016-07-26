@@ -42,8 +42,8 @@ Partial Class MultiPackageDialog
         '
         'lstFiles
         '
-        Me.lstFiles.FormattingEnabled = True
         resources.ApplyResources(Me.lstFiles, "lstFiles")
+        Me.lstFiles.FormattingEnabled = True
         Me.lstFiles.Name = "lstFiles"
         '
         'btnAdd
@@ -57,9 +57,9 @@ Partial Class MultiPackageDialog
         '
         'txtFile
         '
+        resources.ApplyResources(Me.txtFile, "txtFile")
         Me.txtFile.Depth = 0
         Me.txtFile.Hint = ""
-        resources.ApplyResources(Me.txtFile, "txtFile")
         Me.txtFile.MaxLength = 32767
         Me.txtFile.MouseState = MaterialSkin.MouseState.HOVER
         Me.txtFile.Name = "txtFile"
@@ -97,8 +97,8 @@ Partial Class MultiPackageDialog
         '
         'btnOk
         '
-        Me.btnOk.Depth = 0
         resources.ApplyResources(Me.btnOk, "btnOk")
+        Me.btnOk.Depth = 0
         Me.btnOk.MouseState = MaterialSkin.MouseState.HOVER
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Primary = True
@@ -134,8 +134,11 @@ Partial Class MultiPackageDialog
         '
         'MultiPackageDialog
         '
+        Me.AcceptButton = Me.btnOk
         resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.CancelButton = Me.btnCancel
+        Me.ControlBox = False
         Me.Controls.Add(Me.btnAdd)
         Me.Controls.Add(Me.btnBrowse)
         Me.Controls.Add(Me.btnCancel)
@@ -146,6 +149,8 @@ Partial Class MultiPackageDialog
         Me.Controls.Add(Me.txtFile)
         Me.Controls.Add(Me.btnModify)
         Me.Controls.Add(Me.lstFiles)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "MultiPackageDialog"
         Me.ResumeLayout(False)
         Me.PerformLayout()

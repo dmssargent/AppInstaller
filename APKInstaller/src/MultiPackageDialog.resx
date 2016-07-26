@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lstFiles.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="lstFiles.HorizontalScrollbar" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -129,7 +133,7 @@
     <value>12, 156</value>
   </data>
   <data name="lstFiles.Size" type="System.Drawing.Size, System.Drawing">
-    <value>391, 276</value>
+    <value>373, 276</value>
   </data>
   <data name="lstFiles.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -146,15 +150,17 @@
   <data name="&gt;&gt;lstFiles.ZOrder" xml:space="preserve">
     <value>9</value>
   </data>
+  <data name="btnAdd.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="btnAdd.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="btnAdd.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
   </data>
   <data name="btnAdd.Location" type="System.Drawing.Point, System.Drawing">
-    <value>410, 156</value>
+    <value>434, 156</value>
   </data>
   <data name="btnAdd.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -180,11 +186,14 @@
   <data name="&gt;&gt;btnAdd.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="txtFile.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <data name="txtFile.Location" type="System.Drawing.Point, System.Drawing">
     <value>101, 93</value>
   </data>
   <data name="txtFile.Size" type="System.Drawing.Size, System.Drawing">
-    <value>393, 28</value>
+    <value>284, 28</value>
   </data>
   <data name="txtFile.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -261,6 +270,9 @@
   <data name="&gt;&gt;lblFiles.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
+  <data name="btnDelete.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="btnDelete.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -268,7 +280,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnDelete.Location" type="System.Drawing.Point, System.Drawing">
-    <value>410, 252</value>
+    <value>434, 252</value>
   </data>
   <data name="btnDelete.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -294,8 +306,11 @@
   <data name="&gt;&gt;btnDelete.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
+  <data name="btnOk.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
   <data name="btnOk.Location" type="System.Drawing.Point, System.Drawing">
-    <value>417, 450</value>
+    <value>419, 447</value>
   </data>
   <data name="btnOk.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -317,6 +332,9 @@
   </data>
   <data name="&gt;&gt;btnOk.ZOrder" xml:space="preserve">
     <value>3</value>
+  </data>
+  <data name="btnCancel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
   </data>
   <data name="btnCancel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -351,6 +369,9 @@
   <data name="&gt;&gt;btnCancel.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
+  <data name="btnBrowse.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="btnBrowse.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -358,7 +379,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnBrowse.Location" type="System.Drawing.Point, System.Drawing">
-    <value>410, 88</value>
+    <value>428, 88</value>
   </data>
   <data name="btnBrowse.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -384,6 +405,9 @@
   <data name="&gt;&gt;btnBrowse.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="btnModify.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="btnModify.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -391,7 +415,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnModify.Location" type="System.Drawing.Point, System.Drawing">
-    <value>410, 204</value>
+    <value>434, 204</value>
   </data>
   <data name="btnModify.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -471,6 +495,9 @@
         IwDEACMAxAAjAMQAIwDEACMAxAAjAMQAIwDEACMA////APwAPwD8AD8A/kJ/AP4AfwD/AP8A/wD/AP7/
         fwA=
 </value>
+  </data>
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterParent</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Choose APK Files</value>
