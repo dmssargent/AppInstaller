@@ -248,11 +248,11 @@ Public NotInheritable Class AndroidTools
             Const parseFor = "package: name="
             Dim package As String = Nothing
             Try
-                Dim line As String = aapt.StandardOutput.ReadLine.Trim
+                Dim line As String = aapt.StandardOutput.ReadLine
                 While line IsNot Nothing
                     'Detect interrupts
                     Thread.Sleep(1)
-
+                    line = line.Trim
                     If line.Contains(parseFor) Then
                         Dim versionName As String = line.Substring(line.IndexOf(parseFor, StringComparison.Ordinal) + parseFor.Length)
                         package = versionName.Substring(versionName.IndexOf("'", StringComparison.Ordinal) + 1)

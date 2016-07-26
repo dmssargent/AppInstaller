@@ -180,7 +180,48 @@ Public Class Main
             Exit Sub
         End If
 
-        If apkInstaller.VerifyFilesToInstall Then
+        If apkInstaller IsNot Nothing AndAlso Not apkInstaller.UseMultiFileDialog Then
+            Dim pos = txtFileLocation.SelectionStart
+            Dim currentData = txtFileLocation.Text
+            If currentData.Contains(",") Then
+                Dim firstIndex = currentData.IndexOf(",")
+                If firstIndex > pos Then
+                    currentData = currentData.Substring(0, firstIndex + 1)
+                Else
+                    If pos >= currentData.Length Then
+                        currentData = currentData.Substring(currentData.LastIndexOf(",") + 1)
+                    Else
+                        Dim index = -1
+                        While True
+                            Dim temp = currentData.IndexOf(",", index + 1)
+                            If temp >= pos Then
+                                Exit While
+                            Else
+                                index = temp
+                            End If
+                        End While
+                        currentData = currentData.Substring(index)
+                        If currentData.Contains(",") Then
+                            currentData = currentData.Substring(0, currentData.IndexOf(",") + 1)
+                        End If
+                    End If
+                End If
+            End If
+
+            CheckInstallerConfig(apkInstaller.ValidateFile(currentData))
+        End If
+    End Sub
+
+    Private Sub Main_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
+        CheckInstallerConfig()
+    End Sub
+
+    Private Sub CheckInstallerConfig(Optional optionalConditon As Boolean = True)
+        If apkInstaller Is Nothing Then
+            'Exit Sub
+        End If
+
+        If apkInstaller.VerifyFilesToInstall And optionalConditon Then
             btnInstall.Visible = apkInstaller.VerifyFilesToInstall
             lblStatus.Text = My.Resources.Strings.readyToInstall
         Else
@@ -336,19 +377,34 @@ Public Class Main
         If apkInstaller IsNot Nothing AndAlso apkInstaller.UseMultiFileDialog Then
             txtFileLocation.Enabled = True
         Else
-            Dim files = New List(Of String)
-            txtFileLocation.Text.Replace("...", "")
-            If txtFileLocation.Text.Contains(",") Then
-                files.AddRange(txtFileLocation.Text.Split(CType(",", Char)))
-            End If
-            If txtFileLocation.Text.Contains(Path.PathSeparator) Then
-                files.AddRange(txtFileLocation.Text.Split(Path.PathSeparator))
-            End If
+            Dim files As List(Of String) = ExtractFilesFromString(txtFileLocation.Text)
+
             If apkInstaller IsNot Nothing AndAlso Not apkInstaller.UseMultiFileDialog Then
-                apkInstaller.AddFilesToInstall(files.ToArray)
+                Dim desc = ExtractFilesFromString(apkInstaller.FilesToInstallDescription)
+                For Each file As String In files
+                    If Not desc.Contains(file) Then
+                        apkInstaller.RemoveFile(file)
+                    End If
+                Next
+                Dim temp = txtFileLocation.Text
+                apkInstaller.AddFilesToInstall(files.ToArray, False, False)
+                txtFileLocation.Text = temp
             End If
         End If
     End Sub
+
+    Private Function ExtractFilesFromString(data As String) As List(Of String)
+        Dim files = New List(Of String)
+        data.Replace("...", "")
+        If data.Contains(",") Then
+            files.AddRange(data.Split(CType(",", Char)))
+        End If
+        If data.Contains(Path.PathSeparator) Then
+            files.AddRange(data.Split(Path.PathSeparator))
+        End If
+
+        Return files
+    End Function
 
     Private Sub txtFileLocation_DoubleClick(sender As Object, e As EventArgs) Handles txtFileLocation.DoubleClick
         Dim dialog = MultiPackageDialog.Create(apkInstaller.GetFilesToInstall)
@@ -360,6 +416,5 @@ Public Class Main
             dialogLock = False
         End If
     End Sub
-
 
 End Class
