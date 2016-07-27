@@ -72,6 +72,11 @@ Public Class Main
             End If
         Next
 
+        If Not enableFileArg Then
+            MsgBox("The installer is broken.", CType(MsgBoxStyle.Critical + MsgBoxStyle.OkOnly, MsgBoxStyle))
+            Close()
+        End If
+
         Dim fileArgs As String() = appList.ToArray
         _apkInstaller.AddFilesToInstall(fileArgs)
         If Not (fileArgs.Length = 0) And txtFileLocation.Text.Length > 0 And btnInstall.Enabled Then

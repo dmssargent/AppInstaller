@@ -4,6 +4,7 @@ Imports System.IO
 Imports System.Threading
 Imports APKInstaller.My.Resources
 Imports MaterialSkin.Controls
+Imports Microsoft.VisualBasic.Logging
 Imports Microsoft.Win32
 Imports Squirrel
 
@@ -20,6 +21,8 @@ Public Class AppUpdateManager
     Private Shared _updateManager As UpdateManager
     Private _updateLabel As MaterialLabel = Nothing
     Private ReadOnly _gui As Form
+    Private Shared _configured As Boolean = False
+
     'Private _updatesEnabled As Boolean
 
     ''' <summary>
@@ -30,9 +33,8 @@ Public Class AppUpdateManager
         Get
             Return _updateLabel
         End Get
-        Set(value As MaterialLabel)
-
-            _updateLabel = value
+        Set
+            _updateLabel = Value
             If (_updateLabel IsNot Nothing) Then
                 ' Add our click handler on the fly
                 AddHandler UpdateLabel.Click, AddressOf UpdateClick
@@ -47,15 +49,10 @@ Public Class AppUpdateManager
     ''' <param name="gui">The main window form, and contains UpdateLabel, cannot be null</param>
     <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub New(ByRef gui As Form)
-        Try
-            Const updatePath = "https://github.com/dmssargent/AppInstaller"
-            'updatesEnabled = IO.Directory.Exists(updatePath)
-            Dim githubMgr = UpdateManager.GitHubUpdateManager(updatePath)
-            githubMgr.Start()
-            _updateManager = githubMgr.Result
-        Catch e As Exception
-
-        End Try
+        'MsgBox("foo")
+        Dim updateManager = New Thread(New ThreadStart(AddressOf GetUpdateManager))
+        updateManager.Name = "Update Manager"
+        updateManager.Start()
 
         If gui Is Nothing Then
             Throw New ArgumentNullException(NameOf(gui))
@@ -63,14 +60,32 @@ Public Class AppUpdateManager
         _gui = gui
     End Sub
 
+    Private Shared Async Sub GetUpdateManager()
+
+        Try
+            Const updatePath = "https://github.com/dmssargent/AppInstaller"
+            Dim githubMgr = Await UpdateManager.GitHubUpdateManager(updatePath, prerelease:=True)
+
+            _updateManager = githubMgr
+
+
+        Catch e As Exception
+            Console.Write(e.ToString())
+        End Try
+
+        _configured = True
+    End Sub
+
     ''' <summary>
     ''' Handles installer events, some of which may result in termination without the main form being loaded
     ''' </summary>
     Shared Sub HandleEvents()
-        If (_updateManager Is Nothing) Then
+        'MsgBox("Squirrel Init")
+        If Not VerifyState() Then
             Return
         End If
 
+        'MsgBox("Squirrel Handle")
         SquirrelAwareApp.HandleEvents(
                 onInitialInstall:=Sub(v) SquirrelInstall(),
                 onAppUpdate:=Sub(v) _updateManager.CreateShortcutForThisExe(),
@@ -79,7 +94,21 @@ Public Class AppUpdateManager
 
     End Sub
 
+    Private Shared Function VerifyState() As Boolean
+        If (_updateManager Is Nothing) Then
+            While Not _configured
+                Thread.Sleep(10)
+            End While
+
+            If (_updateManager Is Nothing) Then
+                Return False
+            End If
+        End If
+        Return True
+    End Function
+
     Private Shared Sub SquirrelInstall()
+        'MsgBox("Squirrel Install")
         _updateManager.CreateShortcutForThisExe()
 
         ' Create a default icon
@@ -144,7 +173,7 @@ Public Class AppUpdateManager
 
 
     Private Async Sub StartUpdate()
-        If _updateManager Is Nothing Then
+        If Not VerifyState() Then
             Exit Sub
         End If
 
