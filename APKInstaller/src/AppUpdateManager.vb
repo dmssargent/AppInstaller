@@ -4,7 +4,6 @@ Imports System.IO
 Imports System.Threading
 Imports APKInstaller.My.Resources
 Imports MaterialSkin.Controls
-Imports Microsoft.VisualBasic.Logging
 Imports Microsoft.Win32
 Imports Squirrel
 
@@ -217,5 +216,9 @@ Public Class AppUpdateManager
         If (_updateManager IsNot Nothing) Then
             UpdateManager.RestartApp()
         End If
+    End Sub
+
+    Sub CleanUp()
+        _updateManager.Dispose()
     End Sub
 End Class

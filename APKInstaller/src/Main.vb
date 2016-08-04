@@ -60,7 +60,7 @@ Public Class Main
         Dim enableFileArg = True
         For Each arg As String In My.Application.CommandLineArgs
             If arg.StartsWith("--", StringComparison.Ordinal) Or arg.StartsWith("-", StringComparison.Ordinal) Then
-                If arg.Contains("squirrel") Then
+                If arg.Contains("squirrel") AndAlso Not arg.Contains("firstrun") Then
                     enableFileArg = False
                 End If
                 noPrompt = ParseNonFileArgument(noPrompt, arg)
@@ -284,6 +284,7 @@ Public Class Main
     <Log("App Installer Debug")>
     Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         IoUtilities.Cleanup() ' Cleanup all of the tools we used
+        _updateMgr.CleanUp()
     End Sub
 
     <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
