@@ -12,6 +12,12 @@ Option Strict On
 Option Explicit On
 
 Imports System
+Imports System.CodeDom.Compiler
+Imports System.ComponentModel
+Imports System.Diagnostics.CodeAnalysis
+Imports System.Globalization
+Imports System.Resources
+Imports System.Runtime.CompilerServices
 
 Namespace My.Resources
     
@@ -22,16 +28,16 @@ Namespace My.Resources
     '''<summary>
     '''  A strongly-typed resource class, for looking up localized strings, etc.
     '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),  _
-     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute()>  _
+    <GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),  _
+     DebuggerNonUserCode(),  _
+     CompilerGenerated()>  _
     Friend Class Strings
         
-        Private Shared resourceMan As Global.System.Resources.ResourceManager
+        Private Shared resourceMan As ResourceManager
         
-        Private Shared resourceCulture As Global.System.Globalization.CultureInfo
+        Private Shared resourceCulture As CultureInfo
         
-        <Global.System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")>  _
+        <SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")>  _
         Friend Sub New()
             MyBase.New
         End Sub
@@ -39,11 +45,11 @@ Namespace My.Resources
         '''<summary>
         '''  Returns the cached ResourceManager instance used by this class.
         '''</summary>
-        <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
+        <EditorBrowsable(EditorBrowsableState.Advanced)>  _
+        Friend Shared ReadOnly Property ResourceManager() As ResourceManager
             Get
-                If Object.ReferenceEquals(resourceMan, Nothing) Then
-                    Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("APKInstaller.Strings", GetType(Strings).Assembly)
+                If ReferenceEquals(resourceMan, Nothing) Then
+                    Dim temp As ResourceManager = New ResourceManager("APKInstaller.Strings", GetType(Strings).Assembly)
                     resourceMan = temp
                 End If
                 Return resourceMan
@@ -54,8 +60,8 @@ Namespace My.Resources
         '''  Overrides the current thread's CurrentUICulture property for all
         '''  resource lookups using this strongly typed resource class.
         '''</summary>
-        <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared Property Culture() As Global.System.Globalization.CultureInfo
+        <EditorBrowsable(EditorBrowsableState.Advanced)>  _
+        Friend Shared Property Culture() As CultureInfo
             Get
                 Return resourceCulture
             End Get

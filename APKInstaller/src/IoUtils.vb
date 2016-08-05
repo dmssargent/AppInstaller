@@ -128,11 +128,9 @@ Public Class IoUtilities : Implements IDisposable
         If Not _disposedValue Then
             Dim temp = _tempFilePath
             If disposing Then
-                ' TODO: dispose managed state (managed objects).
                 _isReady = False
                 _instance = Nothing
 
-                'tempFile = Nothing
                 _sessions.Clear()
                 _sessions = Nothing
                 _tempFilePath = Nothing
@@ -145,23 +143,18 @@ Public Class IoUtilities : Implements IDisposable
                     File.Delete(temp)
                 End If
             End If
-
-            ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
-            ' TODO: set large fields to null.
         End If
         _disposedValue = True
     End Sub
 
-    ' TODO: override Finalize() only if Dispose(disposing As Boolean) above has code to free unmanaged resources.
     Protected Overrides Sub Finalize()
-        ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
         Dispose(False)
         MyBase.Finalize()
     End Sub
 
-    ' This code added by Visual Basic to correctly implement the disposable pattern.
+
     Public Sub Dispose() Implements IDisposable.Dispose
-        ' Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
+        GC.SuppressFinalize(Me)
         Dispose(True)
     End Sub
 #End Region

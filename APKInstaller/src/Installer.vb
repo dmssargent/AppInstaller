@@ -67,12 +67,20 @@ Public Class Installer
         End Get
     End Property
 
+    Sub AddFilesToInstall(files() As String)
+        AddFilesToInstall(files, False)
+    End Sub
+
+    Sub AddFilesToInstall(files() As String, clear As Boolean)
+        AddFilesToInstall(files, clear, True)
+    End Sub
+
     ''' <summary>
     ''' Adds files to be installed
     ''' </summary>
     ''' <param name="files">files to be installed</param>
     <Log("App Installer Debug")>
-    Sub AddFilesToInstall(files() As String, Optional clear As Boolean = False, Optional notifyUser As Boolean = True)
+    Sub AddFilesToInstall(files() As String, clear As Boolean, notifyUser As Boolean)
         If files Is Nothing Then
             Throw New ArgumentNullException(NameOf(files))
         End If
@@ -111,6 +119,9 @@ Public Class Installer
         _filesToInstall.Remove(path)
     End Sub
 
+    Public Shared Function ValidateFile(path As String) As Boolean
+        Return ValidateFile(path, False)
+    End Function
     ''' <summary>
     ''' Determines if the given file is a valid APK file
     ''' </summary>
@@ -118,7 +129,11 @@ Public Class Installer
     ''' <param name="notifyUser">true will notify the user of the problem via dialogs, false will not</param>
     ''' <returns>true if the file is a valid APK, false otherwise</returns>
     <Log("App Installer Debug")>
-    Public Shared Function ValidateFile(path As String, Optional notifyUser As Boolean = False) As Boolean
+    Public Shared Function ValidateFile(path As String, notifyUser As Boolean) As Boolean
+        If path Is Nothing Then
+            Throw New ArgumentNullException(NameOf(path))
+        End If
+
         ' Check to see if the file exists
         If Not File.Exists(path) Then
             If notifyUser Then
@@ -223,7 +238,7 @@ Public Class Installer
             For retry = 0 To maxRetryCount
                 'Display a status
                 _gui.SetText(_gui.lblStatus, If(retry = 0, Strings.installing, Strings.retrying_install) & " """ & file & Strings.onto_the_device & deviceId & """")
-                Dim installAttempt = PackageInstallAttempt(deviceId, installStatus, file)
+                Dim installAttempt = PackageInstallAttempt(deviceId, file)
                 Select Case installAttempt
                     Case ErrorCode.Abort
                         installAborted = True
@@ -257,7 +272,7 @@ Public Class Installer
         ' End device install section
     End Sub
 
-    Private Function PackageInstallAttempt(deviceId As String, installStatus As String, file As String) As ErrorCode
+    Private Function PackageInstallAttempt(deviceId As String, file As String) As ErrorCode
         If Force Then
             ForceRemovePackage(file)
         End If

@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports APKInstaller.My.Resources
+﻿Imports APKInstaller.My.Resources
 Imports MaterialSkin
 
 Public Class MultiPackageDialog
@@ -44,7 +43,7 @@ Public Class MultiPackageDialog
     Private Sub btnOk_Click(sender As Object, e As EventArgs) Handles btnOk.Click
         For Each item In lstFiles.Items
             If Not Installer.ValidateFile(item.ToString(), True) Then
-                If MsgBox("An invalid or nonexistent APK file was found. If you continue, the file may not be installed. Do you want to continue?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.No Then
+                If MsgBox("An invalid or nonexistent APK file was found. If you continue, the file may not be installed. Do you want to continue?", CType(MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation, MsgBoxStyle)) = MsgBoxResult.No Then
                     Exit Sub
                 End If
             End If
@@ -54,7 +53,7 @@ Public Class MultiPackageDialog
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
-        If MsgBox("Are you really sure you want to cancel? None of the changes made will be preserved.", CType(MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo, Global.Microsoft.VisualBasic.MsgBoxStyle)) = MsgBoxResult.Yes Then
+        If MsgBox("Are you really sure you want to cancel? None of the changes made will be preserved.", CType(MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo, MsgBoxStyle)) = MsgBoxResult.Yes Then
             DialogResult = DialogResult.Cancel
             Close()
         End If

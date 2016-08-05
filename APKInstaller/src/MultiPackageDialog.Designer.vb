@@ -27,17 +27,17 @@ Partial Class MultiPackageDialog
     'Do not modify it using the code editor.
     <DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MultiPackageDialog))
-        Me.lstFiles = New System.Windows.Forms.ListBox()
-        Me.btnAdd = New MaterialSkin.Controls.MaterialFlatButton()
-        Me.txtFile = New MaterialSkin.Controls.MaterialSingleLineTextField()
-        Me.lblFile = New MaterialSkin.Controls.MaterialLabel()
-        Me.lblFiles = New MaterialSkin.Controls.MaterialLabel()
-        Me.btnDelete = New MaterialSkin.Controls.MaterialFlatButton()
-        Me.btnOk = New MaterialSkin.Controls.MaterialRaisedButton()
-        Me.btnCancel = New MaterialSkin.Controls.MaterialFlatButton()
-        Me.btnBrowse = New MaterialSkin.Controls.MaterialFlatButton()
-        Me.btnModify = New MaterialSkin.Controls.MaterialFlatButton()
+        Dim resources As ComponentResourceManager = New ComponentResourceManager(GetType(MultiPackageDialog))
+        Me.lstFiles = New ListBox()
+        Me.btnAdd = New MaterialFlatButton()
+        Me.txtFile = New MaterialSingleLineTextField()
+        Me.lblFile = New MaterialLabel()
+        Me.lblFiles = New MaterialLabel()
+        Me.btnDelete = New MaterialFlatButton()
+        Me.btnOk = New MaterialRaisedButton()
+        Me.btnCancel = New MaterialFlatButton()
+        Me.btnBrowse = New MaterialFlatButton()
+        Me.btnModify = New MaterialFlatButton()
         Me.SuspendLayout()
         '
         'lstFiles
@@ -50,7 +50,7 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.btnAdd, "btnAdd")
         Me.btnAdd.Depth = 0
-        Me.btnAdd.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnAdd.MouseState = MouseState.HOVER
         Me.btnAdd.Name = "btnAdd"
         Me.btnAdd.Primary = False
         Me.btnAdd.UseVisualStyleBackColor = True
@@ -61,9 +61,9 @@ Partial Class MultiPackageDialog
         Me.txtFile.Depth = 0
         Me.txtFile.Hint = ""
         Me.txtFile.MaxLength = 32767
-        Me.txtFile.MouseState = MaterialSkin.MouseState.HOVER
+        Me.txtFile.MouseState = MouseState.HOVER
         Me.txtFile.Name = "txtFile"
-        Me.txtFile.PasswordChar = Global.Microsoft.VisualBasic.ChrW(0)
+        Me.txtFile.PasswordChar = ChrW(0)
         Me.txtFile.SelectedText = ""
         Me.txtFile.SelectionLength = 0
         Me.txtFile.SelectionStart = 0
@@ -74,23 +74,23 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.lblFile, "lblFile")
         Me.lblFile.Depth = 0
-        Me.lblFile.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lblFile.MouseState = MaterialSkin.MouseState.HOVER
+        Me.lblFile.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lblFile.MouseState = MouseState.HOVER
         Me.lblFile.Name = "lblFile"
         '
         'lblFiles
         '
         resources.ApplyResources(Me.lblFiles, "lblFiles")
         Me.lblFiles.Depth = 0
-        Me.lblFiles.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lblFiles.MouseState = MaterialSkin.MouseState.HOVER
+        Me.lblFiles.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lblFiles.MouseState = MouseState.HOVER
         Me.lblFiles.Name = "lblFiles"
         '
         'btnDelete
         '
         resources.ApplyResources(Me.btnDelete, "btnDelete")
         Me.btnDelete.Depth = 0
-        Me.btnDelete.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnDelete.MouseState = MouseState.HOVER
         Me.btnDelete.Name = "btnDelete"
         Me.btnDelete.Primary = False
         Me.btnDelete.UseVisualStyleBackColor = True
@@ -99,7 +99,7 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.btnOk, "btnOk")
         Me.btnOk.Depth = 0
-        Me.btnOk.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnOk.MouseState = MouseState.HOVER
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Primary = True
         Me.btnOk.UseVisualStyleBackColor = True
@@ -108,8 +108,8 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.btnCancel, "btnCancel")
         Me.btnCancel.Depth = 0
-        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Yes
-        Me.btnCancel.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnCancel.DialogResult = DialogResult.Yes
+        Me.btnCancel.MouseState = MouseState.HOVER
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Primary = False
         Me.btnCancel.UseVisualStyleBackColor = True
@@ -118,7 +118,7 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.btnBrowse, "btnBrowse")
         Me.btnBrowse.Depth = 0
-        Me.btnBrowse.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnBrowse.MouseState = MouseState.HOVER
         Me.btnBrowse.Name = "btnBrowse"
         Me.btnBrowse.Primary = False
         Me.btnBrowse.UseVisualStyleBackColor = True
@@ -127,7 +127,7 @@ Partial Class MultiPackageDialog
         '
         resources.ApplyResources(Me.btnModify, "btnModify")
         Me.btnModify.Depth = 0
-        Me.btnModify.MouseState = MaterialSkin.MouseState.HOVER
+        Me.btnModify.MouseState = MouseState.HOVER
         Me.btnModify.Name = "btnModify"
         Me.btnModify.Primary = False
         Me.btnModify.UseVisualStyleBackColor = True
@@ -136,7 +136,7 @@ Partial Class MultiPackageDialog
         '
         Me.AcceptButton = Me.btnOk
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
         Me.ControlBox = False
         Me.Controls.Add(Me.btnAdd)

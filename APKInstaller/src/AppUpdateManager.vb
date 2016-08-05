@@ -231,7 +231,7 @@ Public Class AppUpdateManager
         End If
     End Sub
 
-    Sub CleanUp()
+    Shared Sub CleanUp()
         If _updateManager IsNot Nothing Then
             _updateManager.Dispose()
         End If

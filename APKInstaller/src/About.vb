@@ -1,28 +1,29 @@
-﻿Imports APKInstaller.My.Resources
+﻿Imports System.IO
+Imports APKInstaller.My.Resources
 Imports MaterialSkin
 
 Public NotInheritable Class About
-    Private Sub About_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub About_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         MaterialSkinManager.Instance.AddFormToManage(Me)
         ' Set the title of the form.
         Dim applicationTitle As String
         If My.Application.Info.Title <> "" Then
             applicationTitle = My.Application.Info.Title
         Else
-            applicationTitle = System.IO.Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
+            applicationTitle = Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
         End If
-        Me.Text = $"About {applicationTitle}"
+        Text = $"About {applicationTitle}"
         ' Initialize all of the text displayed on the About Box.
         '    properties dialog (under the "Project" menu).
         'Me.LabelProductName.Text = My.Application.Info.ProductName
-        Me.LabelVersion.Text = $"Version {My.Application.Info.Version.ToString}"
-        Me.LabelCopyright.Text = My.Application.Info.Copyright
-        Me.LabelCompanyName.Text = Strings.Built_by & My.Application.Info.CompanyName
-        Me.TextBoxDescription.Font = LabelVersion.Font
-        Me.TextBoxDescription.Text = My.Application.Info.Description
+        LabelVersion.Text = $"Version {My.Application.Info.Version.ToString}"
+        LabelCopyright.Text = My.Application.Info.Copyright
+        LabelCompanyName.Text = Strings.Built_by & My.Application.Info.CompanyName
+        TextBoxDescription.Font = LabelVersion.Font
+        TextBoxDescription.Text = My.Application.Info.Description
 
-        Me.chkPrerelease.Checked = My.Settings.prerelease
-        Me.lblUpdateStatus.Text = AppUpdateManager.UpdateStatusText
+        chkPrerelease.Checked = My.Settings.prerelease
+        lblUpdateStatus.Text = AppUpdateManager.UpdateStatusText
     End Sub
 
     Private Sub chkPrerelease_CheckedChanged(sender As Object, e As EventArgs) Handles chkPrerelease.CheckedChanged
@@ -30,7 +31,7 @@ Public NotInheritable Class About
         AppUpdateManager.UpdateApp()
     End Sub
 
-    Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
+    Private Sub OKButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OKButton.Click
         Close()
     End Sub
 

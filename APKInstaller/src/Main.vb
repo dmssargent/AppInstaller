@@ -292,7 +292,7 @@ Public Class Main
     <Log("App Installer Debug")>
     Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         IoUtilities.Cleanup() ' Cleanup all of the tools we used
-        _updateMgr.CleanUp()
+        AppUpdateManager.CleanUp()
     End Sub
 
     <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>

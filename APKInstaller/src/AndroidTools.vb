@@ -246,7 +246,7 @@ Public NotInheritable Class AndroidTools
     ''' <param name="apkFile">the location of the APK file</param>
     ''' <returns>The package name of the APK file, or nothing on failure</returns>
     <Log("App Installer Debug")>
-    Shared Function PackageName(ByVal apkFile As String) As String
+    Shared Function PackageName(apkFile As String) As String
         If apkFile Is Nothing Then
             Throw New ArgumentNullException(NameOf(apkFile))
         End If
