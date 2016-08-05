@@ -236,7 +236,7 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Welcome to the FIRST App Installer! Try dragging an APK file on me to install or use the Browse button below..
+        '''  Looks up a localized string similar to Welcome to the FIRST App Installer! Try dragging an APK file onto me to install or use the Browse button below..
         '''</summary>
         Friend Shared ReadOnly Property firstRunMessage() As String
             Get

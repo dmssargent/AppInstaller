@@ -169,7 +169,7 @@
     <value>doesn't seem to exist at this moment. You may want to try that file again in a moment or two.</value>
   </data>
   <data name="firstRunMessage" xml:space="preserve">
-    <value>Welcome to the FIRST App Installer! Try dragging an APK file on me to install or use the Browse button below.</value>
+    <value>Welcome to the FIRST App Installer! Try dragging an APK file onto me to install or use the Browse button below.</value>
   </data>
   <data name="forceConfirm" xml:space="preserve">
     <value>Are you really, absolutely sure you want to force the installation by any means necessary? This WILL be destructive if the app is currently installed on the phone."</value>
