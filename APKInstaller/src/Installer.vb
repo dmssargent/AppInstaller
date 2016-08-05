@@ -209,6 +209,7 @@ Public Class Installer
         Dim filesToInstall As String() = GetFilesToInstall()
         Dim installStatus = ""
         Dim installAborted = False
+        Dim installHasFailed = False
         _gui.ShowProgressAnimation(True, True, CInt(100 / filesToInstall.Length))
         Const maxRetryCount = 3
         For Each file As String In filesToInstall
@@ -217,26 +218,36 @@ Public Class Installer
             End If
 
             ' Retry Loop
+            Dim packageInstallSuccess = False
             For retry = 0 To maxRetryCount
                 'Display a status
                 _gui.SetText(_gui.lblStatus, If(retry = 0, Strings.installing, Strings.retrying_install) & " """ & file & Strings.onto_the_device & deviceId & """")
-                Select Case PackageInstallAttempt(deviceId, installStatus, file)
+                Dim installAttempt = PackageInstallAttempt(deviceId, installStatus, file)
+                Select Case installAttempt
                     Case ErrorCode.Abort
                         installAborted = True
                         Return
-                    Case ErrorCode.Failure1
-                    Case ErrorCode.Failure2 ' Fall-through
+                    Case ErrorCode.Failure1, ErrorCode.Failure2
                         Continue For
-                    Case ErrorCode.Success
-                    Case ErrorCode.Ignore ' Fall-through
+                    Case ErrorCode.Success, ErrorCode.Ignore
+                        packageInstallSuccess = True
                         Exit For
                 End Select
             Next retry ' End retry loop
+            If Not packageInstallSuccess Then
+                MsgBox("The file """ & file & """ couldn't be installed.", CType(MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly, MsgBoxStyle))
+                installHasFailed = True
+            End If
         Next file ' for each file
         _gui.UseWaitCursor = False
         If Not installAborted Then
             If CompletionMessageWhenFinished Then
-                MsgBox(Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks) & Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), Strings.apkInstallFinished)
+                If installHasFailed Then
+                    MsgBox(Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks) & Strings.hasFinishedError)
+                Else
+                    MsgBox(Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks) & Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), Strings.apkInstallFinished)
+                End If
+
             End If
             _gui.ResetGUI(Strings.done)
         Else
@@ -250,7 +261,7 @@ Public Class Installer
             ForceRemovePackage(file)
         End If
 
-        _gui.SetText(_gui.lblStatus, installStatus)
+        '_gui.SetText(_gui.lblStatus, installStatus)
         Using adb As Process = InstallSinglePackage(deviceId, file)
             If adb Is Nothing Then ' Install Single Package failed catastrophically when this happened
                 Return ErrorCode.Failure1

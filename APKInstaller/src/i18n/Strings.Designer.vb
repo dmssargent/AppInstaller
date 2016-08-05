@@ -263,6 +263,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to  did not complete successfully..
+        '''</summary>
+        Friend Shared ReadOnly Property hasFinishedError() As String
+            Get
+                Return ResourceManager.GetString("hasFinishedError", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to  has finished successfully!.
         '''</summary>
         Friend Shared ReadOnly Property hasFinishedSucess() As String

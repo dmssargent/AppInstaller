@@ -282,4 +282,7 @@
   <data name="onto_the_device" xml:space="preserve">
     <value>" onto the device "</value>
   </data>
+  <data name="hasFinishedError" xml:space="preserve">
+    <value> did not complete successfully.</value>
+  </data>
 </root>
