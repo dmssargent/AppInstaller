@@ -299,6 +299,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Installing.
+        '''</summary>
+        Friend Shared ReadOnly Property installing() As String
+            Get
+                Return ResourceManager.GetString("installing", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to The Android SDK is not completely correctly configured at this moment..
         '''</summary>
         Friend Shared ReadOnly Property invalidAndroidSdkConfig() As String
@@ -353,6 +362,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to &quot; onto the device &quot;.
+        '''</summary>
+        Friend Shared ReadOnly Property onto_the_device() As String
+            Get
+                Return ResourceManager.GetString("onto_the_device", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Android App Packages (*.apk)|*.apk|All Files|*.*.
         '''</summary>
         Friend Shared ReadOnly Property openFileDialogFilter() As String
@@ -403,6 +421,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property retryIn() As String
             Get
                 Return ResourceManager.GetString("retryIn", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Retrying the install of.
+        '''</summary>
+        Friend Shared ReadOnly Property retrying_install() As String
+            Get
+                Return ResourceManager.GetString("retrying_install", resourceCulture)
             End Get
         End Property
         

@@ -215,8 +215,11 @@ Public Class Installer
             If installAborted Then ' Check if the install has been aborted, if so stop the installs
                 'Exit For
             End If
+
             ' Retry Loop
             For retry = 0 To maxRetryCount
+                'Display a status
+                _gui.SetText(_gui.lblStatus, If(retry = 0, Strings.installing, Strings.retrying_install) & " """ & file & Strings.onto_the_device & deviceId & """")
                 Select Case PackageInstallAttempt(deviceId, installStatus, file)
                     Case ErrorCode.Abort
                         installAborted = True

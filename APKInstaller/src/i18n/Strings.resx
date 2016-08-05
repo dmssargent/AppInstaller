@@ -273,4 +273,13 @@
   <data name="Built_by" xml:space="preserve">
     <value>Built by </value>
   </data>
+  <data name="installing" xml:space="preserve">
+    <value>Installing</value>
+  </data>
+  <data name="retrying_install" xml:space="preserve">
+    <value>Retrying the install of</value>
+  </data>
+  <data name="onto_the_device" xml:space="preserve">
+    <value>" onto the device "</value>
+  </data>
 </root>
