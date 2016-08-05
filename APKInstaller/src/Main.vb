@@ -263,6 +263,9 @@ Public Class Main
             chkForce.Visible = True
             chkReinstall.Visible = True
             UseWaitCursor = False
+            pgbStatus.Visible = False
+            pgbStatus.Step = 0
+            pgbStatus.Value = 0
             _apkInstaller.Reset()
         End If
     End Sub
