@@ -3,12 +3,12 @@ Imports MaterialSkin
 Imports MaterialSkin.Controls
 Imports Microsoft.VisualBasic.CompilerServices
 
-<DesignerGenerated()> _
+<DesignerGenerated()>
 Partial Class Main
     Inherits MaterialForm
 
     'Form overrides dispose to clean up the component list.
-    <DebuggerNonUserCode()> _
+    <DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -25,9 +25,8 @@ Partial Class Main
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <DebuggerStepThrough()> _
+    <DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
         Me.lblStatus = New MaterialSkin.Controls.MaterialLabel()
         Me.txtFileLocation = New MaterialSkin.Controls.MaterialSingleLineTextField()
@@ -36,8 +35,8 @@ Partial Class Main
         Me.btnOpenFileDialogTrigger = New MaterialSkin.Controls.MaterialFlatButton()
         Me.btnInstall = New MaterialSkin.Controls.MaterialRaisedButton()
         Me.pgbStatus = New MaterialSkin.Controls.MaterialProgressBar()
-        Me.Label1 = New MaterialSkin.Controls.MaterialLabel()
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.lnkAbout = New System.Windows.Forms.LinkLabel()
+        Me.lnkHelp = New System.Windows.Forms.LinkLabel()
         Me.SuspendLayout()
         '
         'lblStatus
@@ -97,6 +96,7 @@ Partial Class Main
         '
         'btnInstall
         '
+        Me.btnInstall.AllowDrop = True
         resources.ApplyResources(Me.btnInstall, "btnInstall")
         Me.btnInstall.Depth = 0
         Me.btnInstall.ForeColor = System.Drawing.Color.Green
@@ -113,20 +113,37 @@ Partial Class Main
         Me.pgbStatus.Name = "pgbStatus"
         Me.pgbStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee
         '
-        'Label1
+        'lnkAbout
         '
-        resources.ApplyResources(Me.Label1, "Label1")
-        Me.Label1.Depth = 0
-        Me.Label1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.Label1.MouseState = MaterialSkin.MouseState.HOVER
-        Me.Label1.Name = "Label1"
+        Me.lnkAbout.ActiveLinkColor = System.Drawing.Color.White
+        resources.ApplyResources(Me.lnkAbout, "lnkAbout")
+        Me.lnkAbout.BackColor = System.Drawing.Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(124, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lnkAbout.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lnkAbout.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkAbout.LinkColor = System.Drawing.Color.White
+        Me.lnkAbout.Name = "lnkAbout"
+        Me.lnkAbout.TabStop = True
+        Me.lnkAbout.VisitedLinkColor = System.Drawing.Color.White
+        '
+        'lnkHelp
+        '
+        Me.lnkHelp.ActiveLinkColor = System.Drawing.Color.White
+        resources.ApplyResources(Me.lnkHelp, "lnkHelp")
+        Me.lnkHelp.BackColor = System.Drawing.Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(124, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lnkHelp.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lnkHelp.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkHelp.LinkColor = System.Drawing.Color.White
+        Me.lnkHelp.Name = "lnkHelp"
+        Me.lnkHelp.TabStop = True
+        Me.lnkHelp.VisitedLinkColor = System.Drawing.Color.White
         '
         'Main
         '
         Me.AllowDrop = True
         resources.ApplyResources(Me, "$this")
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lnkHelp)
+        Me.Controls.Add(Me.lnkAbout)
         Me.Controls.Add(Me.pgbStatus)
         Me.Controls.Add(Me.btnInstall)
         Me.Controls.Add(Me.btnOpenFileDialogTrigger)
@@ -146,6 +163,6 @@ Partial Class Main
     Friend WithEvents btnOpenFileDialogTrigger As MaterialFlatButton
     Friend WithEvents btnInstall As MaterialRaisedButton
     Friend WithEvents pgbStatus As MaterialProgressBar
-    Friend WithEvents Label1 As MaterialLabel
-    Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents lnkAbout As LinkLabel
+    Friend WithEvents lnkHelp As LinkLabel
 End Class

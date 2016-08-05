@@ -129,7 +129,7 @@
     <value>8, 98</value>
   </data>
   <data name="lblStatus.Size" type="System.Drawing.Size, System.Drawing">
-    <value>824, 230</value>
+    <value>824, 294</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="lblStatus.TabIndex" type="System.Int32, mscorlib">
@@ -151,16 +151,16 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;lblStatus.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>8</value>
   </data>
   <data name="txtFileLocation.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
   </data>
   <data name="txtFileLocation.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 496</value>
+    <value>12, 517</value>
   </data>
   <data name="txtFileLocation.Size" type="System.Drawing.Size, System.Drawing">
-    <value>704, 28</value>
+    <value>723, 28</value>
   </data>
   <data name="txtFileLocation.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -175,7 +175,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;txtFileLocation.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <data name="chkReinstall.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -187,7 +187,7 @@
     <value>Roboto, 10pt</value>
   </data>
   <data name="chkReinstall.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 454</value>
+    <value>12, 498</value>
   </data>
   <data name="chkReinstall.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -211,7 +211,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chkReinstall.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="chkForce.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -223,7 +223,7 @@
     <value>Roboto, 10pt</value>
   </data>
   <data name="chkForce.Location" type="System.Drawing.Point, System.Drawing">
-    <value>205, 454</value>
+    <value>200, 498</value>
   </data>
   <data name="chkForce.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -247,7 +247,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;chkForce.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
@@ -259,7 +259,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Location" type="System.Drawing.Point, System.Drawing">
-    <value>762, 488</value>
+    <value>768, 517</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
@@ -283,7 +283,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnOpenFileDialogTrigger.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="btnInstall.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
@@ -292,7 +292,7 @@
     <value>Open Sans Extrabold, 18pt, style=Bold</value>
   </data>
   <data name="btnInstall.Location" type="System.Drawing.Point, System.Drawing">
-    <value>293, 308</value>
+    <value>295, 375</value>
   </data>
   <data name="btnInstall.Size" type="System.Drawing.Size, System.Drawing">
     <value>255, 78</value>
@@ -316,13 +316,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnInstall.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="pgbStatus.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
   </data>
   <data name="pgbStatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 410</value>
+    <value>14, 459</value>
   </data>
   <data name="pgbStatus.Size" type="System.Drawing.Size, System.Drawing">
     <value>820, 5</value>
@@ -343,41 +343,77 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;pgbStatus.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
-  <data name="Label1.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lnkAbout.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="lnkAbout.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="Label1.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="lnkAbout.Font" type="System.Drawing.Font, System.Drawing">
     <value>Roboto, 11pt</value>
   </data>
-  <data name="Label1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 531</value>
+  <data name="lnkAbout.Location" type="System.Drawing.Point, System.Drawing">
+    <value>733, 49</value>
   </data>
-  <data name="Label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>15, 24</value>
+  <data name="lnkAbout.Size" type="System.Drawing.Size, System.Drawing">
+    <value>60, 24</value>
   </data>
-  <data name="Label1.TabIndex" type="System.Int32, mscorlib">
+  <data name="lnkAbout.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
   </data>
-  <data name="Label1.Text" xml:space="preserve">
-    <value> </value>
+  <data name="lnkAbout.Text" xml:space="preserve">
+    <value>About</value>
   </data>
-  <data name="&gt;&gt;Label1.Name" xml:space="preserve">
-    <value>Label1</value>
+  <data name="&gt;&gt;lnkAbout.Name" xml:space="preserve">
+    <value>lnkAbout</value>
   </data>
-  <data name="&gt;&gt;Label1.Type" xml:space="preserve">
-    <value>MaterialSkin.Controls.MaterialLabel, MaterialSkin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  <data name="&gt;&gt;lnkAbout.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;Label1.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lnkAbout.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;Label1.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lnkAbout.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="lnkHelp.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="lnkHelp.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lnkHelp.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Roboto, 11pt</value>
+  </data>
+  <data name="lnkHelp.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lnkHelp.Location" type="System.Drawing.Point, System.Drawing">
+    <value>794, 49</value>
+  </data>
+  <data name="lnkHelp.Size" type="System.Drawing.Size, System.Drawing">
+    <value>50, 24</value>
+  </data>
+  <data name="lnkHelp.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="lnkHelp.Text" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="&gt;&gt;lnkHelp.Name" xml:space="preserve">
+    <value>lnkHelp</value>
+  </data>
+  <data name="&gt;&gt;lnkHelp.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lnkHelp.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;lnkHelp.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>82, 12</value>
-  </metadata>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -388,7 +424,7 @@
     <value>Zoom</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>846, 537</value>
+    <value>846, 560</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -441,12 +477,6 @@
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>App Installer</value>
-  </data>
-  <data name="&gt;&gt;ToolTip1.Name" xml:space="preserve">
-    <value>ToolTip1</value>
-  </data>
-  <data name="&gt;&gt;ToolTip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>Main</value>

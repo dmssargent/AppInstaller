@@ -5,7 +5,6 @@ Imports System.Threading
 Imports APKInstaller.My.Resources
 Imports MaterialSkin.Controls
 Imports PostSharp.Patterns.Diagnostics
-Imports PostSharp.Extensibility
 
 ''' <summary>
 ''' Handler of installing Android packages

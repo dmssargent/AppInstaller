@@ -270,4 +270,7 @@
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
+  <data name="Built_by" xml:space="preserve">
+    <value>Built by </value>
+  </data>
 </root>

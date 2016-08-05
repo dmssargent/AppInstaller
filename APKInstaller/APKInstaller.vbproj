@@ -175,6 +175,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="src\About.Designer.vb">
+      <DependentUpon>About.vb</DependentUpon>
+    </Compile>
+    <Compile Include="src\About.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="src\AndroidTools.vb" />
     <Compile Include="src\AppUpdateManager.vb" />
     <Compile Include="src\DeviceChooserDialog.Designer.vb">
@@ -221,6 +227,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="src\About.resx">
+      <DependentUpon>About.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\DeviceChooserDialog.resx">
       <DependentUpon>DeviceChooserDialog.vb</DependentUpon>
     </EmbeddedResource>
@@ -264,6 +273,8 @@
     <None Include="Resources\platform-tools_r24-windows.zip" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\ftc_logo_vert.bmp" />
+    <None Include="Resources\FIRSTTech_IconVert_RGB.png" />
     <Content Include="src\CustomDictionary.xml" />
     <Content Include="src\CInstaller.cs" />
     <Content Include="ic_android_black_24px.ico" />

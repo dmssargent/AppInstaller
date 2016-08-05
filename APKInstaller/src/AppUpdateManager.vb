@@ -19,8 +19,10 @@ Public Class AppUpdateManager
     Private Delegate Sub SetUpdateCallback()
     Private Shared _updateManager As UpdateManager
     Private _updateLabel As MaterialLabel = Nothing
+    Private Shared _instance As AppUpdateManager
     Private ReadOnly _gui As Form
     Private Shared _configured As Boolean = False
+    'Private Shared _updateStatusText As String = "Everything is up-to-date"
 
     'Private _updatesEnabled As Boolean
 
@@ -42,6 +44,8 @@ Public Class AppUpdateManager
         End Set
     End Property
 
+    Public Shared ReadOnly Property UpdateStatusText As String = "Everything is up-to-date" '_updateStatusText
+
     ''' <summary>
     ''' Creates a new AppUpdateManager instance binded to a specific GUI
     ''' </summary>
@@ -49,6 +53,8 @@ Public Class AppUpdateManager
     <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
     Sub New(ByRef gui As Form)
         'MsgBox("foo")
+        _instance = Me
+
         Dim updateManager = New Thread(New ThreadStart(AddressOf GetUpdateManager))
         updateManager.Name = "Update Manager"
         updateManager.Start()
@@ -63,6 +69,7 @@ Public Class AppUpdateManager
 
         Try
             Const updatePath = "https://github.com/dmssargent/AppInstaller"
+            ' todo: on release allow prerelease to toggle on and off
             Dim githubMgr = Await UpdateManager.GitHubUpdateManager(updatePath, prerelease:=True)
 
             _updateManager = githubMgr
@@ -180,9 +187,9 @@ Public Class AppUpdateManager
         If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
             Await _updateManager.UpdateApp()
 
-            If (_updateLabel IsNot Nothing) Then
-                NotifyOfUpdate()
-            End If
+            'If (_updateLabel IsNot Nothing) Then
+            '    NotifyOfUpdate()
+            'End If
         End If
     End Sub
 
@@ -194,7 +201,13 @@ Public Class AppUpdateManager
         update.Start()
     End Sub
 
+    Public Shared Sub UpdateApp()
+        _instance.Update()
+    End Sub
+
     Private Sub NotifyOfUpdate()
+        _UpdateStatusText = Strings.updateReady
+
         If (_updateLabel Is Nothing) Then
             Exit Sub
         End If
@@ -202,7 +215,7 @@ Public Class AppUpdateManager
         If (UpdateLabel.InvokeRequired) Then
             UpdateLabel.Invoke(New SetUpdateCallback(AddressOf NotifyOfUpdate))
         Else
-            UpdateLabel.Text = Strings.ResourceManager.GetString("updateReady")
+            UpdateLabel.Text = Strings.updateReady 'Strings.ResourceManager.GetString("updateReady")
             UpdateLabel.Font = New Font(UpdateLabel.Font, FontStyle.Underline)
             UpdateLabel.Visible = True
             If (Not _gui.InvokeRequired) Then
@@ -219,6 +232,8 @@ Public Class AppUpdateManager
     End Sub
 
     Sub CleanUp()
-        _updateManager.Dispose()
+        If _updateManager IsNot Nothing Then
+            _updateManager.Dispose()
+        End If
     End Sub
 End Class

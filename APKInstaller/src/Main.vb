@@ -32,7 +32,7 @@ Public Class Main
 
         ' Add any initialization after the InitializeComponent() call.
         _updateMgr = New AppUpdateManager(Me)
-        _updateMgr.UpdateLabel = Label1
+        '_updateMgr.UpdateLabel = Label1
 
         _apkInstaller = New Installer(Me, lblStatus, txtFileLocation)
     End Sub
@@ -52,6 +52,11 @@ Public Class Main
         manager.AddFormToManage(Me)
         SkinManager.Theme = MaterialSkinManager.Themes.LIGHT
         SkinManager.ColorScheme = New ColorScheme(Primary.Orange700, Primary.Orange700, Primary.Orange100, Accent.LightBlue200, TextShade.WHITE)
+        lnkAbout.Font = SkinManager.ROBOTO_MEDIUM_10
+        lnkHelp.Font = SkinManager.ROBOTO_MEDIUM_10
+        lnkAbout.ForeColor = Color.White
+        lnkHelp.ForeColor = Color.White
+
         CenterToScreen()
 
         ' Start parsing the arguments
@@ -164,7 +169,7 @@ Public Class Main
     End Sub
 
     Private Sub Me_DragDrop(sender As Object, e As DragEventArgs) Handles lblStatus.DragDrop, Me.DragDrop
-        Dim files() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+        Dim files() = CType(e.Data.GetData(DataFormats.FileDrop), String())
         _apkInstaller.AddFilesToInstall(files)
     End Sub
 
@@ -470,4 +475,18 @@ Public Class Main
         End If
     End Sub
 
+    Private Sub lnkAbout_Click(sender As Object, e As EventArgs) Handles lnkAbout.Click
+        Using aboutDialog = New About
+            aboutDialog.ShowDialog()
+        End Using
+    End Sub
+
+    Private Sub lnkHelp_Click(sender As Object, e As EventArgs) Handles lnkHelp.Click
+        ' Using browser = New Process()
+        UseWaitCursor = True
+        'Process.Start("https://www.google.com/")
+        MsgBox("The help feature isn't quite done.")
+        UseWaitCursor = False
+        'End Using
+    End Sub
 End Class

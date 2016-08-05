@@ -128,6 +128,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Built by .
+        '''</summary>
+        Friend Shared ReadOnly Property Built_by() As String
+            Get
+                Return ResourceManager.GetString("Built_by", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Checking device(s)...This may be a moment or two.
         '''</summary>
         Friend Shared ReadOnly Property checkDevices() As String

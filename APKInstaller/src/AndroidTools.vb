@@ -335,8 +335,9 @@ Public NotInheritable Class AndroidTools
                 possibleSdkPaths.Add(path)
             Else
                 For Each sdkPath In androidSdkPaths
-                    If path.Contains(sdkPath) Then
-                        Dim path2 = path.Substring(0, path.IndexOf(IO.Path.DirectorySeparatorChar & sdkPath, StringComparison.OrdinalIgnoreCase))
+                    Dim value = IO.Path.DirectorySeparatorChar & sdkPath
+                    If path.Contains(value) Then
+                        Dim path2 = path.Substring(0, path.IndexOf(value, StringComparison.OrdinalIgnoreCase))
                         If IsAndroidSdk(path2) Then
                             possibleSdkPaths.Add(path2)
                         End If
