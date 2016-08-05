@@ -146,6 +146,7 @@ Public Class Installer
                 MsgBox("""" & path & """" & Strings.invalidApk,
                        CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "Invalid File")
             End If
+            Return False
         End Try
     End Function
 
