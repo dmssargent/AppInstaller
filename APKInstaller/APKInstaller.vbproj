@@ -273,7 +273,6 @@
     <None Include="Resources\platform-tools_r24-windows.zip" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ftc_logo_vert.bmp" />
     <None Include="Resources\FIRSTTech_IconVert_RGB.png" />
     <Content Include="src\CustomDictionary.xml" />
     <Content Include="src\CInstaller.cs" />

@@ -23,6 +23,8 @@ Public NotInheritable Class About
         TextBoxDescription.Text = My.Application.Info.Description
 
         chkPrerelease.Checked = My.Settings.prerelease
+        chkPrerelease.Location = New Point(131, 0)
+
         lblUpdateStatus.Text = AppUpdateManager.UpdateStatusText
     End Sub
 

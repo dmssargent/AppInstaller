@@ -30,27 +30,27 @@ Partial Class About
     'Do not modify it using the code editor.
     <DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As ComponentResourceManager = New ComponentResourceManager(GetType(About))
-        Me.TableLayoutPanel = New TableLayoutPanel()
-        Me.LabelCopyright = New MaterialLabel()
-        Me.LabelCompanyName = New MaterialLabel()
-        Me.Panel1 = New Panel()
-        Me.lblUpdateStatus = New MaterialLabel()
-        Me.chkPrerelease = New MaterialCheckBox()
-        Me.LabelVersion = New MaterialLabel()
-        Me.Panel2 = New Panel()
-        Me.TextBoxDescription = New TextBox()
-        Me.OKButton = New MaterialRaisedButton()
-        Me.LogoPictureBox = New PictureBox()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(About))
+        Me.TableLayoutPanel = New System.Windows.Forms.TableLayoutPanel()
+        Me.LabelCopyright = New MaterialSkin.Controls.MaterialLabel()
+        Me.LabelCompanyName = New MaterialSkin.Controls.MaterialLabel()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.lblUpdateStatus = New MaterialSkin.Controls.MaterialLabel()
+        Me.chkPrerelease = New MaterialSkin.Controls.MaterialCheckBox()
+        Me.LabelVersion = New MaterialSkin.Controls.MaterialLabel()
+        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.TextBoxDescription = New System.Windows.Forms.TextBox()
+        Me.OKButton = New MaterialSkin.Controls.MaterialRaisedButton()
+        Me.LogoPictureBox = New System.Windows.Forms.PictureBox()
         Me.TableLayoutPanel.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
-        CType(Me.LogoPictureBox, ISupportInitialize).BeginInit()
+        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TableLayoutPanel
         '
-        Me.TableLayoutPanel.BackColor = Color.White
+        Me.TableLayoutPanel.BackColor = System.Drawing.Color.White
         resources.ApplyResources(Me.TableLayoutPanel, "TableLayoutPanel")
         Me.TableLayoutPanel.Controls.Add(Me.LabelCopyright, 1, 1)
         Me.TableLayoutPanel.Controls.Add(Me.LabelCompanyName, 1, 2)
@@ -63,16 +63,16 @@ Partial Class About
         '
         Me.LabelCopyright.Depth = 0
         resources.ApplyResources(Me.LabelCopyright, "LabelCopyright")
-        Me.LabelCopyright.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.LabelCopyright.MouseState = MouseState.HOVER
+        Me.LabelCopyright.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelCopyright.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelCopyright.Name = "LabelCopyright"
         '
         'LabelCompanyName
         '
         Me.LabelCompanyName.Depth = 0
         resources.ApplyResources(Me.LabelCompanyName, "LabelCompanyName")
-        Me.LabelCompanyName.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.LabelCompanyName.MouseState = MouseState.HOVER
+        Me.LabelCompanyName.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelCompanyName.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelCompanyName.Name = "LabelCompanyName"
         '
         'Panel1
@@ -87,16 +87,16 @@ Partial Class About
         '
         resources.ApplyResources(Me.lblUpdateStatus, "lblUpdateStatus")
         Me.lblUpdateStatus.Depth = 0
-        Me.lblUpdateStatus.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lblUpdateStatus.MouseState = MouseState.HOVER
+        Me.lblUpdateStatus.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lblUpdateStatus.MouseState = MaterialSkin.MouseState.HOVER
         Me.lblUpdateStatus.Name = "lblUpdateStatus"
         '
         'chkPrerelease
         '
         resources.ApplyResources(Me.chkPrerelease, "chkPrerelease")
         Me.chkPrerelease.Depth = 0
-        Me.chkPrerelease.MouseLocation = New Point(-1, -1)
-        Me.chkPrerelease.MouseState = MouseState.HOVER
+        Me.chkPrerelease.MouseLocation = New System.Drawing.Point(-1, -1)
+        Me.chkPrerelease.MouseState = MaterialSkin.MouseState.HOVER
         Me.chkPrerelease.Name = "chkPrerelease"
         Me.chkPrerelease.Ripple = True
         Me.chkPrerelease.UseVisualStyleBackColor = True
@@ -105,8 +105,8 @@ Partial Class About
         '
         Me.LabelVersion.Depth = 0
         resources.ApplyResources(Me.LabelVersion, "LabelVersion")
-        Me.LabelVersion.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.LabelVersion.MouseState = MouseState.HOVER
+        Me.LabelVersion.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelVersion.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelVersion.Name = "LabelVersion"
         '
         'Panel2
@@ -118,9 +118,9 @@ Partial Class About
         '
         'TextBoxDescription
         '
-        Me.TextBoxDescription.BackColor = Color.White
-        Me.TextBoxDescription.BorderStyle = BorderStyle.None
-        Me.TextBoxDescription.Cursor = Cursors.Arrow
+        Me.TextBoxDescription.BackColor = System.Drawing.Color.White
+        Me.TextBoxDescription.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxDescription.Cursor = System.Windows.Forms.Cursors.Arrow
         resources.ApplyResources(Me.TextBoxDescription, "TextBoxDescription")
         Me.TextBoxDescription.Name = "TextBoxDescription"
         Me.TextBoxDescription.ReadOnly = True
@@ -130,22 +130,22 @@ Partial Class About
         '
         resources.ApplyResources(Me.OKButton, "OKButton")
         Me.OKButton.Depth = 0
-        Me.OKButton.DialogResult = DialogResult.Cancel
-        Me.OKButton.MouseState = MouseState.HOVER
+        Me.OKButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.OKButton.MouseState = MaterialSkin.MouseState.HOVER
         Me.OKButton.Name = "OKButton"
         Me.OKButton.Primary = True
         '
         'LogoPictureBox
         '
         resources.ApplyResources(Me.LogoPictureBox, "LogoPictureBox")
-        Me.LogoPictureBox.Image = My.Resources.Resources.FIRSTTech_IconVert_RGB
+        Me.LogoPictureBox.Image = Global.APKInstaller.My.Resources.Resources.FIRSTTech_IconVert_RGB
         Me.LogoPictureBox.Name = "LogoPictureBox"
         Me.LogoPictureBox.TabStop = False
         '
         'About
         '
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.OKButton
         Me.Controls.Add(Me.TableLayoutPanel)
         Me.MaximizeBox = False
@@ -157,7 +157,7 @@ Partial Class About
         Me.Panel1.PerformLayout()
         Me.Panel2.ResumeLayout(False)
         Me.Panel2.PerformLayout()
-        CType(Me.LogoPictureBox, ISupportInitialize).EndInit()
+        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
