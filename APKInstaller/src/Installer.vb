@@ -207,7 +207,7 @@ Public Class Installer
     Private Sub Install()
         ' Wait until an Android device is connected
         Dim waitForDeviceReturn = WaitForDevice()
-        If Not waitForDeviceReturn = 0 Then
+        If Not waitForDeviceReturn = ErrorCode.Success Then
             HandleWaitForDeviceError(waitForDeviceReturn)
             Return
         End If
@@ -304,12 +304,20 @@ Public Class Installer
     End Function
 
     Private Sub HandleWaitForDeviceError(waitForDeviceReturn As Integer)
+        Dim message = "An unknown error while waiting for the device"
         If waitForDeviceReturn = ErrorCode.FailureTimeout Then
-            _gui.ResetGUI(Strings.timeoutWaiting & vbCrLf &
-                                Strings.userTroubleshootingA1 & vbCrLf &
-                                Strings.userTroubleshootingA2)
+            message = Strings.timeoutWaiting & vbCrLf &
+                                 Strings.userTroubleshootingA1 & vbCrLf &
+                                 Strings.userTroubleshootingA2
         ElseIf waitForDeviceReturn = ErrorCode.Abort Then
-            _gui.ResetGUI(Strings.installAborted)
+            message = Strings.installAborted
+        End If
+
+        If CompletionMessageWhenFinished Then
+            _gui.ResetGui(message)
+        Else
+            MsgBox(message, CType((MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly), MsgBoxStyle))
+            _gui.Close()
         End If
     End Sub
 
@@ -344,7 +352,7 @@ Public Class Installer
                 End If
                 counter += 1
                 If counter > 60 Then
-                    Return ErrorCode.Failure2
+                    Return ErrorCode.FailureTimeout
                 End If
             End While
             _gui.ShowProgressAnimation(False, False)
