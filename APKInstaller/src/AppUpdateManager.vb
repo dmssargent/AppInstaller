@@ -141,10 +141,9 @@ Public Class AppUpdateManager
         Dim appClassKey = classes.OpenSubKey(classKey, True)
 
         appClassKey.CreateSubKey("DefaultIcon")
-        appClassKey = appClassKey.OpenSubKey("DefaultIcon", True)
-        appClassKey.SetValue("", """" & Application.ExecutablePath & ",1""") ' Set Default key value
-
-        appClassKey.Close()
+        Dim appDefaultIcon = appClassKey.OpenSubKey("DefaultIcon", True)
+        appDefaultIcon.SetValue("", """" & Application.ExecutablePath & ",1""") ' Set Default key value
+        appDefaultIcon.Close()
 
         appClassKey.CreateSubKey("shell")
         Dim shellKey = appClassKey.OpenSubKey("shell", True)
@@ -155,8 +154,10 @@ Public Class AppUpdateManager
         shellKey.CreateSubKey("command")
         shellKey = shellKey.OpenSubKey("command", True)
         shellKey.SetValue("", """" & Application.ExecutablePath & """" & " ""%1""") ' Set Default key value
-
         shellKey.Close()
+
+        appClassKey.Close()
+
     End Sub
 
     Private Shared Sub SquirrelUninstall()
@@ -186,10 +187,7 @@ Public Class AppUpdateManager
         Dim updateInfo = Await _updateManager.CheckForUpdate
         If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
             Await _updateManager.UpdateApp()
-
-            'If (_updateLabel IsNot Nothing) Then
-            '    NotifyOfUpdate()
-            'End If
+            NotifyOfUpdate()
         End If
     End Sub
 
