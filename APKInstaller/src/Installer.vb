@@ -256,19 +256,27 @@ Public Class Installer
             End If
         Next file ' for each file
         _gui.UseWaitCursor = False
-        If Not installAborted Then
+        If installAborted Then
             If CompletionMessageWhenFinished Then
-                If installHasFailed Then
-                    MsgBox(Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks) & Strings.hasFinishedError)
-                Else
-                    MsgBox(Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks) & Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), Strings.apkInstallFinished)
-                End If
-
+                _gui.ResetGui(Strings.failure & Strings.details & vbCrLf & installStatus)
+            Else
+                MsgBox(Strings.failure & Strings.details & vbCrLf & installStatus, CType((MsgBoxStyle.Exclamation + MsgBoxStyle.OkOnly), MsgBoxStyle))
+                _gui.Close()
             End If
-            _gui.ResetGUI(Strings.done)
         Else
-            _gui.ResetGUI(Strings.failure & Strings.details & vbCrLf & installStatus)
+            If CompletionMessageWhenFinished Then
+                Dim message = Strings.installationOf & If(filesToInstall.Length = 1, Strings.apk, Strings.apks)
+                If installHasFailed Then
+                    MsgBox(message & Strings.hasFinishedError)
+                Else
+                    MsgBox(message & Strings.hasFinishedSucess, CType(MsgBoxStyle.Information + MsgBoxStyle.OkOnly, MsgBoxStyle), Strings.apkInstallFinished)
+                End If
+                _gui.ResetGui(Strings.done)
+            Else
+                _gui.SetText(_gui.lblStatus, Strings.done)
+            End If
         End If
+        'FinishInstall(If(installAborted, Strings.failure & Strings.details & vbCrLf & installStatus, Strings.done))
         ' End device install section
     End Sub
 
