@@ -241,6 +241,7 @@ Public Class Installer
                 Dim installAttempt = PackageInstallAttempt(deviceId, file)
                 Select Case installAttempt
                     Case ErrorCode.Abort
+                        ' ReSharper disable once RedundantAssignment
                         installAborted = True
                         Return
                     Case ErrorCode.Failure1, ErrorCode.Failure2
@@ -285,30 +286,22 @@ Public Class Installer
             ForceRemovePackage(file)
         End If
 
-        '_gui.SetText(_gui.lblStatus, installStatus)
-        Using adb As Process = InstallSinglePackage(deviceId, file)
-            If adb Is Nothing Then ' Install Single Package failed catastrophically when this happened
-                Return ErrorCode.Failure1
-            End If
+        Dim adbCode = InstallSinglePackage(deviceId, file)
+        If adbCode Is Nothing Then ' Install Single Package failed catastrophically when this happened
+            Return ErrorCode.Failure1
+        End If
 
-            If Not adb.ExitCode = 0 Then
-                Select Case HandleInstallFailure(file, adb)
-                    Case MsgBoxResult.Abort
-                        Return ErrorCode.Abort
-                    Case MsgBoxResult.Ignore
-                        Return ErrorCode.Ignore ' Don't retry
-                    Case Else
-                        For second As Integer = 5 To 1 Step -1
-                            Dim message = Strings.retryIn & second & If(second = 1, Strings.second, Strings.seconds)
-                            _gui.SetText(_gui.lblStatus, message)
-                        Next second
-                        Return ErrorCode.Failure2
-                End Select
-            Else
+        Dim result = -1
+        If Integer.TryParse(adbCode, result) Then ' Checks if the result is a return code
+            If result = 0 Then
                 _gui.StepProgressBar()
-                Return ErrorCode.Success ' Go to next file b/c this file is a success
+                Return ErrorCode.Success
+            Else
+                Return HandleInstallFailure(file, result)
             End If
-        End Using
+        Else ' the result is an details error message
+            Return HandleInstallFailure(file, adbCode)
+        End If
     End Function
 
     Private Sub HandleWaitForDeviceError(waitForDeviceReturn As Integer)
@@ -374,6 +367,7 @@ Public Class Installer
 
         Dim deviceId As String = Nothing
         GetDeviceId(Sub(id As String)
+                        ' ReSharper disable once RedundantAssignment
                         deviceId = id
                     End Sub)
         While deviceId Is Nothing
@@ -418,44 +412,77 @@ Public Class Installer
         End Using
     End Function
 
-    Private Function InstallSinglePackage(deviceId As String, file As String) As Process
-        Dim adb = AndroidTools.RunAdb("-s " & deviceId & " install " & If(_update, "-r ", "") & """" & file & """", True, True, False)
+    Private Function InstallSinglePackage(deviceId As String, file As String) As String
+        Const abortKey = "ABORT"
 
-        Dim haltInstall = False
-        ' Dim t = ""
-        While Not adb.HasExited
-            ' t &= adb.StandardOutput.ReadToEnd
-            If _stopRequested Then
-                If MsgBox(Strings.abortCurrentApk, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.No Then
-                    haltInstall = True
-                    _stopRequested = False
-                Else
-                    Try
-                        If adb.HasExited Then
-                            adb.Kill()
-                        End If
-                    Catch ex As InvalidOperationException
+        Using adb = AndroidTools.RunAdb("-s " & deviceId & " install " & If(_update, "-r ", "") & """" & file & """", True, True, False)
+            Dim adbStandardOut = adb.StandardOutput
+            Dim haltInstall = False
 
-                    End Try
-                    MsgBox(Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
-                    Return Nothing
+            ' Process aborts while the adb process is running
+            ' Check for and identify failures during the adb install
+            Dim currentLine = adbStandardOut.ReadLine
+            While Not adb.HasExited Or currentLine IsNot Nothing
+                If _stopRequested Then ' user requested stop
+                    If MsgBox(Strings.abortCurrentApk, CType(MsgBoxStyle.YesNo + MsgBoxStyle.Question, MsgBoxStyle)) = MsgBoxResult.Yes Then
+                        Try
+                            If adb.HasExited Then
+                                adb.Kill()
+                            End If
+                        Catch ex As InvalidOperationException
+
+                        End Try
+                        MsgBox(Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "APK Install Aborted")
+                        Return abortKey
+                    Else
+                        haltInstall = True
+                        _stopRequested = False
+                    End If
                 End If
 
+
+                While currentLine IsNot Nothing AndAlso Not _stopRequested
+                    If currentLine.StartsWith("Failure", StringComparison.OrdinalIgnoreCase) Then
+                        Dim startPos = currentLine.IndexOf("[", StringComparison.OrdinalIgnoreCase)
+                        Dim endPos = currentLine.IndexOf("]", StringComparison.OrdinalIgnoreCase)
+                        Dim errorMessage = "Unknown Failure"
+                        If startPos < endPos And startPos <> -1 And endPos <> -1 Then
+                            errorMessage = currentLine.Substring(startPos + 1, endPos - startPos - 1)
+                        End If
+                        Return errorMessage
+                    End If
+                    currentLine = adbStandardOut.ReadLine()
+                End While
+            End While
+
+            ' Display an abort message
+            If haltInstall Then
+                MsgBox(Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), Strings.installAborted)
+                Return abortKey
             End If
-            Thread.Sleep(10)
-        End While
 
-        If haltInstall Then
-            MsgBox(Strings.installAborted, CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), Strings.installAborted)
-            Return Nothing
-        End If
-
-        Return adb
+            Return adb.ExitCode.ToString()
+        End Using
     End Function
 
-    Private Shared Function HandleInstallFailure(file As String, adb As Process) As MsgBoxResult
-        Dim result As MsgBoxResult = MsgBox(Strings.unsuccessfulInstall1 & file & Strings.unsuccessfulInstall2 & vbCrLf & Strings.details & Strings.adbExitErrorCode & adb.ExitCode, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.AbortRetryIgnore, MsgBoxStyle))
-        Return result
+    Private Function HandleInstallFailure(file As String, code As Integer) As ErrorCode
+        Return HandleInstallFailure(file, Strings.adbExitErrorCode & code)
+    End Function
+
+    Private Function HandleInstallFailure(file As String, message As String) As ErrorCode
+        Dim result As MsgBoxResult = MsgBox(Strings.unsuccessfulInstall1 & file & Strings.unsuccessfulInstall2 & vbCrLf & Strings.details & message, CType(MsgBoxStyle.Exclamation + MsgBoxStyle.AbortRetryIgnore, MsgBoxStyle))
+        Select Case result
+            Case MsgBoxResult.Abort
+                Return ErrorCode.Abort
+            Case MsgBoxResult.Ignore
+                Return ErrorCode.Ignore ' Don't retry
+            Case Else
+                For second As Integer = 5 To 1 Step -1
+                    Dim retryMessage = Strings.retryIn & second & If(second = 1, Strings.second, Strings.seconds)
+                    _gui.SetText(_gui.lblStatus, retryMessage)
+                Next second
+                Return ErrorCode.Failure2
+        End Select
     End Function
 
     ''' <summary>
