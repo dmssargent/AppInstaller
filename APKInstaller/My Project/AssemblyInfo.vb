@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("App Installer")>
 <Assembly: AssemblyDescription("Provides a means of quickly and reliably putting various Android apps on Android devices")>
 <Assembly: AssemblyCompany("FIRST Tech Challenge")>
-<Assembly: AssemblyProduct("APK Installer")>
+<Assembly: AssemblyProduct("App Installer")>
 <Assembly: AssemblyCopyright("Copyright © 2016 FIRST")>
 <Assembly: AssemblyTrademark("")>
 
@@ -33,7 +33,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("0.1.7.0")>
-<Assembly: AssemblyFileVersion("0.1.7.0")>
+<Assembly: AssemblyVersion("0.1.7.1")>
+<Assembly: AssemblyFileVersion("0.1.7.1")>
 <Assembly: NeutralResourcesLanguage("en-US")>
 <Assembly: AssemblyMetadata("SquirrelAwareVersion", "1")>
