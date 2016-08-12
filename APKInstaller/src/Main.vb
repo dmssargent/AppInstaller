@@ -487,8 +487,8 @@ Public Class Main
     Private Sub lnkHelp_Click(sender As Object, e As EventArgs) Handles lnkHelp.Click
         ' Using browser = New Process()
         UseWaitCursor = True
-        'Process.Start("https://www.google.com/")
-        MsgBox("The help feature isn't quite done.")
+        Process.Start("https://cdn.rawgit.com/dmssargent/AppInstaller/v0.1.7.1-rc/docs/manual.pdf")
+        'MsgBox("The help feature isn't quite done.")
         UseWaitCursor = False
         'End Using
     End Sub
