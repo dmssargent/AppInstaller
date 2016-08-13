@@ -20,7 +20,7 @@ Public Class AppUpdateManager
     Private Shared _updateManager As UpdateManager
     Private _updateLabel As MaterialLabel = Nothing
     Private Shared _instance As AppUpdateManager
-    Private ReadOnly _gui As Form
+    'Private ReadOnly _gui As Form
     Private Shared _configured As Boolean = False
     'Private Shared _updateStatusText As String = "Everything is up-to-date"
 
@@ -50,8 +50,8 @@ Public Class AppUpdateManager
     ''' Creates a new AppUpdateManager instance binded to a specific GUI
     ''' </summary>
     ''' <param name="gui">The main window form, and contains UpdateLabel, cannot be null</param>
-    <SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
-    Sub New(ByRef gui As Form)
+    '<SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId:="0#")>
+    Sub New()
         'MsgBox("foo")
         _instance = Me
 
@@ -59,10 +59,10 @@ Public Class AppUpdateManager
         updateManager.Name = "Update Manager"
         updateManager.Start()
 
-        If gui Is Nothing Then
-            Throw New ArgumentNullException(NameOf(gui))
-        End If
-        _gui = gui
+        'If gui Is Nothing Then
+        '    Throw New ArgumentNullException(NameOf(gui))
+        'End If
+        '_gui = gui
     End Sub
 
     Private Shared Async Sub GetUpdateManager()
@@ -70,7 +70,7 @@ Public Class AppUpdateManager
         Try
             Const updatePath = "https://github.com/dmssargent/AppInstaller"
             ' todo: on release allow prerelease to toggle on and off
-            Dim githubMgr = Await UpdateManager.GitHubUpdateManager(updatePath, prerelease:=True)
+            Dim githubMgr = Await UpdateManager.GitHubUpdateManager(updatePath, prerelease:=My.Settings.prerelease)
 
             _updateManager = githubMgr
 
@@ -94,7 +94,10 @@ Public Class AppUpdateManager
         'MsgBox("Squirrel Handle")
         SquirrelAwareApp.HandleEvents(
                 onInitialInstall:=Sub(v) SquirrelInstall(),
-                onAppUpdate:=Sub(v) _updateManager.CreateShortcutForThisExe(),
+                onAppUpdate:=Sub(v)
+                                 SquirrelUninstall()
+                                 SquirrelInstall()
+                             End Sub,
                 onAppUninstall:=Sub(v) SquirrelUninstall()
             )
 
@@ -216,9 +219,9 @@ Public Class AppUpdateManager
             UpdateLabel.Text = Strings.updateReady 'Strings.ResourceManager.GetString("updateReady")
             UpdateLabel.Font = New Font(UpdateLabel.Font, FontStyle.Underline)
             UpdateLabel.Visible = True
-            If (Not _gui.InvokeRequired) Then
-                _gui.Height += 20
-            End If
+            'If (Not _gui.InvokeRequired) Then
+            '_gui.Height += 20
+            'End If
         End If
 
     End Sub

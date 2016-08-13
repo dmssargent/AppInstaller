@@ -53,6 +53,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <SkipPostSharp>True</SkipPostSharp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -101,13 +102,13 @@
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeltaCompressionDotNet, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
-      <HintPath>..\packages\DeltaCompressionDotNet.2.0.0.0-rc1\lib\net20\DeltaCompressionDotNet.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DeltaCompressionDotNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NET\Apps\squirrel.windows\src\Squirrel\bin\Debug\DeltaCompressionDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\squirrel.windows.1.4.4\lib\Net45\ICSharpCode.SharpZipLib.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.4.369, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NET\Apps\squirrel.windows\src\Squirrel\bin\Debug\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="MaterialSkin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -130,8 +131,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NuGet.Squirrel, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\squirrel.windows.1.4.4\lib\Net45\NuGet.Squirrel.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NET\Apps\squirrel.windows\src\Squirrel\bin\Debug\NuGet.Squirrel.dll</HintPath>
     </Reference>
     <Reference Include="PostSharp, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <HintPath>..\packages\PostSharp.4.2.29\lib\net35-client\PostSharp.dll</HintPath>
@@ -146,8 +147,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Squirrel, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\squirrel.windows.1.4.4\lib\Net45\Squirrel.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NET\Apps\squirrel.windows\src\Squirrel\bin\Debug\Squirrel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -183,22 +184,9 @@
     </Compile>
     <Compile Include="src\AndroidTools.vb" />
     <Compile Include="src\AppUpdateManager.vb" />
-    <Compile Include="src\DeviceChooserDialog.Designer.vb">
-      <DependentUpon>DeviceChooserDialog.vb</DependentUpon>
-    </Compile>
-    <Compile Include="src\DeviceChooserDialog.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="src\ErrorCode.vb" />
     <Compile Include="src\Installer.vb" />
     <Compile Include="src\IoUtils.vb" />
-    <Compile Include="src\Main.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="src\Main.Designer.vb">
-      <DependentUpon>Main.vb</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -219,22 +207,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="src\MultiPackageDialog.Designer.vb">
-      <DependentUpon>MultiPackageDialog.vb</DependentUpon>
-    </Compile>
-    <Compile Include="src\MultiPackageDialog.vb">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="src\About.resx">
       <DependentUpon>About.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\DeviceChooserDialog.resx">
-      <DependentUpon>DeviceChooserDialog.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\Main.resx">
-      <DependentUpon>Main.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -244,11 +220,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="src\i18n\Strings.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.vb</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="src\MultiPackageDialog.resx">
-      <DependentUpon>MultiPackageDialog.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
