@@ -6,9 +6,6 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-//using Microsoft.VisualBasic;
-
-//using MaterialSkin;
 
 namespace APKInstaller
 {
@@ -17,9 +14,9 @@ namespace APKInstaller
     /// </summary>
     public partial class DeviceChooserDialog
     {
-        private Thread _autoUpdateThread;
+        Thread _autoUpdateThread;
 
-        private int _deviceIndex = -1;
+        int _deviceIndex = -1;
 
         public DeviceChooserDialog()
         {
@@ -38,14 +35,12 @@ namespace APKInstaller
             get
             {
                 if (IsReady())
-                {
                     return CleanupOutput(lstDevices.SelectedItem.ToString());
-                }
                 return null;
             }
         }
 
-        private void UpdateDeviceList()
+        void UpdateDeviceList()
         {
             using (var adb = AndroidTools.RunAdb("devices", true, true, true))
             {
@@ -67,41 +62,31 @@ namespace APKInstaller
                         dynamic rcVersion = CheckForFtcRobotController(CleanupOutput(data));
                         dynamic dsVersion = CheckForFtcDriverStation(CleanupOutput(data));
                         if (rcVersion > 0)
-                        {
                             details += "[FTC Robot Controller " + rcVersion + "]";
-                        }
 
                         if (dsVersion > 0)
-                        {
                             details = string.IsNullOrEmpty(details)
                                 ? "["
                                 : "; " + " FTC Driver Station " + dsVersion + "]";
-                        }
 
                         UpdateDeviceListEntry(numberOfDevices, CleanupOutput(data) + "\t" + details);
                         numberOfDevices += 1;
                     }
 
                     if (data.Trim() == "List of devices attached")
-                    {
                         parserInDeviceList = true;
-                    }
 
                     data = adb.StandardOutput.ReadLine();
                 }
 
 
                 for (int i = numberOfDevices; i <= numberOfDevicesLastFound - 1; i++)
-                {
                     UpdateDeviceListEntry(i, null);
-                }
 
                 if (numberOfDevices == 1)
                 {
                     if (!InvokeRequired)
-                    {
                         lstDevices.SelectedIndex = 0;
-                    }
 
                     SetVisibilityForNoPromptSingleDevice(true);
                 }
@@ -121,14 +106,10 @@ namespace APKInstaller
         public DialogResult? GetUserInput()
         {
             if (InvokeRequired)
-            {
                 return (DialogResult) Invoke(new UserInputCallback(GetUserInput));
-            }
             UpdateDeviceList();
             if (IsReady() /*& My.Settings.noPromptSingleDevice*/)
-            {
                 return null;
-            }
             return ShowDialog();
         }
 
@@ -141,7 +122,7 @@ namespace APKInstaller
             return _deviceIndex >= 0;
         }
 
-        private void DeviceChooser_Load(object sender, EventArgs e)
+        void DeviceChooser_Load(object sender, EventArgs e)
         {
             _autoUpdateThread = new Thread(() =>
             {
@@ -168,16 +149,14 @@ namespace APKInstaller
             CenterToScreen();
         }
 
-        private void UpdateDeviceListEntry(int index, string deviceName)
+        void UpdateDeviceListEntry(int index, string deviceName)
         {
             if (lstDevices.InvokeRequired)
             {
                 try
                 {
                     if (IsDisposed)
-                    {
                         return;
-                    }
                     Invoke(new DeviceListUpdateCallback(UpdateDeviceListEntry), index, deviceName);
                 }
                 catch (ObjectDisposedException ex)
@@ -189,47 +168,33 @@ namespace APKInstaller
                 dynamic oldIndex = lstDevices.SelectedIndex;
 
                 if (lstDevices.Items.Count > index)
-                {
                     lstDevices.Items.RemoveAt(index);
-                }
 
                 if (deviceName != null)
-                {
                     lstDevices.Items.Insert(index, deviceName);
-                }
 
                 if (oldIndex >= lstDevices.Items.Count) return;
                 if (oldIndex >= 0)
-                {
                     lstDevices.SelectedIndex = oldIndex;
-                }
             }
         }
 
-        private void SetVisibilityForNoPromptSingleDevice(bool isVisible)
+        void SetVisibilityForNoPromptSingleDevice(bool isVisible)
         {
             if (chkNoPromptSingleDevice.InvokeRequired)
-            {
                 Invoke(new ChkNoPromptSingleDeviceVisibleCallback(SetVisibilityForNoPromptSingleDevice), isVisible);
-            }
             else
-            {
                 chkNoPromptSingleDevice.Visible = isVisible;
-            }
         }
 
-        private static string CleanupOutput(string inputValue)
+        static string CleanupOutput(string inputValue)
         {
             if (inputValue.Contains(" "))
-            {
                 inputValue = inputValue.Substring(0, inputValue.IndexOf(" ", StringComparison.CurrentCulture));
-            }
 
             if (inputValue.Contains("\t"))
-            {
                 inputValue = inputValue.Substring(0,
                     inputValue.IndexOf("\t", StringComparison.CurrentCulture));
-            }
 
             return inputValue;
         }
@@ -280,12 +245,8 @@ namespace APKInstaller
                         {
                             line = line.Trim();
                             if (adb.HasExited)
-                            {
                                 if (adb.ExitCode != 0)
-                                {
                                     return -2;
-                                }
-                            }
                         }
                         catch (ThreadInterruptedException ex)
                         {
@@ -301,9 +262,7 @@ namespace APKInstaller
                             break; // TODO: might not be correct. Was : Exit While
                         }
                         if (line.Contains(package) & line.Contains("Package "))
-                        {
                             inSection = true;
-                        }
                         line = adb.StandardOutput.ReadLine();
                     }
                 }
@@ -316,19 +275,19 @@ namespace APKInstaller
             }
         }
 
-        private void OK_Button_Click(object sender, EventArgs e)
+        void OK_Button_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void Cancel_Button_Click(object sender, EventArgs e)
+        void Cancel_Button_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
         }
 
-        private void lstDevices_SelectedIndexChanged(object sender, EventArgs e)
+        void lstDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lstDevices.SelectedIndices.Count > 0)
             {
@@ -341,57 +300,51 @@ namespace APKInstaller
             }
         }
 
-        private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
+        void listBox1_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-            {
                 e.Graphics.FillRectangle(Brushes.Aqua, e.Bounds);
-            }
             using (var b = new SolidBrush(e.ForeColor))
             {
                 if (e.Index >= 0)
-                {
                     e.Graphics.DrawString(lstDevices.GetItemText(lstDevices.Items[e.Index]), e.Font, b, e.Bounds);
-                }
             }
             e.DrawFocusRectangle();
         }
 
-        private void dlgDeviceChoose_Closing(object sender, CancelEventArgs e)
+        void dlgDeviceChoose_Closing(object sender, CancelEventArgs e)
         {
             _autoUpdateThread.Interrupt();
         }
 
-        private void dlgDeviceChoose_Closed(object sender, EventArgs e)
+        void dlgDeviceChoose_Closed(object sender, EventArgs e)
         {
-            if (DialogResult == DialogResult.None | false)
-            {
+            if ((DialogResult == DialogResult.None) | false)
                 DialogResult = DialogResult.Cancel;
-            }
         }
 
-        private void chkNoPromptSingleDevice_CheckedChanged(object sender, EventArgs e)
+        void chkNoPromptSingleDevice_CheckedChanged(object sender, EventArgs e)
         {
             // todo: My.Settings.noPromptSingleDevice = chkNoPromptSingleDevice.Checked;
         }
 
-        private delegate DialogResult? UserInputCallback();
+        delegate DialogResult? UserInputCallback();
 
-        private delegate void DeviceListUpdateCallback(int index, string device);
+        delegate void DeviceListUpdateCallback(int index, string device);
 
-        private delegate void ChkNoPromptSingleDeviceVisibleCallback(bool visible);
+        delegate void ChkNoPromptSingleDeviceVisibleCallback(bool visible);
 
-        //private void InitializeComponent()
-        //{
-        //    this.SuspendLayout();
+        //}
+        //    this.ResumeLayout(false);
+        //    this.Name = "DeviceChooserDialog";
+        //    this.ClientSize = new System.Drawing.Size(423, 316);
         //    // 
         //    // DeviceChooserDialog
         //    // 
-        //    this.ClientSize = new System.Drawing.Size(423, 316);
-        //    this.Name = "DeviceChooserDialog";
-        //    this.ResumeLayout(false);
+        //    this.SuspendLayout();
+        //{
 
-        //}
+        //private void InitializeComponent()
     }
 }

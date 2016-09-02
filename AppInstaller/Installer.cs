@@ -1,14 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: APKInstaller.Installer
-// Assembly: AppInstaller, Version=0.1.7.1, Culture=neutral, PublicKeyToken=null
-// MVID: 47EE20FC-A5A0-42AE-9843-329E79F78F9B
-// Assembly location: C:\Users\dmssa_000\Documents\Visual Studio 2015\Projects\APKInstallerMono\APKInstaller\bin\Debug\AppInstaller.exe
-
-//using Microsoft.VisualBasic;
-// using Microsoft.VisualBasic.CompilerServices;
-//using PostSharp.ImplementationDetails_b6ccb45d;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -25,11 +15,11 @@ namespace APKInstaller
     /// </summary>
     public class Installer
     {
-        private readonly LinkedList<string> _filesToInstall = new LinkedList<string>();
-        private readonly Main _gui;
-        private readonly TextBox _txtUserInput;
-        private Label _lblStatus;
-        private bool _stopRequested;
+        readonly LinkedList<string> _filesToInstall = new LinkedList<string>();
+        readonly Main _gui;
+        readonly TextBox _txtUserInput;
+        Label _lblStatus;
+        bool _stopRequested;
 
         /// <summary>
         ///     Creates a new installer instance
@@ -87,37 +77,27 @@ namespace APKInstaller
         public void AddFilesToInstall(string[] files, bool clear, bool notifyUser)
         {
             if (files == null)
-            {
                 throw new ArgumentNullException(nameof(files));
-            }
 
             if (clear)
-            {
                 _filesToInstall.Clear();
-            }
 
             foreach (var path in files)
             {
                 // Prevent bugs in detection routine
                 if (path == null)
-                {
                     continue;
-                }
 
                 var path2 = path.Trim();
 
                 // Determine if the file is already in the installer list, if so skip it
                 if (_filesToInstall.Contains(path2))
-                {
                     continue;
-                }
 
                 try
                 {
                     if (ValidateFile(path, notifyUser))
-                    {
                         _filesToInstall.AddLast(path);
-                    }
                 }
                 catch (IOException ex)
                 {
@@ -150,47 +130,39 @@ namespace APKInstaller
         public static bool ValidateFile(string path, bool notifyUser)
         {
             if (path == null)
-            {
                 throw new ArgumentNullException(nameof(path));
-            }
 
             // Check to see if the file exists
             if (!File.Exists(path))
             {
                 if (notifyUser)
-                {
                     MessageBox.Show(
                         Directory.Exists(path) ? "\"" + path + "\" " + UIStrings.isDirError : UIStrings.fileDoesNotExist,
                         "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
                 return false;
             }
 
             try
             {
                 // Check for the correct extension and that the file can be correctly parsed as an APK
-                if ((path.ToUpper(CultureInfo.CurrentCulture)
-                          .EndsWith(".APK", StringComparison.CurrentCultureIgnoreCase) &
-                      AndroidTools.PackageName(path) != "")) return true;
+                if (path.ToUpper(CultureInfo.CurrentCulture)
+                        .EndsWith(".APK", StringComparison.CurrentCultureIgnoreCase) &
+                    (AndroidTools.PackageName(path) != "")) return true;
                 if (notifyUser)
-                {
                     MessageBox.Show("\"" + path + "\" " + UIStrings.invalidApk, "Invalid File", MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
-                }
                 return false;
             }
             catch (IOException ex)
             {
                 if (notifyUser)
-                {
                     MessageBox.Show("\"" + path + "\" " + UIStrings.invalidApk, "Invalid File", MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
-                }
                 return false;
             }
         }
 
-        private string GenerateFileListSummary()
+        string GenerateFileListSummary()
         {
             if (_filesToInstall.Count == 0)
             {
@@ -217,9 +189,7 @@ namespace APKInstaller
 
             // Nothing to install
             if (apkFiles.Length == 0)
-            {
                 return excuseNoFiles;
-            }
 
             foreach (var apkFile in apkFiles)
                 if (!ValidateFile(apkFile))
@@ -239,7 +209,7 @@ namespace APKInstaller
         /// <summary>
         ///     Installs the APK packages
         /// </summary>
-        private void Install()
+        void Install()
         {
             // Wait until an Android device is connected
             dynamic waitForDeviceReturn = WaitForDevice();
@@ -264,7 +234,7 @@ namespace APKInstaller
             dynamic installStatus = "";
             dynamic installAborted = false;
             dynamic installHasFailed = false;
-            _gui.ShowProgressAnimation(true, true, Convert.ToInt32(100/filesToInstall.Length));
+            _gui.ShowProgressAnimation(true, true, Convert.ToInt32(100 / filesToInstall.Length));
             const int maxRetryCount = 3;
             foreach (var file in filesToInstall)
             {
@@ -276,7 +246,7 @@ namespace APKInstaller
 
                 // Retry Loop
                 dynamic packageInstallSuccess = false;
-                for (var retry = 0; retry <= maxRetryCount && !packageInstallSuccess; retry++)
+                for (var retry = 0; (retry <= maxRetryCount) && !packageInstallSuccess; retry++)
                 {
                     //Display a status
                     _gui.SetText(ref _gui.lblStatus,
@@ -327,14 +297,10 @@ namespace APKInstaller
                     dynamic message = UIStrings.installationOf +
                                       (filesToInstall.Length == 1 ? UIStrings.apk : UIStrings.apks);
                     if (installHasFailed)
-                    {
                         MessageBox.Show(message + UIStrings.hasFinishedError);
-                    }
                     else
-                    {
                         MessageBox.Show(message + UIStrings.hasFinishedSucess, UIStrings.apkInstallFinished,
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
                     _gui.ResetGui(UIStrings.done);
                 }
                 else
@@ -346,19 +312,15 @@ namespace APKInstaller
             // End device install section
         }
 
-        private ErrorCode PackageInstallAttempt(string deviceId, string file)
+        ErrorCode PackageInstallAttempt(string deviceId, string file)
         {
             if (Force)
-            {
                 ForceRemovePackage(file);
-            }
 
             dynamic adbCode = InstallSinglePackage(deviceId, file);
             // Install Single Package failed catastrophically when this happened
             if (adbCode == null)
-            {
                 return ErrorCode.Failure1;
-            }
 
             int result;
             // Checks if the result is a return code
@@ -372,7 +334,7 @@ namespace APKInstaller
             return HandleInstallFailure(file, adbCode);
         }
 
-        private void HandleWaitForDeviceError(ErrorCode waitForDeviceReturn)
+        void HandleWaitForDeviceError(ErrorCode waitForDeviceReturn)
         {
             dynamic message = "An unknown error while waiting for the device";
             switch (waitForDeviceReturn)
@@ -409,7 +371,7 @@ namespace APKInstaller
             }
         }
 
-        private ErrorCode WaitForDevice()
+        ErrorCode WaitForDevice()
         {
             dynamic counter = 0;
             using (var adbWait = AndroidTools.RunAdb("wait-for-device", false, true, false))
@@ -435,10 +397,8 @@ namespace APKInstaller
                     }
                     caret += 1;
                     if (counter > 10)
-                    {
                         currentMessage += "\n" + UIStrings.userTroubleshootingA1 + "\n" +
                                           UIStrings.userTroubleshootingA2;
-                    }
                     _gui.SetText(ref _lblStatus, currentMessage);
 
                     Thread.Sleep(1000);
@@ -451,16 +411,14 @@ namespace APKInstaller
                     }
                     counter += 1;
                     if (counter > 60)
-                    {
                         return ErrorCode.FailureTimeout;
-                    }
                 }
                 _gui.ShowProgressAnimation(false, false);
             }
             return 0;
         }
 
-        private string AcquireDeviceId()
+        string AcquireDeviceId()
         {
             _gui.SetText(ref _lblStatus, UIStrings.checkDevices);
             _gui.ShowProgressAnimation(true, false);
@@ -484,31 +442,23 @@ namespace APKInstaller
             return deviceId;
         }
 
-        private void GetDeviceId(DeviceIdCallback callback)
+        void GetDeviceId(DeviceIdCallback callback)
         {
             while (true)
             {
                 var deviceChooser = new DeviceChooserDialog();
                 dynamic result = deviceChooser.GetUserInput();
-                if (result == DialogResult.OK | result == null)
-                {
-                    if (MessageBox.Show(UIStrings.correctDevice1 + deviceChooser.Device + UIStrings.correctDevice2, "Verify Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
+                if ((result == DialogResult.OK) | (result == null))
+                    if (
+                        MessageBox.Show(UIStrings.correctDevice1 + deviceChooser.Device + UIStrings.correctDevice2,
+                            "Verify Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         callback(deviceChooser.Device);
-                    }
                     else
-                    {
                         continue;
-                    }
-                }
                 else if (result == DialogResult.Cancel)
-                {
                     Abort();
-                }
                 else
-                {
                     callback(deviceChooser.Device);
-                }
                 //End Using
                 break;
             }
@@ -527,12 +477,13 @@ namespace APKInstaller
             }
         }
 
-        private string InstallSinglePackage(string deviceId, string file)
+        string InstallSinglePackage(string deviceId, string file)
         {
             const string abortKey = "ABORT";
 
             using (
-                var adb = AndroidTools.RunAdb("-s " + deviceId + " install " + (Reinstall ? "-r " : "") + "\"" + file + "\"",
+                var adb =
+                    AndroidTools.RunAdb("-s " + deviceId + " install " + (Reinstall ? "-r " : "") + "\"" + file + "\"",
                         true, true, false))
             {
                 dynamic adbStandardOut = adb.StandardOutput;
@@ -541,7 +492,7 @@ namespace APKInstaller
                 // Process aborts while the adb process is running
                 // Check for and identify failures during the adb install
                 dynamic currentLine = adbStandardOut.ReadLine();
-                while (!adb.HasExited | currentLine != null)
+                while (!adb.HasExited | (currentLine != null))
                 {
                     // user requested stop
                     if (_stopRequested)
@@ -553,9 +504,7 @@ namespace APKInstaller
                             try
                             {
                                 if (adb.HasExited)
-                                {
                                     adb.Kill();
-                                }
                             }
                             catch (InvalidOperationException ex)
                             {
@@ -569,17 +518,15 @@ namespace APKInstaller
                     }
 
 
-                    while (currentLine != null && !_stopRequested)
+                    while ((currentLine != null) && !_stopRequested)
                     {
                         if (currentLine.StartsWith("Failure", StringComparison.OrdinalIgnoreCase))
                         {
                             dynamic startPos = currentLine.IndexOf("[", StringComparison.OrdinalIgnoreCase);
                             dynamic endPos = currentLine.IndexOf("]", StringComparison.OrdinalIgnoreCase);
                             dynamic errorMessage = "Unknown Failure";
-                            if (startPos < endPos & startPos != -1 & endPos != -1)
-                            {
+                            if ((startPos < endPos) & (startPos != -1) & (endPos != -1))
                                 errorMessage = currentLine.Substring(startPos + 1, endPos - startPos - 1);
-                            }
                             return errorMessage;
                         }
                         currentLine = adbStandardOut.ReadLine();
@@ -595,12 +542,12 @@ namespace APKInstaller
             }
         }
 
-        private ErrorCode HandleInstallFailure(string file, int code)
+        ErrorCode HandleInstallFailure(string file, int code)
         {
             return HandleInstallFailure(file, UIStrings.adbExitErrorCode + code);
         }
 
-        private ErrorCode HandleInstallFailure(string file, string message)
+        ErrorCode HandleInstallFailure(string file, string message)
         {
             var result =
                 MessageBox.Show(
@@ -638,6 +585,6 @@ namespace APKInstaller
             _stopRequested = false;
         }
 
-        private delegate void DeviceIdCallback(string deviceId);
+        delegate void DeviceIdCallback(string deviceId);
     }
 }

@@ -46,19 +46,19 @@ namespace APKInstaller
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(About));
             this.TableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.LabelCopyright = new System.Windows.Forms.Label();
-            this.LabelCompanyName = new System.Windows.Forms.Label();
             this.Panel1 = new System.Windows.Forms.Panel();
             this.lblUpdateStatus = new System.Windows.Forms.Label();
             this.chkPrerelease = new System.Windows.Forms.CheckBox();
             this.LabelVersion = new System.Windows.Forms.Label();
-            this.LogoPictureBox = new System.Windows.Forms.PictureBox();
             this.Panel2 = new System.Windows.Forms.Panel();
             this.TextBoxDescription = new System.Windows.Forms.TextBox();
             this.OKButton = new System.Windows.Forms.Button();
+            this.LabelCompanyName = new System.Windows.Forms.Label();
+            this.LogoPictureBox = new System.Windows.Forms.PictureBox();
             this.TableLayoutPanel.SuspendLayout();
             this.Panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
             this.Panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // TableLayoutPanel
@@ -88,15 +88,6 @@ namespace APKInstaller
             this.LabelCopyright.Name = "LabelCopyright";
             this.LabelCopyright.Size = new System.Drawing.Size(321, 27);
             this.LabelCopyright.TabIndex = 0;
-            // 
-            // LabelCompanyName
-            // 
-            this.LabelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LabelCompanyName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.LabelCompanyName.Location = new System.Drawing.Point(130, 104);
-            this.LabelCompanyName.Name = "LabelCompanyName";
-            this.LabelCompanyName.Size = new System.Drawing.Size(321, 26);
-            this.LabelCompanyName.TabIndex = 1;
             // 
             // Panel1
             // 
@@ -134,18 +125,6 @@ namespace APKInstaller
             this.LabelVersion.Size = new System.Drawing.Size(205, 23);
             this.LabelVersion.TabIndex = 2;
             // 
-            // LogoPictureBox
-            // 
-            this.LogoPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LogoPictureBox.BackgroundImage = global::APKInstaller.Resources.FIRSTTech_IconVert_RGB;
-            this.LogoPictureBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.LogoPictureBox.InitialImage = global::APKInstaller.Resources.FIRSTTech_IconVert_RGB;
-            this.LogoPictureBox.Location = new System.Drawing.Point(3, 190);
-            this.LogoPictureBox.Name = "LogoPictureBox";
-            this.LogoPictureBox.Size = new System.Drawing.Size(121, 103);
-            this.LogoPictureBox.TabIndex = 4;
-            this.LogoPictureBox.TabStop = false;
-            // 
             // Panel2
             // 
             this.Panel2.Controls.Add(this.TextBoxDescription);
@@ -178,10 +157,32 @@ namespace APKInstaller
             this.OKButton.TabIndex = 1;
             this.OKButton.Text = "OK";
             // 
+            // LabelCompanyName
+            // 
+            this.LabelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LabelCompanyName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.LabelCompanyName.Location = new System.Drawing.Point(130, 104);
+            this.LabelCompanyName.Name = "LabelCompanyName";
+            this.LabelCompanyName.Size = new System.Drawing.Size(321, 26);
+            this.LabelCompanyName.TabIndex = 1;
+            // 
+            // LogoPictureBox
+            // 
+            this.LogoPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.LogoPictureBox.BackgroundImage = global::APKInstaller.Resources.FIRSTTech_IconVert_RGB;
+            this.LogoPictureBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.LogoPictureBox.InitialImage = global::APKInstaller.Resources.FIRSTTech_IconVert_RGB;
+            this.LogoPictureBox.Location = new System.Drawing.Point(3, 190);
+            this.LogoPictureBox.Name = "LogoPictureBox";
+            this.LogoPictureBox.Size = new System.Drawing.Size(121, 103);
+            this.LogoPictureBox.TabIndex = 4;
+            this.LogoPictureBox.TabStop = false;
+            // 
             // About
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.OKButton;
             this.ClientSize = new System.Drawing.Size(478, 320);
             this.Controls.Add(this.TableLayoutPanel);
@@ -195,9 +196,9 @@ namespace APKInstaller
             this.Load += new System.EventHandler(this.About_Load);
             this.TableLayoutPanel.ResumeLayout(false);
             this.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
             this.Panel2.ResumeLayout(false);
             this.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
             this.ResumeLayout(false);
 
         }

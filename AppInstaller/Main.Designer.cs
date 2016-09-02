@@ -52,6 +52,7 @@ namespace APKInstaller
             this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStatus.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStatus.Location = new System.Drawing.Point(7, 49);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(840, 301);
@@ -66,9 +67,10 @@ namespace APKInstaller
             this.txtFileLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFileLocation.BackColor = System.Drawing.Color.White;
-            this.txtFileLocation.Location = new System.Drawing.Point(11, 530);
+            this.txtFileLocation.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtFileLocation.Location = new System.Drawing.Point(12, 527);
             this.txtFileLocation.Name = "txtFileLocation";
-            this.txtFileLocation.Size = new System.Drawing.Size(754, 22);
+            this.txtFileLocation.Size = new System.Drawing.Size(723, 28);
             this.txtFileLocation.TabIndex = 1;
             this.txtFileLocation.TabStop = false;
             this.txtFileLocation.TextChanged += new System.EventHandler(this.txtFileLocation_TextChanged);
@@ -80,9 +82,10 @@ namespace APKInstaller
             this.chkReinstall.AutoSize = true;
             this.chkReinstall.Checked = true;
             this.chkReinstall.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkReinstall.Location = new System.Drawing.Point(12, 503);
+            this.chkReinstall.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkReinstall.Location = new System.Drawing.Point(12, 497);
             this.chkReinstall.Name = "chkReinstall";
-            this.chkReinstall.Size = new System.Drawing.Size(144, 21);
+            this.chkReinstall.Size = new System.Drawing.Size(166, 24);
             this.chkReinstall.TabIndex = 6;
             this.chkReinstall.Text = "Update (Reinstall)";
             this.chkReinstall.UseVisualStyleBackColor = true;
@@ -92,10 +95,11 @@ namespace APKInstaller
             // 
             this.chkForce.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chkForce.AutoSize = true;
-            this.chkForce.Location = new System.Drawing.Point(169, 506);
+            this.chkForce.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkForce.Location = new System.Drawing.Point(217, 497);
             this.chkForce.Margin = new System.Windows.Forms.Padding(0);
             this.chkForce.Name = "chkForce";
-            this.chkForce.Size = new System.Drawing.Size(66, 21);
+            this.chkForce.Size = new System.Drawing.Size(74, 24);
             this.chkForce.TabIndex = 3;
             this.chkForce.Text = "Force";
             this.chkForce.UseVisualStyleBackColor = true;
@@ -104,9 +108,10 @@ namespace APKInstaller
             // btnOpenFileDialogTrigger
             // 
             this.btnOpenFileDialogTrigger.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFileDialogTrigger.Location = new System.Drawing.Point(771, 528);
+            this.btnOpenFileDialogTrigger.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnOpenFileDialogTrigger.Location = new System.Drawing.Point(743, 527);
             this.btnOpenFileDialogTrigger.Name = "btnOpenFileDialogTrigger";
-            this.btnOpenFileDialogTrigger.Size = new System.Drawing.Size(79, 27);
+            this.btnOpenFileDialogTrigger.Size = new System.Drawing.Size(104, 27);
             this.btnOpenFileDialogTrigger.TabIndex = 4;
             this.btnOpenFileDialogTrigger.Text = "Browse";
             this.btnOpenFileDialogTrigger.UseVisualStyleBackColor = true;
@@ -117,6 +122,7 @@ namespace APKInstaller
             this.btnInstall.AllowDrop = true;
             this.btnInstall.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnInstall.Font = new System.Drawing.Font("Roboto", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.Green;
             this.btnInstall.Location = new System.Drawing.Point(295, 382);
             this.btnInstall.Name = "btnInstall";
@@ -138,13 +144,14 @@ namespace APKInstaller
             // 
             this.lnkAbout.ActiveLinkColor = System.Drawing.Color.White;
             this.lnkAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lnkAbout.BackColor = System.Drawing.SystemColors.Control;
+            this.lnkAbout.BackColor = System.Drawing.Color.White;
+            this.lnkAbout.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lnkAbout.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.lnkAbout.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.lnkAbout.LinkColor = System.Drawing.Color.Black;
-            this.lnkAbout.Location = new System.Drawing.Point(757, 9);
+            this.lnkAbout.Location = new System.Drawing.Point(739, 9);
             this.lnkAbout.Name = "lnkAbout";
-            this.lnkAbout.Size = new System.Drawing.Size(47, 23);
+            this.lnkAbout.Size = new System.Drawing.Size(58, 23);
             this.lnkAbout.TabIndex = 1;
             this.lnkAbout.TabStop = true;
             this.lnkAbout.Text = "About";
@@ -155,13 +162,15 @@ namespace APKInstaller
             // 
             this.lnkHelp.ActiveLinkColor = System.Drawing.Color.White;
             this.lnkHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lnkHelp.BackColor = System.Drawing.SystemColors.Control;
+            this.lnkHelp.AutoSize = true;
+            this.lnkHelp.BackColor = System.Drawing.Color.White;
+            this.lnkHelp.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lnkHelp.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.lnkHelp.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.lnkHelp.LinkColor = System.Drawing.Color.Black;
-            this.lnkHelp.Location = new System.Drawing.Point(810, 9);
+            this.lnkHelp.Location = new System.Drawing.Point(803, 9);
             this.lnkHelp.Name = "lnkHelp";
-            this.lnkHelp.Size = new System.Drawing.Size(37, 23);
+            this.lnkHelp.Size = new System.Drawing.Size(44, 20);
             this.lnkHelp.TabIndex = 0;
             this.lnkHelp.TabStop = true;
             this.lnkHelp.Text = "Help";
@@ -173,6 +182,7 @@ namespace APKInstaller
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(862, 567);
             this.Controls.Add(this.lnkHelp);
             this.Controls.Add(this.lnkAbout);

@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
+using Mono.Unix.Native;
 
 namespace APKInstaller
 {
     /// <summary>Provides utilities for performing various common IO tasks</summary>
     public class IoUtilities : IDisposable
     {
-        private static IoUtilities _instance = new IoUtilities();
-        private bool _disposedValue;
-        private bool _isReady;
-        private List<string> _sessions;
-        private string _tempFilePath;
+        static IoUtilities _instance = new IoUtilities();
+        bool _disposedValue;
+        bool _isReady;
+        List<string> _sessions;
+        string _tempFilePath;
 
         public IoUtilities()
         {
@@ -27,8 +28,10 @@ namespace APKInstaller
             Dispose(true);
         }
 
-        public static void UnzipFromFile(string file, string outFolder) {
-            using (var stream = new FileStream (file, FileMode.Open)) {
+        public static void UnzipFromFile(string file, string outFolder)
+        {
+            using (var stream = new FileStream(file, FileMode.Open))
+            {
                 UnzipFromStream(stream, outFolder);
             }
         }
@@ -44,16 +47,18 @@ namespace APKInstaller
             var buffer = new byte[4097];
             for (; nextEntry != null; nextEntry = zipInputStream.GetNextEntry())
             {
-                var path2 = nextEntry.Name.Replace("/", (Path.DirectorySeparatorChar.ToString()));
+                var path2 = nextEntry.Name.Replace("/", Path.DirectorySeparatorChar.ToString());
                 var path = Path.Combine(outFolder, path2);
                 var directoryName = Path.GetDirectoryName(path);
                 if (directoryName.Length > 0)
                     Directory.CreateDirectory(directoryName);
-                if (!((directoryName + Path.DirectorySeparatorChar.ToString()) == (path)))
+                if (!(directoryName + Path.DirectorySeparatorChar == path))
                 {
                     using (var fileStream = File.Create(path))
+                    {
                         StreamUtils.Copy(zipInputStream, fileStream, buffer);
-                    Mono.Unix.Native.Syscall.chmod(path, Mono.Unix.Native.FilePermissions.S_IRWXU);
+                    }
+                    Syscall.chmod(path, FilePermissions.S_IRWXU);
                 }
             }
         }
@@ -66,7 +71,7 @@ namespace APKInstaller
             _instance._Prepare();
         }
 
-        private void _Prepare()
+        void _Prepare()
         {
             if (_isReady)
                 return;
@@ -125,12 +130,10 @@ namespace APKInstaller
                     _tempFilePath = null;
                 }
                 if (File.Exists(path))
-                {
                     if (Directory.Exists(path))
                         Directory.Delete(path);
                     else
                         File.Delete(path);
-                }
             }
             _disposedValue = true;
         }

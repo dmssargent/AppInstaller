@@ -7,61 +7,27 @@ using System.Windows.Forms;
 using APKInstaller.i18n;
 using Microsoft.Win32;
 using Squirrel;
-//using APKInstaller.My.Resources;
-//using MaterialSkin.Controls;
 
 namespace APKInstaller
 {
-
-
-
     /// <summary>
-    /// Core Updating system of APKInstaller. This handles app installs, updates, and uninstalls
-    /// Usage:
-    /// Create a new instance, then call HandleEvents before the app has fully loaded. HandleEvents may result
-    /// in app termination due to a special event being triggered i.e. app install, so the GUI shouldn't be shown
-    /// 
-    /// Calling Update() will update the app, if possible (no-op if not possible), and if a new update has been released
+    ///     Core Updating system of APKInstaller. This handles app installs, updates, and uninstalls
+    ///     Usage:
+    ///     Create a new instance, then call HandleEvents before the app has fully loaded. HandleEvents may result
+    ///     in app termination due to a special event being triggered i.e. app install, so the GUI shouldn't be shown
+    ///     Calling Update() will update the app, if possible (no-op if not possible), and if a new update has been released
     /// </summary>
     public class AppUpdateManager
     {
-        private delegate void SetUpdateCallback();
-
-        private static UpdateManager _updateManager;
-        private Label _updateLabel;
-        private static AppUpdateManager _instance;
-        private readonly Form _gui;
-        private static bool _configured;
-        private static string _updateStatusText = "Everything is up-to-date";
-        //Private Shared _updateStatusText As String = "Everything is up-to-date"
-
-        //Private _updatesEnabled As Boolean
-
-        /// <summary>
-        /// 
-        /// The label that update notification should be applied to; must be a child of the GUI form used when creating the instance
-        /// </summary>
-        /// <returns>the current update notification label</returns>
-        public Label UpdateLabel
-        {
-            get { return _updateLabel; }
-            set
-            {
-                _updateLabel = value;
-                if ((_updateLabel != null))
-                {
-                    // Add our click handler on the fly
-                    UpdateLabel.Click += UpdateClick;
-                    UpdateLabel.Visible = false;
-                }
-            }
-        }
-
-        public static string UpdateStatusText => _updateStatusText;
+        static UpdateManager _updateManager;
+        static AppUpdateManager _instance;
+        static bool _configured;
+        readonly Form _gui;
+        Label _updateLabel;
         //_updateStatusText
 
         /// <summary>
-        /// Creates a new AppUpdateManager instance binded to a specific GUI
+        ///     Creates a new AppUpdateManager instance binded to a specific GUI
         /// </summary>
         /// <param name="gui">The main window form, and contains UpdateLabel, cannot be null</param>
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
@@ -75,14 +41,36 @@ namespace APKInstaller
             updateManager.Start();
 
             if (gui == null)
-            {
                 throw new ArgumentNullException(nameof(gui));
-            }
             _gui = gui;
         }
 
+        //Private Shared _updateStatusText As String = "Everything is up-to-date"
 
-        private static async void GetUpdateManager()
+        //Private _updatesEnabled As Boolean
+
+        /// <summary>
+        ///     The label that update notification should be applied to; must be a child of the GUI form used when creating the
+        ///     instance
+        /// </summary>
+        /// <returns>the current update notification label</returns>
+        public Label UpdateLabel
+        {
+            get { return _updateLabel; }
+            set
+            {
+                _updateLabel = value;
+                if (_updateLabel == null) return;
+                // Add our click handler on the fly
+                UpdateLabel.Click += UpdateClick;
+                UpdateLabel.Visible = false;
+            }
+        }
+
+        public static string UpdateStatusText { get; private set; } = "Everything is up-to-date";
+
+
+        static async void GetUpdateManager()
         {
             try
             {
@@ -91,8 +79,6 @@ namespace APKInstaller
                 var githubMgr = await UpdateManager.GitHubUpdateManager(updatePath, prerelease: true);
 
                 _updateManager = githubMgr;
-
-
             }
             catch (Exception e)
             {
@@ -103,47 +89,40 @@ namespace APKInstaller
         }
 
         /// <summary>
-        /// Handles installer events, some of which may result in termination without the main form being loaded
+        ///     Handles installer events, some of which may result in termination without the main form being loaded
         /// </summary>
         public static void HandleEvents()
         {
             //MsgBox("Squirrel Init")
             if (!VerifyState())
-            {
                 return;
-            }
 
             //MsgBox("Squirrel Handle")
-            SquirrelAwareApp.HandleEvents(onInitialInstall: v => SquirrelInstall(),
-                onAppUpdate: v => _updateManager.CreateShortcutForThisExe(), onAppUninstall: v => SquirrelUninstall());
-
+            SquirrelAwareApp.HandleEvents(v => SquirrelInstall(),
+                v => _updateManager.CreateShortcutForThisExe(), onAppUninstall: v => SquirrelUninstall());
         }
 
-        private static bool VerifyState()
+        static bool VerifyState()
         {
-            if ((_updateManager == null))
+            if (_updateManager == null)
             {
                 while (!_configured)
-                {
                     Thread.Sleep(10);
-                }
 
-                if ((_updateManager == null))
-                {
+                if (_updateManager == null)
                     return false;
-                }
             }
             return true;
         }
 
-        private static void SquirrelInstall()
+        static void SquirrelInstall()
         {
             //MsgBox("Squirrel Install")
             _updateManager.CreateShortcutForThisExe();
 
             // Create a default icon
             dynamic icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico");
-            using (FileStream file = new FileStream(icon, FileMode.Create))
+            using (var file = new FileStream(icon, FileMode.Create))
             {
                 // todo: android_app.Save(file);
             }
@@ -188,7 +167,7 @@ namespace APKInstaller
             appClassKey.Close();
         }
 
-        private static void SquirrelUninstall()
+        static void SquirrelUninstall()
         {
             _updateManager.RemoveShortcutForThisExe();
 
@@ -208,24 +187,18 @@ namespace APKInstaller
         }
 
 
-
-        private async void StartUpdate()
+        async void StartUpdate()
         {
             if (!VerifyState())
-            {
                 return;
-            }
 
             var updateInfo = await _updateManager.CheckForUpdate();
-            if ((updateInfo.FutureReleaseEntry.Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0))
-            {
-                //Await _updateManager.UpdateApp()
+            if (updateInfo.FutureReleaseEntry.Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0)
                 NotifyOfUpdate();
-            }
         }
 
         /// <summary>
-        /// Updates the current app asynchronously
+        ///     Updates the current app asynchronously
         /// </summary>
         public void Update()
         {
@@ -238,16 +211,14 @@ namespace APKInstaller
             _instance.Update();
         }
 
-        private void NotifyOfUpdate()
+        void NotifyOfUpdate()
         {
-            _updateStatusText = UIStrings.updateReady;
+            UpdateStatusText = UIStrings.updateReady;
 
-            if ((_updateLabel == null))
-            {
+            if (_updateLabel == null)
                 return;
-            }
 
-            if ((UpdateLabel.InvokeRequired))
+            if (UpdateLabel.InvokeRequired)
             {
                 UpdateLabel.Invoke(new SetUpdateCallback(NotifyOfUpdate));
             }
@@ -257,25 +228,22 @@ namespace APKInstaller
                 //Strings.ResourceManager.GetString("updateReady")
                 UpdateLabel.Font = new Font(UpdateLabel.Font, FontStyle.Underline);
                 UpdateLabel.Visible = true;
-                if ((!_gui.InvokeRequired))
-                {
+                if (!_gui.InvokeRequired)
                     _gui.Height += 20;
-                }
             }
-
         }
 
-        private void UpdateClick(object sender, EventArgs e)
+        void UpdateClick(object sender, EventArgs e)
         {
-            if ((_updateManager != null))
-            {
+            if (_updateManager != null)
                 UpdateManager.RestartApp();
-            }
         }
 
         public static void CleanUp()
         {
             _updateManager?.Dispose();
         }
+
+        delegate void SetUpdateCallback();
     }
 }

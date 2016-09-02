@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -10,21 +9,19 @@ using APKInstaller.i18n;
 
 namespace APKInstaller
 {
-
     public partial class Main : Form
     {
-
         //Private stopAll As Boolean
-        private readonly Installer _apkInstaller;
+        readonly Installer _apkInstaller;
 
-        private readonly AppUpdateManager _updateMgr;
-        private bool _dialogLock;
+        readonly AppUpdateManager _updateMgr;
+        bool _dialogLock;
 
-        private bool _singleInstall;
+        bool _singleInstall;
         //private Button button1;
 
         // private Label lblStatus;
-        private bool _txtLock;
+        bool _txtLock;
 
         public Main()
         {
@@ -38,7 +35,7 @@ namespace APKInstaller
             Load += APKInstallerMain_Load;
 
 
-            Main test = this;
+            var test = this;
             Form test2 = this;
             // Add any initialization after the InitializeComponent() call.
             _updateMgr = new AppUpdateManager(ref test2);
@@ -50,7 +47,7 @@ namespace APKInstaller
         }
 
         //[Log("App Installer Debug")]
-        private void APKInstallerMain_Load(object sender, EventArgs e)
+        void APKInstallerMain_Load(object sender, EventArgs e)
         {
             // Handle Fatal Errors for further diagnostics
             Application.ThreadException += FatalErrorWasThrownHandlerTE;
@@ -69,7 +66,7 @@ namespace APKInstaller
             //SkinManager.ColorScheme = New ColorScheme(Primary.Orange700, Primary.Orange700, Primary.Orange100, Accent.LightBlue200, TextShade.WHITE)
             //lnkAbout.Font = SkinManager.ROBOTO_MEDIUM_10
             //lnkHelp.Font = SkinManager.ROBOTO_MEDIUM_10
-            
+
             CenterToScreen();
 
             // Start parsing the arguments
@@ -78,13 +75,10 @@ namespace APKInstaller
             dynamic enableFileArg = true;
             foreach (var arg in Environment.GetCommandLineArgs())
             {
-                
                 if (arg.StartsWith("--", StringComparison.Ordinal) | arg.StartsWith("-", StringComparison.Ordinal))
                 {
                     if (arg.Contains("squirrel") && !arg.Contains("firstrun"))
-                    {
                         enableFileArg = false;
-                    }
                     noPrompt = ParseNonFileArgument(noPrompt, arg);
                     continue;
                 }
@@ -103,13 +97,11 @@ namespace APKInstaller
 
             var fileArgs = appList.ToArray();
             _apkInstaller.AddFilesToInstall(fileArgs);
-            if (fileArgs.Length != 0 & txtFileLocation.Text.Length > 0 & btnInstall.Enabled)
-            {
+            if ((fileArgs.Length != 0) & (txtFileLocation.Text.Length > 0) & btnInstall.Enabled)
                 SetupSingleInstall(e, noPrompt);
-            }
         }
 
-        private void SetupSingleInstall(EventArgs e, bool noPrompt)
+        void SetupSingleInstall(EventArgs e, bool noPrompt)
         {
             _singleInstall = true;
             txtFileLocation.Visible = false;
@@ -123,17 +115,15 @@ namespace APKInstaller
                     MessageBox.Show(UIStrings.updateQuestion, "Reinstall", MessageBoxButtons.YesNo,
                         MessageBoxIcon.Question) == DialogResult.Yes;
                 if (!chkReinstall.Checked)
-                {
                     chkForce.Checked =
                         MessageBox.Show(UIStrings.forceQuestion, "Force", MessageBoxButtons.YesNo,
                             MessageBoxIcon.Question) == DialogResult.Yes;
-                }
             }
 
             btnInstaller_Click(btnInstall, e);
         }
 
-        private void ParseFileArgument(List<string> appList, string arg)
+        void ParseFileArgument(List<string> appList, string arg)
         {
             if (MessageBox.Show(UIStrings.installApkAtConfirm + "\"" + arg + "\"",
                     "Confirm File", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
@@ -147,7 +137,7 @@ namespace APKInstaller
             }
         }
 
-        private bool ParseNonFileArgument(bool noPrompt, string arg)
+        bool ParseNonFileArgument(bool noPrompt, string arg)
         {
             if (arg.Equals("-f") | arg.Equals("--force"))
             {
@@ -194,14 +184,12 @@ namespace APKInstaller
             return noPrompt;
         }
 
-        private void btnOpenFileDialogTrigger_Click(object sender, EventArgs e)
+        void btnOpenFileDialogTrigger_Click(object sender, EventArgs e)
         {
             using (var fileDialog = new OpenFileDialog())
             {
                 if (txtFileLocation.Text.Length > 0)
-                {
                     if (txtFileLocation.Text.Contains(Path.PathSeparator.ToString()))
-                    {
                         fileDialog.FileName =
                             txtFileLocation.Text.Substring(
                                 txtFileLocation.Text.LastIndexOf(Path.PathSeparator.ToString(),
@@ -209,12 +197,8 @@ namespace APKInstaller
                                 txtFileLocation.Text.Length -
                                 txtFileLocation.Text.LastIndexOf(Path.PathSeparator.ToString(),
                                     StringComparison.OrdinalIgnoreCase));
-                    }
                     else
-                    {
                         fileDialog.FileName = txtFileLocation.Text;
-                    }
-                }
                 fileDialog.AutoUpgradeEnabled = true;
                 fileDialog.CheckFileExists = true;
                 fileDialog.DefaultExt = ".apk";
@@ -228,25 +212,21 @@ namespace APKInstaller
             }
         }
 
-        private void Me_DragDrop(object sender, DragEventArgs e)
+        void Me_DragDrop(object sender, DragEventArgs e)
         {
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             _apkInstaller.AddFilesToInstall(files);
         }
 
-        private void Me_DragEnter(object sender, DragEventArgs e)
+        void Me_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
                 e.Effect = DragDropEffects.Copy;
-            }
             else
-            {
                 e.Effect = DragDropEffects.None;
-            }
         }
 
-        private void btnInstaller_Click(object sender, EventArgs e)
+        void btnInstaller_Click(object sender, EventArgs e)
         {
             btnInstall.Visible = false;
 
@@ -258,9 +238,9 @@ namespace APKInstaller
             installerThread.Start();
         }
 
-        private void txtFileLocation_TextChanged(object sender, EventArgs e)
+        void txtFileLocation_TextChanged(object sender, EventArgs e)
         {
-            if (_apkInstaller == null || _apkInstaller.UseMultiFileDialog) return;
+            if ((_apkInstaller == null) || _apkInstaller.UseMultiFileDialog) return;
             dynamic pos = txtFileLocation.SelectionStart;
             dynamic currentData = txtFileLocation.Text;
             if (currentData.Contains(","))
@@ -284,17 +264,13 @@ namespace APKInstaller
                         {
                             dynamic temp = currentData.IndexOf(",", index + 1, StringComparison.Ordinal);
                             if (temp >= pos)
-                            {
                                 break; // TODO: might not be correct. Was : Exit While
-                            }
                             index = temp;
                         }
                         currentData = currentData.Substring(index);
                         if (currentData.Contains(","))
-                        {
                             currentData = currentData.Substring(0,
                                 currentData.IndexOf(",", StringComparison.Ordinal) + 1);
-                        }
                     }
                 }
             }
@@ -302,19 +278,19 @@ namespace APKInstaller
             CheckInstallerConfig(Installer.ValidateFile(currentData));
         }
 
-        private void Main_GotFocus(object sender, EventArgs e)
+        void Main_GotFocus(object sender, EventArgs e)
         {
             CheckInstallerConfig();
         }
 
-        private void CheckInstallerConfig(bool optionalConditon = true)
+        void CheckInstallerConfig(bool optionalConditon = true)
         {
             if (_apkInstaller == null)
             {
                 //Exit Sub
             }
 
-            if (_apkInstaller != null && _apkInstaller.VerifyFilesToInstall(true) & optionalConditon)
+            if ((_apkInstaller != null) && (_apkInstaller.VerifyFilesToInstall(true) & optionalConditon))
             {
                 btnInstall.Visible = true;
                 lblStatus.Text = UIStrings.readyToInstall;
@@ -356,7 +332,7 @@ namespace APKInstaller
             }
         }
 
-        private void chkReinstall_CheckedChanged(object sender, EventArgs e)
+        void chkReinstall_CheckedChanged(object sender, EventArgs e)
         {
             if (chkReinstall.Checked)
             {
@@ -369,23 +345,21 @@ namespace APKInstaller
             }
         }
 
-        private void chkForce_CheckedChanged(object sender, EventArgs e)
+        void chkForce_CheckedChanged(object sender, EventArgs e)
         {
             if (chkForce.Checked)
-            {
                 chkForce.Checked =
                     MessageBox.Show(UIStrings.forceConfirm, "Force", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
                     DialogResult.Yes;
-            }
         }
 
-        private void Form1_Closing(object sender, EventArgs e)
+        void Form1_Closing(object sender, EventArgs e)
         {
             _apkInstaller.Abort();
         }
 
         //[Log("App Installer Debug")]
-        private void Form1_Closed(object sender, EventArgs e)
+        void Form1_Closed(object sender, EventArgs e)
         {
             IoUtilities.Cleanup();
             // Cleanup all of the tools we used
@@ -397,9 +371,7 @@ namespace APKInstaller
         public void SetText(ref Label label, string message)
         {
             if (label == null)
-            {
                 throw new ArgumentNullException(nameof(label));
-            }
 
             if (label.InvokeRequired)
             {
@@ -418,7 +390,7 @@ namespace APKInstaller
             ShowProgressAnimation(isVisible, useStep, 0);
         }
 
-       // [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
+        // [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         //[Log("App Installer Debug")]
         public void ShowProgressAnimation(bool isVisible, bool useStep, int stepAmount = 0)
         {
@@ -457,13 +429,11 @@ namespace APKInstaller
         }
 
 
-        private static void FatalErrorWasThrownHandler(Exception e)
+        static void FatalErrorWasThrownHandler(Exception e)
         {
             dynamic details = "";
             if (e != null)
-            {
                 details = Convert.ToBase64String(Encoding.Unicode.GetBytes(e.Message + e.StackTrace));
-            }
             var sTempFileName = Path.GetTempFileName();
             using (var fsTemp = new FileStream(sTempFileName, FileMode.Create))
             {
@@ -490,19 +460,19 @@ namespace APKInstaller
         }
 
         //[Log("App Installer Debug")]
-        private static void FatalErrorWasThrownHandlerTE(object sender, ThreadExceptionEventArgs e)
+        static void FatalErrorWasThrownHandlerTE(object sender, ThreadExceptionEventArgs e)
         {
             FatalErrorWasThrownHandler(e.Exception);
         }
 
         //[Log("App Installer Debug")]
-        private static void FatalErrorWasThrownHandlerCD(object sender, UnhandledExceptionEventArgs e)
+        static void FatalErrorWasThrownHandlerCD(object sender, UnhandledExceptionEventArgs e)
         {
             FatalErrorWasThrownHandler((Exception)e.ExceptionObject);
         }
 
         //[Log("App Installer Debug")]
-        private void txtFileLocation_GotFocus(object sender, EventArgs e)
+        void txtFileLocation_GotFocus(object sender, EventArgs e)
         {
             if (_apkInstaller == null) return;
 
@@ -521,9 +491,7 @@ namespace APKInstaller
 
                     _dialogLock = true;
                     if (dialog.ShowDialog() == DialogResult.OK)
-                    {
                         _apkInstaller.AddFilesToInstall(dialog.GetFiles(), true);
-                    }
                     _dialogLock = false;
                 }
 
@@ -531,35 +499,27 @@ namespace APKInstaller
             }
         }
 
-        private void txtFileLocation_LostFocus(object sender, EventArgs e)
+        void txtFileLocation_LostFocus(object sender, EventArgs e)
         {
-            if (_apkInstaller != null && _apkInstaller.UseMultiFileDialog)
-            {
+            if ((_apkInstaller != null) && _apkInstaller.UseMultiFileDialog)
                 txtFileLocation.Enabled = true;
-            }
             else
-            {
                 ConfigureAppListFromTextbox();
-            }
         }
 
-        private void ConfigureAppListFromTextbox()
+        void ConfigureAppListFromTextbox()
         {
             if (_txtLock) return;
 
             _txtLock = true;
             var files = ExtractFilesFromString(txtFileLocation.Text);
 
-            if (_apkInstaller != null && !_apkInstaller.UseMultiFileDialog)
+            if ((_apkInstaller != null) && !_apkInstaller.UseMultiFileDialog)
             {
                 dynamic desc = ExtractFilesFromString(_apkInstaller.FilesToInstallDescription);
                 foreach (var file in files)
-                {
                     if (!desc.Contains(file))
-                    {
                         _apkInstaller.RemoveFile(file);
-                    }
-                }
                 dynamic tempText = txtFileLocation.Text;
                 dynamic tempPos = txtFileLocation.SelectionStart;
                 _apkInstaller.AddFilesToInstall(files.ToArray(), false, false);
@@ -569,7 +529,7 @@ namespace APKInstaller
             _txtLock = false;
         }
 
-        private static List<string> ExtractFilesFromString(string data)
+        static List<string> ExtractFilesFromString(string data)
         {
             dynamic files = new List<string>();
             data = data.Replace("...", "");
@@ -577,13 +537,8 @@ namespace APKInstaller
             {
                 dynamic commaFiles = data.Split(Convert.ToChar(","));
                 foreach (var file in commaFiles)
-                {
-                    // file = file_loopVariable;
                     if (data.Contains(file))
-                    {
                         data = data.Replace(file, "");
-                    }
-                }
                 data = data.Replace(",", "");
                 files.AddRange(commaFiles);
             }
@@ -591,39 +546,29 @@ namespace APKInstaller
             {
                 dynamic collection = data.Split(Path.PathSeparator);
                 foreach (var file in collection)
-                {
-                    //file = file_loopVariable;
                     if (data.Contains(file))
-                    {
                         data = data.Replace(file, "");
-                    }
-                }
                 data = data.Replace(Path.PathSeparator.ToString(), "");
                 files.AddRange(collection);
             }
             if (!ReferenceEquals(data, ""))
-            {
                 files.Add(data);
-            }
 
             return files;
         }
 
-        private void txtFileLocation_DoubleClick(object sender, EventArgs e)
+        void txtFileLocation_DoubleClick(object sender, EventArgs e)
         {
-            
             if (_dialogLock) return;
 
             dynamic dialog = MultiPackageDialog.Create(_apkInstaller.GetFilesToInstall());
             _dialogLock = true;
             if (dialog.ShowDialog() == DialogResult.OK)
-            {
                 _apkInstaller.AddFilesToInstall(dialog.GetFiles(), true);
-            }
             _dialogLock = false;
         }
 
-        private void lnkAbout_Click(object sender, EventArgs e)
+        void lnkAbout_Click(object sender, EventArgs e)
         {
             using (var aboutDialog = new About())
             {
@@ -631,9 +576,8 @@ namespace APKInstaller
             }
         }
 
-        
 
-        private void lnkHelp_Click(object sender, EventArgs e)
+        void lnkHelp_Click(object sender, EventArgs e)
         {
             // Using browser = New Process()
             UseWaitCursor = true;
@@ -645,12 +589,12 @@ namespace APKInstaller
 
         // This delegate enables asynchronous calls for setting
         // the text property on a TextBox control.
-        private delegate void SetTextCallback(ref Label label, string text);
+        delegate void SetTextCallback(ref Label label, string text);
 
-        private delegate void VisibilityCallback(bool visible, bool useStep, int stepAmount);
+        delegate void VisibilityCallback(bool visible, bool useStep, int stepAmount);
 
-        private delegate void StepProgressBarDelegate();
+        delegate void StepProgressBarDelegate();
 
-        private delegate void ResetGuiCallback(string message);
+        delegate void ResetGuiCallback(string message);
     }
 }
