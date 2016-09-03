@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
+﻿
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
+using MaterialSkin.Controls;
 
 namespace APKInstaller
 {
@@ -36,11 +34,11 @@ namespace APKInstaller
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.lblStatus = new System.Windows.Forms.Label();
-            this.txtFileLocation = new System.Windows.Forms.TextBox();
-            this.chkReinstall = new System.Windows.Forms.CheckBox();
-            this.chkForce = new System.Windows.Forms.CheckBox();
-            this.btnOpenFileDialogTrigger = new System.Windows.Forms.Button();
-            this.btnInstall = new System.Windows.Forms.Button();
+            this.txtFileLocation = new MaterialSkin.Controls.MaterialSingleLineTextField();
+            this.chkReinstall = new MaterialSkin.Controls.MaterialCheckBox();
+            this.chkForce = new MaterialSkin.Controls.MaterialCheckBox();
+            this.btnOpenFileDialogTrigger = new MaterialSkin.Controls.MaterialFlatButton();
+            this.btnInstall = new MaterialSkin.Controls.MaterialRaisedButton();
             this.pgbStatus = new System.Windows.Forms.ProgressBar();
             this.lnkAbout = new System.Windows.Forms.LinkLabel();
             this.lnkHelp = new System.Windows.Forms.LinkLabel();
@@ -53,9 +51,10 @@ namespace APKInstaller
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblStatus.Font = new System.Drawing.Font("Roboto", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblStatus.Location = new System.Drawing.Point(7, 49);
+            this.lblStatus.Location = new System.Drawing.Point(5, 102);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(840, 301);
+            this.lblStatus.Size = new System.Drawing.Size(630, 183);
             this.lblStatus.TabIndex = 8;
             this.lblStatus.Text = "Drag the APK here...";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -67,14 +66,24 @@ namespace APKInstaller
             this.txtFileLocation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFileLocation.BackColor = System.Drawing.Color.White;
+            this.txtFileLocation.Depth = 0;
             this.txtFileLocation.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFileLocation.Location = new System.Drawing.Point(12, 527);
+            this.txtFileLocation.Hint = "";
+            this.txtFileLocation.Location = new System.Drawing.Point(9, 428);
+            this.txtFileLocation.Margin = new System.Windows.Forms.Padding(2);
+            this.txtFileLocation.MaxLength = 32767;
+            this.txtFileLocation.MouseState = MaterialSkin.MouseState.HOVER;
             this.txtFileLocation.Name = "txtFileLocation";
-            this.txtFileLocation.Size = new System.Drawing.Size(723, 28);
+            this.txtFileLocation.PasswordChar = '\0';
+            this.txtFileLocation.SelectedText = "";
+            this.txtFileLocation.SelectionLength = 0;
+            this.txtFileLocation.SelectionStart = 0;
+            this.txtFileLocation.Size = new System.Drawing.Size(543, 28);
             this.txtFileLocation.TabIndex = 1;
             this.txtFileLocation.TabStop = false;
-            this.txtFileLocation.TextChanged += new System.EventHandler(this.txtFileLocation_TextChanged);
+            this.txtFileLocation.UseSystemPasswordChar = false;
             this.txtFileLocation.DoubleClick += new System.EventHandler(this.txtFileLocation_DoubleClick);
+            this.txtFileLocation.TextChanged += new System.EventHandler(this.txtFileLocation_TextChanged);
             // 
             // chkReinstall
             // 
@@ -82,10 +91,15 @@ namespace APKInstaller
             this.chkReinstall.AutoSize = true;
             this.chkReinstall.Checked = true;
             this.chkReinstall.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkReinstall.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkReinstall.Location = new System.Drawing.Point(12, 497);
+            this.chkReinstall.Depth = 0;
+            this.chkReinstall.Font = new System.Drawing.Font("Roboto", 10F);
+            this.chkReinstall.Location = new System.Drawing.Point(9, 394);
+            this.chkReinstall.Margin = new System.Windows.Forms.Padding(2);
+            this.chkReinstall.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.chkReinstall.MouseState = MaterialSkin.MouseState.HOVER;
             this.chkReinstall.Name = "chkReinstall";
-            this.chkReinstall.Size = new System.Drawing.Size(166, 24);
+            this.chkReinstall.Ripple = true;
+            this.chkReinstall.Size = new System.Drawing.Size(169, 30);
             this.chkReinstall.TabIndex = 6;
             this.chkReinstall.Text = "Update (Reinstall)";
             this.chkReinstall.UseVisualStyleBackColor = true;
@@ -95,11 +109,15 @@ namespace APKInstaller
             // 
             this.chkForce.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chkForce.AutoSize = true;
-            this.chkForce.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkForce.Location = new System.Drawing.Point(217, 497);
+            this.chkForce.Depth = 0;
+            this.chkForce.Font = new System.Drawing.Font("Roboto", 10F);
+            this.chkForce.Location = new System.Drawing.Point(163, 394);
             this.chkForce.Margin = new System.Windows.Forms.Padding(0);
+            this.chkForce.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.chkForce.MouseState = MaterialSkin.MouseState.HOVER;
             this.chkForce.Name = "chkForce";
-            this.chkForce.Size = new System.Drawing.Size(74, 24);
+            this.chkForce.Ripple = true;
+            this.chkForce.Size = new System.Drawing.Size(74, 30);
             this.chkForce.TabIndex = 3;
             this.chkForce.Text = "Force";
             this.chkForce.UseVisualStyleBackColor = true;
@@ -108,13 +126,24 @@ namespace APKInstaller
             // btnOpenFileDialogTrigger
             // 
             this.btnOpenFileDialogTrigger.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenFileDialogTrigger.AutoSize = true;
+            this.btnOpenFileDialogTrigger.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnOpenFileDialogTrigger.BackColor = System.Drawing.Color.DimGray;
+            this.btnOpenFileDialogTrigger.Depth = 0;
+            this.btnOpenFileDialogTrigger.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnOpenFileDialogTrigger.FlatAppearance.BorderSize = 0;
             this.btnOpenFileDialogTrigger.Font = new System.Drawing.Font("Roboto", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnOpenFileDialogTrigger.Location = new System.Drawing.Point(743, 527);
+            this.btnOpenFileDialogTrigger.ForeColor = System.Drawing.Color.White;
+            this.btnOpenFileDialogTrigger.Icon = null;
+            this.btnOpenFileDialogTrigger.Location = new System.Drawing.Point(556, 420);
+            this.btnOpenFileDialogTrigger.Margin = new System.Windows.Forms.Padding(2);
+            this.btnOpenFileDialogTrigger.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnOpenFileDialogTrigger.Name = "btnOpenFileDialogTrigger";
-            this.btnOpenFileDialogTrigger.Size = new System.Drawing.Size(104, 27);
+            this.btnOpenFileDialogTrigger.Primary = false;
+            this.btnOpenFileDialogTrigger.Size = new System.Drawing.Size(91, 36);
             this.btnOpenFileDialogTrigger.TabIndex = 4;
             this.btnOpenFileDialogTrigger.Text = "Browse";
-            this.btnOpenFileDialogTrigger.UseVisualStyleBackColor = true;
+            this.btnOpenFileDialogTrigger.UseVisualStyleBackColor = false;
             this.btnOpenFileDialogTrigger.Click += new System.EventHandler(this.btnOpenFileDialogTrigger_Click);
             // 
             // btnInstall
@@ -122,21 +151,30 @@ namespace APKInstaller
             this.btnInstall.AllowDrop = true;
             this.btnInstall.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnInstall.BackColor = System.Drawing.Color.DimGray;
+            this.btnInstall.Depth = 0;
+            this.btnInstall.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.btnInstall.FlatAppearance.BorderSize = 0;
             this.btnInstall.Font = new System.Drawing.Font("Roboto", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInstall.ForeColor = System.Drawing.Color.Green;
-            this.btnInstall.Location = new System.Drawing.Point(295, 382);
+            this.btnInstall.ForeColor = System.Drawing.Color.White;
+            this.btnInstall.Icon = null;
+            this.btnInstall.Location = new System.Drawing.Point(213, 287);
+            this.btnInstall.Margin = new System.Windows.Forms.Padding(2);
+            this.btnInstall.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnInstall.Name = "btnInstall";
-            this.btnInstall.Size = new System.Drawing.Size(271, 78);
+            this.btnInstall.Primary = true;
+            this.btnInstall.Size = new System.Drawing.Size(204, 68);
             this.btnInstall.TabIndex = 3;
             this.btnInstall.Text = "INSTALL";
-            this.btnInstall.UseVisualStyleBackColor = true;
+            this.btnInstall.UseVisualStyleBackColor = false;
             this.btnInstall.Click += new System.EventHandler(this.btnInstaller_Click);
             // 
             // pgbStatus
             // 
-            this.pgbStatus.Location = new System.Drawing.Point(11, 482);
+            this.pgbStatus.Location = new System.Drawing.Point(8, 392);
+            this.pgbStatus.Margin = new System.Windows.Forms.Padding(2);
             this.pgbStatus.Name = "pgbStatus";
-            this.pgbStatus.Size = new System.Drawing.Size(820, 5);
+            this.pgbStatus.Size = new System.Drawing.Size(615, 4);
             this.pgbStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pgbStatus.TabIndex = 2;
             // 
@@ -149,9 +187,10 @@ namespace APKInstaller
             this.lnkAbout.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.lnkAbout.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.lnkAbout.LinkColor = System.Drawing.Color.Black;
-            this.lnkAbout.Location = new System.Drawing.Point(739, 9);
+            this.lnkAbout.Location = new System.Drawing.Point(552, 67);
+            this.lnkAbout.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lnkAbout.Name = "lnkAbout";
-            this.lnkAbout.Size = new System.Drawing.Size(58, 23);
+            this.lnkAbout.Size = new System.Drawing.Size(44, 19);
             this.lnkAbout.TabIndex = 1;
             this.lnkAbout.TabStop = true;
             this.lnkAbout.Text = "About";
@@ -168,7 +207,8 @@ namespace APKInstaller
             this.lnkHelp.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(222)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.lnkHelp.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.lnkHelp.LinkColor = System.Drawing.Color.Black;
-            this.lnkHelp.Location = new System.Drawing.Point(803, 9);
+            this.lnkHelp.Location = new System.Drawing.Point(603, 67);
+            this.lnkHelp.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lnkHelp.Name = "lnkHelp";
             this.lnkHelp.Size = new System.Drawing.Size(44, 20);
             this.lnkHelp.TabIndex = 0;
@@ -180,10 +220,10 @@ namespace APKInstaller
             // Main
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(862, 567);
+            this.ClientSize = new System.Drawing.Size(646, 461);
             this.Controls.Add(this.lnkHelp);
             this.Controls.Add(this.lnkAbout);
             this.Controls.Add(this.pgbStatus);
@@ -194,6 +234,7 @@ namespace APKInstaller
             this.Controls.Add(this.txtFileLocation);
             this.Controls.Add(this.lblStatus);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Main";
             this.Text = "App Installer";
             this.ResumeLayout(false);
@@ -205,13 +246,13 @@ namespace APKInstaller
         #endregion
 
         internal Label lblStatus;
-        internal TextBox txtFileLocation;
-        internal CheckBox chkReinstall;
-        internal CheckBox chkForce;
-        internal Button btnOpenFileDialogTrigger;
-        internal Button btnInstall;
+        internal MaterialSingleLineTextField txtFileLocation;
         internal ProgressBar pgbStatus;
         internal LinkLabel lnkAbout;
         internal LinkLabel lnkHelp;
+        internal MaterialCheckBox chkReinstall;
+        internal MaterialCheckBox chkForce;
+        internal MaterialFlatButton btnOpenFileDialogTrigger;
+        internal MaterialRaisedButton btnInstall;
     }
 }

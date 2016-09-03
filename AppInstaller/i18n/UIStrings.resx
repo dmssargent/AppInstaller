@@ -285,4 +285,31 @@
   <data name="apks" xml:space="preserve">
     <value>APKs</value>
   </data>
+  <data name="PlatformNotSupported" xml:space="preserve">
+    <value>Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable "ANDROID_HOME" to it.</value>
+  </data>
+  <data name="Unsupported_Platform_Title" xml:space="preserve">
+    <value>Unsupported Platform</value>
+  </data>
+  <data name="enviroment_variable_ANDROID_HOME_is_not_defined__when_a_valid_Android_SDK_is_present" xml:space="preserve">
+    <value>The enviroment variable ANDROID_HOME is not defined, when a valid Android SDK is present</value>
+  </data>
+  <data name="Invalid_SDK" xml:space="preserve">
+    <value>Invalid SDK</value>
+  </data>
+  <data name="Invalid_File" xml:space="preserve">
+    <value>Invalid File</value>
+  </data>
+  <data name="Installer_Install_Failed_install" xml:space="preserve">
+    <value>Failed Install</value>
+  </data>
+  <data name="Device_Error" xml:space="preserve">
+    <value>Device Error</value>
+  </data>
+  <data name="APK_Install_Aborted" xml:space="preserve">
+    <value>APK Install Aborted</value>
+  </data>
+  <data name="Verify_Device" xml:space="preserve">
+    <value>Verify Device</value>
+  </data>
 </root>

@@ -129,10 +129,10 @@ namespace APKInstaller
                 if (androidHome != null)
                     if (
                         MessageBox.Show(
-                            UIStrings.invalidAndroidSdkConfig + "\n" + UIStrings.correctConfigIssue +
-                            "\n" + UIStrings.details +
-                            "ANDROID_HOME is not defined, when valid Android SDK is present",
-                            "Invalid SDK", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                            UIStrings.invalidAndroidSdkConfig + "\n"
+                            + UIStrings.correctConfigIssue +"\n" + UIStrings.details +
+                            UIStrings.enviroment_variable_ANDROID_HOME_is_not_defined__when_a_valid_Android_SDK_is_present,
+                            UIStrings.Invalid_SDK, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
                     {
                         Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome);
                         // Change the environment variable for this process as well as the user
@@ -147,7 +147,7 @@ namespace APKInstaller
                         if (
                             MessageBox.Show(
                                 UIStrings.invalidAndroidSdkConfig + "\n" + UIStrings.invalidAndroidSdkConfig,
-                                "Invalid SDK", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                                UIStrings.Invalid_SDK, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
                         {
                             Environment.SetEnvironmentVariable("ANDROID_HOME", androidHome2);
                             // Change the environment variable for this process as well as the user
@@ -184,35 +184,46 @@ namespace APKInstaller
 
             // Fall-back to app version
             dynamic tempFileName = IoUtilities.CreateTempSession("adb");
-            string platformToolsZip = tempFileName + Path.DirectorySeparatorChar + "platform-tools.zip";
+            string platformToolsZip = Path.Combine(tempFileName, "platform-tools.zip");
 
-            var env = (int)Environment.OSVersion.Platform;
-            string androidPlatformTools = tempFileName + Path.DirectorySeparatorChar + "platform-tools";
-            if ((Environment.OSVersion.Platform == PlatformID.Unix) || ((int)Environment.OSVersion.Platform == 128))
-            {
-                File.WriteAllBytes(platformToolsZip, Resources.platform_tools_r24_linux);
-                _adbCache = androidPlatformTools + Path.DirectorySeparatorChar + "platform-tools" +
-                            Path.DirectorySeparatorChar + "adb";
-            }
-            else if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
+           string androidPlatformTools = Path.Combine(tempFileName, "platform-tools");
+            if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
                      (Environment.OSVersion.Platform == PlatformID.Win32NT))
             {
                 File.WriteAllBytes(platformToolsZip, Resources.platform_tools_r24_windows);
-                _adbCache = androidPlatformTools + Path.DirectorySeparatorChar + "platform-tools" +
-                            Path.DirectorySeparatorChar + "adb.exe";
+                _adbCache = Path.Combine(androidPlatformTools, "platform-tools",  "adb.exe");
             }
             else
             {
                 MessageBox.Show(
-                    "Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable \"ANDROID_HOME\" to it.",
-                    "Unsupported Platform", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    UIStrings.PlatformNotSupported,
+                    UIStrings.Unsupported_Platform_Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            //string androidPlatformTools = tempFileName + Path.DirectorySeparatorChar + "platform-tools";
+            //if ((Environment.OSVersion.Platform == PlatformID.Unix) || ((int)Environment.OSVersion.Platform == 128))
+            //{
+            //    File.WriteAllBytes(platformToolsZip, Resources.platform_tools_r24_linux);
+            //    _adbCache = androidPlatformTools + Path.DirectorySeparatorChar + "platform-tools" +
+            //                Path.DirectorySeparatorChar + "adb";
+            //}
+            //else if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
+            //         (Environment.OSVersion.Platform == PlatformID.Win32NT))
+            //{
+            //    File.WriteAllBytes(platformToolsZip, Resources.platform_tools_r24_windows);
+            //    _adbCache = androidPlatformTools + Path.DirectorySeparatorChar + "platform-tools" +
+            //                Path.DirectorySeparatorChar + "adb.exe";
+            //}
+            //else
+            //{
+            //    MessageBox.Show(
+            //        UIStrings.PlatformNotSupported,
+            //        UIStrings.Unsupported_Platform_Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //}
+
             using (var stream = new FileStream(platformToolsZip, FileMode.Open))
             {
                 IoUtilities.UnzipFromStream(stream, androidPlatformTools);
             }
-            //_adbCache = androidPlatformTools + Path.DirectorySeparatorChar + "platform-tools" + Path.DirectorySeparatorChar + "adb.exe";
+       
             return _adbCache;
         }
 
@@ -221,20 +232,11 @@ namespace APKInstaller
         static string SetupAapt()
         {
             dynamic aaptPath = "";
-
             try
             {
                 dynamic temp = IoUtilities.CreateTempSession("aapt");
 
-                if ((Environment.OSVersion.Platform == PlatformID.Unix) || ((int)Environment.OSVersion.Platform == 128))
-                {
-                    var aaptZip = Path.Combine(temp, "aapt.zip");
-                    File.WriteAllBytes(aaptZip, Resources.aapt_r24_01_linux);
-                    var aaptDirPath = Path.Combine(temp, "aapt");
-                    IoUtilities.UnzipFromFile(aaptZip, aaptDirPath);
-                    aaptPath = Path.Combine(aaptDirPath, "aapt", "aapt");
-                }
-                else if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
+                if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
                          (Environment.OSVersion.Platform == PlatformID.Win32NT))
                 {
                     aaptPath = Path.Combine(temp, "aapt.exe");
@@ -243,26 +245,38 @@ namespace APKInstaller
                 else
                 {
                     MessageBox.Show(
-                        "Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable \"ANDROID_HOME\" to it.",
-                        "Unsupported Platform", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                       UIStrings.PlatformNotSupported,
+                        UIStrings.Unsupported_Platform_Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+
+                //if ((Environment.OSVersion.Platform == PlatformID.Unix) || ((int)Environment.OSVersion.Platform == 128))
+                //{
+                //    var aaptZip = Path.Combine(temp, "aapt.zip");
+                //    File.WriteAllBytes(aaptZip, Resources.aapt_r24_01_linux);
+                //    var aaptDirPath = Path.Combine(temp, "aapt");
+                //    IoUtilities.UnzipFromFile(aaptZip, aaptDirPath);
+                //    aaptPath = Path.Combine(aaptDirPath, "aapt", "aapt");
+                //}
+                //else if ((Environment.OSVersion.Platform == PlatformID.Win32Windows) ||
+                //         (Environment.OSVersion.Platform == PlatformID.Win32NT))
+                //{
+                //    aaptPath = Path.Combine(temp, "aapt.exe");
+                //    File.WriteAllBytes(aaptPath, Resources.aapt_23_0_3_win);
+                //}
+                //else
+                //{
+                //    MessageBox.Show(
+                //        "Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable \"ANDROID_HOME\" to it.",
+                //        "Unsupported Platform", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //}
             }
             catch (Exception ex)
             {
             }
 
-            //File.WriteAllBytes(aaptPath, Resources.aapt_23_0_3_win);
-            if (File.Exists(aaptPath))
-            {
-#if __MONOCS__
-                if (Type.GetType("Mono.Unix.Native")) {
-                    Mono.Unix.Native.Syscall.chmod(aaptPath, Mono.Unix.Native.FilePermissions.S_IRWXU);
-                }
-#endif
-                _aaptCache = aaptPath;
-                return aaptPath;
-            }
-            throw new IOException("Failed to build aapt.exe");
+            if (!File.Exists(aaptPath)) throw new IOException("Failed to build aapt.exe");
+            _aaptCache = aaptPath;
+            return aaptPath;
         }
 
 
@@ -285,12 +299,17 @@ namespace APKInstaller
         public static Process RunAdb(string args, bool redirectStdOut, bool run, bool waitToReturn)
         {
             SetupIfPossible();
-            var pAdb = new Process();
-            pAdb.StartInfo.FileName = Adb;
-            pAdb.StartInfo.Arguments = args;
-            pAdb.StartInfo.CreateNoWindow = true;
-            pAdb.StartInfo.UseShellExecute = false;
-            pAdb.StartInfo.RedirectStandardOutput = redirectStdOut;
+            var pAdb = new Process
+            {
+                StartInfo =
+                {
+                    FileName = Adb,
+                    Arguments = args,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = redirectStdOut
+                }
+            };
 
             if (!run) return pAdb;
             pAdb.Start();
@@ -363,7 +382,7 @@ namespace APKInstaller
                                 line.Substring(line.IndexOf(parseFor, StringComparison.Ordinal) + parseFor.Length);
                             package = versionName.Substring(versionName.IndexOf("'", StringComparison.Ordinal) + 1);
                             package = package.Substring(0, package.IndexOf("'", StringComparison.Ordinal));
-                            break; // TODO: might not be correct. Was : Exit While
+                            break;
                         }
                         var readLine = process.StandardOutput.ReadLine();
                         if (readLine != null) line = readLine.Trim();
@@ -389,8 +408,8 @@ namespace APKInstaller
 
             if (!(Directory.Exists(tools) & Directory.Exists(platformTools))) return false;
 
-            dynamic adbPath = Path.Combine(platformTools, "adb.exe");
-            dynamic androidBat = Path.Combine(tools, "android.bat");
+            dynamic adbPath;
+            dynamic androidBat;
             if ((Environment.OSVersion.Platform == PlatformID.Unix) || ((int) Environment.OSVersion.Platform == 128))
             {
                 adbPath = Path.Combine(platformTools, "adb");
@@ -405,8 +424,8 @@ namespace APKInstaller
             else
             {
                 MessageBox.Show(
-                    "Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable \"ANDROID_HOME\" to it.",
-                    "Unsupported Platform", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    UIStrings.PlatformNotSupported,
+                    UIStrings.Unsupported_Platform_Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -467,13 +486,12 @@ namespace APKInstaller
                     {
                         //sdkPath = sdkPath_loopVariable;
                         dynamic value = Path.DirectorySeparatorChar + sdkPath;
-                        if (path.Contains(value))
-                        {
-                            dynamic path2 = path.Substring(0, path.IndexOf(value, StringComparison.OrdinalIgnoreCase));
-                            if (IsAndroidSdk(path2))
-                                possibleSdkPaths.Add(path2);
-                            break; // TODO: might not be correct. Was : Exit For
-                        }
+                        if (!path.Contains(value)) continue;
+
+                        dynamic path2 = path.Substring(0, path.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+                        if (IsAndroidSdk(path2))
+                            possibleSdkPaths.Add(path2);
+                        break;
                     }
 
             dynamic highScore = 0;

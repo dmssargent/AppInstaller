@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using APKInstaller.i18n;
+using MaterialSkin;
+using MaterialSkin.Controls;
 
 namespace APKInstaller
 {
-    public partial class Main : Form
+    public partial class Main : MaterialForm
     {
         //Private stopAll As Boolean
         readonly Installer _apkInstaller;
@@ -60,6 +63,18 @@ namespace APKInstaller
             //Configure GUI
             btnInstall.Visible = false;
             pgbStatus.Visible = false;
+
+            var manager = MaterialSkinManager.Instance;
+            manager.AddFormToManage(this);
+            SkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            SkinManager.ColorScheme = new ColorScheme(Primary.Orange700, Primary.Orange700, Primary.Orange100, Accent.LightBlue200, TextShade.WHITE);
+            lnkAbout.Font = SkinManager.ROBOTO_MEDIUM_10;
+            lnkHelp.Font = SkinManager.ROBOTO_MEDIUM_10;
+            lnkAbout.ForeColor = Color.White;
+            lnkHelp.ForeColor = Color.White;
+
+            CenterToScreen();
+
             // Dim manager = SkinManager.Instance
             // manager.AddFormToManage(Me)
             //SkinManager.Theme = SkinManager.Themes.LIGHT

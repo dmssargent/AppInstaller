@@ -82,7 +82,7 @@ namespace APKInstaller
             }
             catch (Exception e)
             {
-                Console.Write(e.ToString());
+                Console.Write(e);
             }
 
             _configured = true;
@@ -104,15 +104,12 @@ namespace APKInstaller
 
         static bool VerifyState()
         {
-            if (_updateManager == null)
-            {
-                while (!_configured)
-                    Thread.Sleep(10);
+            if (_updateManager != null) return true;
 
-                if (_updateManager == null)
-                    return false;
-            }
-            return true;
+            while (!_configured)
+                Thread.Sleep(10);
+
+            return _updateManager != null;
         }
 
         static void SquirrelInstall()
@@ -123,8 +120,8 @@ namespace APKInstaller
             // Create a default icon
             dynamic icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico");
             using (var file = new FileStream(icon, FileMode.Create))
-            {
-                // todo: android_app.Save(file);
+            { 
+                Resources.ic_android_black_24px.Save(file);
             }
 
             // Register the APK extension to this app

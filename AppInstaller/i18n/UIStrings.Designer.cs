@@ -88,6 +88,15 @@ namespace APKInstaller.i18n {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to APK Install Aborted.
+        /// </summary>
+        public static string APK_Install_Aborted {
+            get {
+                return ResourceManager.GetString("APK_Install_Aborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to APK Install Finished.
         /// </summary>
         public static string apkInstallFinished {
@@ -187,6 +196,15 @@ namespace APKInstaller.i18n {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Device Error.
+        /// </summary>
+        public static string Device_Error {
+            get {
+                return ResourceManager.GetString("Device_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Done!.
         /// </summary>
         public static string done {
@@ -201,6 +219,16 @@ namespace APKInstaller.i18n {
         public static string dragFile {
             get {
                 return ResourceManager.GetString("dragFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The enviroment variable ANDROID_HOME is not defined, when a valid Android SDK is present.
+        /// </summary>
+        public static string enviroment_variable_ANDROID_HOME_is_not_defined__when_a_valid_Android_SDK_is_present {
+            get {
+                return ResourceManager.GetString("enviroment_variable_ANDROID_HOME_is_not_defined__when_a_valid_Android_SDK_is_pres" +
+                        "ent", resourceCulture);
             }
         }
         
@@ -304,11 +332,38 @@ namespace APKInstaller.i18n {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed Install.
+        /// </summary>
+        public static string Installer_Install_Failed_install {
+            get {
+                return ResourceManager.GetString("Installer_Install_Failed_install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installing.
         /// </summary>
         public static string installing {
             get {
                 return ResourceManager.GetString("installing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid File.
+        /// </summary>
+        public static string Invalid_File {
+            get {
+                return ResourceManager.GetString("Invalid_File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid SDK.
+        /// </summary>
+        public static string Invalid_SDK {
+            get {
+                return ResourceManager.GetString("Invalid_SDK", resourceCulture);
             }
         }
         
@@ -403,6 +458,15 @@ namespace APKInstaller.i18n {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your platform is not supported just yet. You need to get the full Android SDK and point the enviroment variable &quot;ANDROID_HOME&quot; to it..
+        /// </summary>
+        public static string PlatformNotSupported {
+            get {
+                return ResourceManager.GetString("PlatformNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ready to install? Click Install. If not, you can drag and drop some more files.
         /// </summary>
         public static string readyToInstall {
@@ -493,6 +557,15 @@ namespace APKInstaller.i18n {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unsupported Platform.
+        /// </summary>
+        public static string Unsupported_Platform_Title {
+            get {
+                return ResourceManager.GetString("Unsupported_Platform_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Would you like to update the installed package on the phone?.
         /// </summary>
         public static string updateQuestion {
@@ -525,6 +598,15 @@ namespace APKInstaller.i18n {
         public static string userTroubleshootingA2 {
             get {
                 return ResourceManager.GetString("userTroubleshootingA2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verify Device.
+        /// </summary>
+        public static string Verify_Device {
+            get {
+                return ResourceManager.GetString("Verify_Device", resourceCulture);
             }
         }
         

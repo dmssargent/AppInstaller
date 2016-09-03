@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using APKInstaller.i18n;
+using MaterialSkin.Controls;
 
 namespace APKInstaller
 {
@@ -17,7 +18,7 @@ namespace APKInstaller
     {
         readonly LinkedList<string> _filesToInstall = new LinkedList<string>();
         readonly Main _gui;
-        readonly TextBox _txtUserInput;
+        readonly MaterialSingleLineTextField _txtUserInput;
         Label _lblStatus;
         bool _stopRequested;
 
@@ -30,7 +31,7 @@ namespace APKInstaller
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "2#")]
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
         [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
-        public Installer(ref Main entry, ref Label statusLabel, ref TextBox userInputTextBox)
+        public Installer(ref Main entry, ref Label statusLabel, ref MaterialSingleLineTextField userInputTextBox)
         {
             _gui = entry;
             _lblStatus = statusLabel;
@@ -73,6 +74,8 @@ namespace APKInstaller
         ///     Adds files to be installed
         /// </summary>
         /// <param name="files">files to be installed</param>
+        /// <param name="clear"></param>
+        /// <param name="notifyUser"></param>
         //[Log("App Installer Debug")]
         public void AddFilesToInstall(string[] files, bool clear, bool notifyUser)
         {
@@ -101,7 +104,7 @@ namespace APKInstaller
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show(ex.Message, "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message, UIStrings.Invalid_File, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
 
@@ -115,10 +118,7 @@ namespace APKInstaller
             _filesToInstall.Remove(path);
         }
 
-        public static bool ValidateFile(string path)
-        {
-            return ValidateFile(path, false);
-        }
+        public static bool ValidateFile(string path) => ValidateFile(path, false);
 
         /// <summary>
         ///     Determines if the given file is a valid APK file
@@ -138,7 +138,7 @@ namespace APKInstaller
                 if (notifyUser)
                     MessageBox.Show(
                         Directory.Exists(path) ? "\"" + path + "\" " + UIStrings.isDirError : UIStrings.fileDoesNotExist,
-                        "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        UIStrings.Invalid_File, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -149,14 +149,14 @@ namespace APKInstaller
                         .EndsWith(".APK", StringComparison.CurrentCultureIgnoreCase) &
                     (AndroidTools.PackageName(path) != "")) return true;
                 if (notifyUser)
-                    MessageBox.Show("\"" + path + "\" " + UIStrings.invalidApk, "Invalid File", MessageBoxButtons.OK,
+                    MessageBox.Show($@"""{path}"" {UIStrings.invalidApk}", UIStrings.Invalid_File, MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                 return false;
             }
             catch (IOException ex)
             {
                 if (notifyUser)
-                    MessageBox.Show("\"" + path + "\" " + UIStrings.invalidApk, "Invalid File", MessageBoxButtons.OK,
+                    MessageBox.Show($@"""{path}"" {UIStrings.invalidApk}", UIStrings.Invalid_File, MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
                 return false;
             }
@@ -164,15 +164,14 @@ namespace APKInstaller
 
         string GenerateFileListSummary()
         {
-            if (_filesToInstall.Count == 0)
+            switch (_filesToInstall.Count)
             {
-                UseMultiFileDialog = false;
-                return "";
-            }
-            if (_filesToInstall.Count == 1)
-            {
-                UseMultiFileDialog = false;
-                return _filesToInstall.First.Value;
+                case 0:
+                    UseMultiFileDialog = false;
+                    return "";
+                case 1:
+                    UseMultiFileDialog = false;
+                    return _filesToInstall.First.Value;
             }
             UseMultiFileDialog = true;
             return _filesToInstall.ElementAt(0) + ", " + _filesToInstall.ElementAt(1) +
@@ -241,7 +240,7 @@ namespace APKInstaller
                 // Check if the install has been aborted, if so stop the installs
                 if (installAborted)
                 {
-                    //Exit For
+                    break;
                 }
 
                 // Retry Loop
@@ -271,7 +270,7 @@ namespace APKInstaller
                 }
                 // End retry loop
                 if (packageInstallSuccess) continue;
-                MessageBox.Show(@"The file """ + file + @""" couldn't be installed.", "Failed install",
+                MessageBox.Show($@"The file ""{file}"" couldn't be installed.", UIStrings.Installer_Install_Failed_install,
                     MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 installHasFailed = true;
             }
@@ -324,14 +323,12 @@ namespace APKInstaller
 
             int result;
             // Checks if the result is a return code
-            if (int.TryParse(adbCode, out result))
-            {
-                if (result != 0) return HandleInstallFailure(file, result);
-                _gui.StepProgressBar();
-                return ErrorCode.Success;
-                // the result is an details error message
-            }
-            return HandleInstallFailure(file, adbCode);
+            if (!int.TryParse(adbCode, out result)) return HandleInstallFailure(file, adbCode);
+
+            if (result != 0) return HandleInstallFailure(file, result);
+            _gui.StepProgressBar();
+            return ErrorCode.Success;
+            // the result is an details error message
         }
 
         void HandleWaitForDeviceError(ErrorCode waitForDeviceReturn)
@@ -340,8 +337,9 @@ namespace APKInstaller
             switch (waitForDeviceReturn)
             {
                 case ErrorCode.FailureTimeout:
-                    message = UIStrings.timeoutWaiting + "\n" + UIStrings.userTroubleshootingA1 + "\n" +
-                              UIStrings.userTroubleshootingA2;
+                    message = $"{UIStrings.timeoutWaiting}\n" +
+                              $"{UIStrings.userTroubleshootingA1}\n" +
+                              $"{UIStrings.userTroubleshootingA2}";
                     break;
                 case ErrorCode.Abort:
                     message = UIStrings.installAborted;
@@ -366,7 +364,7 @@ namespace APKInstaller
             }
             else
             {
-                MessageBox.Show(message, "Device Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(message, UIStrings.Device_Error, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 _gui.Close();
             }
         }
@@ -382,35 +380,37 @@ namespace APKInstaller
                 while (!adbWait.HasExited)
                 {
                     string currentMessage = null;
-                    if (caret == 0)
+                    switch (caret)
                     {
-                        currentMessage = UIStrings.waitForDevice1;
+                        case 0:
+                            currentMessage = UIStrings.waitForDevice1;
+                            break;
+                        case 1:
+                            currentMessage = UIStrings.waitForDevice2;
+                            break;
+                        default: // caret == 2
+                            currentMessage = UIStrings.waitForDevice3;
+                            caret = -1;
+                            break;
                     }
-                    else if (caret == 1)
-                    {
-                        currentMessage = UIStrings.waitForDevice2;
-                    }
-                    else
-                    {
-                        currentMessage = UIStrings.waitForDevice3;
-                        caret = -1;
-                    }
-                    caret += 1;
+                    caret++;
+
+                    // Display help message after 10 seconds
                     if (counter > 10)
-                        currentMessage += "\n" + UIStrings.userTroubleshootingA1 + "\n" +
-                                          UIStrings.userTroubleshootingA2;
+                        currentMessage += $"\n{UIStrings.userTroubleshootingA1}\n{UIStrings.userTroubleshootingA2}";
                     _gui.SetText(ref _lblStatus, currentMessage);
 
                     Thread.Sleep(1000);
                     Thread.Yield();
                     if (_stopRequested)
                     {
-                        MessageBox.Show(UIStrings.installAborted, "APK Install Aborted", MessageBoxButtons.OK,
+                        MessageBox.Show(UIStrings.installAborted, UIStrings.APK_Install_Aborted, MessageBoxButtons.OK,
                             MessageBoxIcon.Exclamation);
                         return ErrorCode.Abort;
                     }
-                    counter += 1;
-                    if (counter > 60)
+                    counter++;
+                
+                    if (counter > 60) // Timeout after 60 seconds
                         return ErrorCode.FailureTimeout;
                 }
                 _gui.ShowProgressAnimation(false, false);
@@ -451,7 +451,7 @@ namespace APKInstaller
                 if ((result == DialogResult.OK) | (result == null))
                     if (
                         MessageBox.Show(UIStrings.correctDevice1 + deviceChooser.Device + UIStrings.correctDevice2,
-                            "Verify Device", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            UIStrings.Verify_Device, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         callback(deviceChooser.Device);
                     else
                         continue;
@@ -483,7 +483,7 @@ namespace APKInstaller
 
             using (
                 var adb =
-                    AndroidTools.RunAdb("-s " + deviceId + " install " + (Reinstall ? "-r " : "") + "\"" + file + "\"",
+                    AndroidTools.RunAdb($@"-s {deviceId} install {(Reinstall ? "-r " : "")}""{file}""",
                         true, true, false))
             {
                 dynamic adbStandardOut = adb.StandardOutput;
@@ -498,7 +498,7 @@ namespace APKInstaller
                     if (_stopRequested)
                     {
                         if (
-                            MessageBox.Show(UIStrings.abortCurrentApk, "Abort Install", MessageBoxButtons.YesNo,
+                            MessageBox.Show(UIStrings.abortCurrentApk, UIStrings.APK_Install_Aborted, MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question) == DialogResult.Yes)
                         {
                             try
@@ -509,7 +509,7 @@ namespace APKInstaller
                             catch (InvalidOperationException ex)
                             {
                             }
-                            MessageBox.Show(UIStrings.installAborted, "APK Install Aborted", MessageBoxButtons.OK,
+                            MessageBox.Show(UIStrings.installAborted, UIStrings.APK_Install_Aborted, MessageBoxButtons.OK,
                                 MessageBoxIcon.Exclamation);
                             return abortKey;
                         }
