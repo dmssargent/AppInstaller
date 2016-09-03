@@ -267,7 +267,7 @@ namespace APKInstaller
                     File.WriteAllBytes(aaptZip, Resources.aapt_r24_02_mac);
                     var aaptDirPath = Path.Combine(temp, "aapt");
                     IoUtilities.UnzipFromFile(aaptZip, aaptDirPath);
-                    aaptPath = Path.Combine(aaptDirPath, "aapt", "aapt");
+                    aaptPath = Path.Combine(aaptDirPath, "aapt");
                 }
                 else
                 {
@@ -278,6 +278,7 @@ namespace APKInstaller
             }
             catch (Exception ex)
             {
+				
             }
 
             //File.WriteAllBytes(aaptPath, Resources.aapt_23_0_3_win);

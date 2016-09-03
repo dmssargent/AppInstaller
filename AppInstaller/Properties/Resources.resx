@@ -136,9 +136,9 @@
   <data name="roboto_regular" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>../Resources/Roboto-Regular.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="aapt_23_0_3_win" type="System.Resources.ResXFileRef, System.Windows.Forms">
+<!-- <data name="aapt_23_0_3_win" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\aapt.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
+  </data>-->
   <data name="aapt_r24_02_mac" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\aapt_r24_02-mac.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
