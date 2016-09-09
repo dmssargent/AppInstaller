@@ -24,6 +24,7 @@ Public Class Main
 
     Private _dialogLock As Boolean = False
     Private _txtLock As Boolean
+    Private _lastEditInTextbox As String = ""
 
 
     Sub New()
@@ -196,7 +197,7 @@ Public Class Main
         If _apkInstaller Is Nothing Then
             Exit Sub
         End If
-
+  
         If _apkInstaller IsNot Nothing AndAlso Not _apkInstaller.UseMultiFileDialog Then
             Dim pos = txtFileLocation.SelectionStart
             Dim currentData = txtFileLocation.Text
@@ -225,20 +226,32 @@ Public Class Main
                 End If
             End If
 
+            ' Detect removed files
+            Dim oldFiles = ExtractFilesFromString(_lastEditInTextbox)
+            Dim currentFiles = ExtractFilesFromString(txtFileLocation.Text)
+            If Not oldFiles.Equals(currentFiles)
+                for each file In oldFiles
+                    if Not currentFiles.Contains(file)
+                        _apkInstaller.RemoveFile(file)
+                    End If
+                Next
+            End If
+
             CheckInstallerConfig(Installer.ValidateFile(currentData))
         End If
+        _lastEditInTextbox = txtFileLocation.Text
     End Sub
 
     Private Sub Main_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
         CheckInstallerConfig()
     End Sub
 
-    Private Sub CheckInstallerConfig(Optional optionalConditon As Boolean = True)
+    Private Sub CheckInstallerConfig(Optional optionalCondition As Boolean = True)
         If _apkInstaller Is Nothing Then
             'Exit Sub
         End If
 
-        If _apkInstaller.VerifyFilesToInstall(True) And optionalConditon Then
+        If _apkInstaller.VerifyFilesToInstall(True) And optionalCondition Then
             btnInstall.Visible = True
             lblStatus.Text = Strings.readyToInstall
             ConfigureAppListFromTextbox()
