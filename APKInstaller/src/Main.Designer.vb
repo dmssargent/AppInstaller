@@ -27,25 +27,25 @@ Partial Class Main
     'Do not modify it using the code editor.
     <DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As ComponentResourceManager = New ComponentResourceManager(GetType(Main))
-        Me.lblStatus = New MaterialLabel()
-        Me.txtFileLocation = New MaterialSingleLineTextField()
-        Me.chkReinstall = New MaterialCheckBox()
-        Me.chkForce = New MaterialCheckBox()
-        Me.btnOpenFileDialogTrigger = New MaterialFlatButton()
-        Me.btnInstall = New MaterialRaisedButton()
-        Me.pgbStatus = New MaterialProgressBar()
-        Me.lnkAbout = New LinkLabel()
-        Me.lnkHelp = New LinkLabel()
-        Me.SuspendLayout()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
+        Me.lblStatus = New MaterialSkin.Controls.MaterialLabel()
+        Me.txtFileLocation = New MaterialSkin.Controls.MaterialSingleLineTextField()
+        Me.chkReinstall = New MaterialSkin.Controls.MaterialCheckBox()
+        Me.chkForce = New MaterialSkin.Controls.MaterialCheckBox()
+        Me.btnOpenFileDialogTrigger = New MaterialSkin.Controls.MaterialFlatButton()
+        Me.btnInstall = New MaterialSkin.Controls.MaterialRaisedButton()
+        Me.pgbStatus = New MaterialSkin.Controls.MaterialProgressBar()
+        Me.lnkAbout = New System.Windows.Forms.LinkLabel()
+        Me.lnkHelp = New System.Windows.Forms.LinkLabel()
+        Me.SuspendLayout
         '
         'lblStatus
         '
-        Me.lblStatus.AllowDrop = True
+        Me.lblStatus.AllowDrop = true
         resources.ApplyResources(Me.lblStatus, "lblStatus")
         Me.lblStatus.Depth = 0
-        Me.lblStatus.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lblStatus.MouseState = MouseState.HOVER
+        Me.lblStatus.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
+        Me.lblStatus.MouseState = MaterialSkin.MouseState.HOVER
         Me.lblStatus.Name = "lblStatus"
         '
         'txtFileLocation
@@ -54,94 +54,96 @@ Partial Class Main
         Me.txtFileLocation.Depth = 0
         Me.txtFileLocation.Hint = ""
         Me.txtFileLocation.MaxLength = 32767
-        Me.txtFileLocation.MouseState = MouseState.HOVER
+        Me.txtFileLocation.MouseState = MaterialSkin.MouseState.HOVER
         Me.txtFileLocation.Name = "txtFileLocation"
-        Me.txtFileLocation.PasswordChar = ChrW(0)
+        Me.txtFileLocation.PasswordChar = Global.Microsoft.VisualBasic.ChrW(0)
         Me.txtFileLocation.SelectedText = ""
         Me.txtFileLocation.SelectionLength = 0
         Me.txtFileLocation.SelectionStart = 0
-        Me.txtFileLocation.TabStop = False
-        Me.txtFileLocation.UseSystemPasswordChar = False
+        Me.txtFileLocation.TabStop = false
+        Me.txtFileLocation.UseSystemPasswordChar = false
         '
         'chkReinstall
         '
         resources.ApplyResources(Me.chkReinstall, "chkReinstall")
-        Me.chkReinstall.Checked = True
-        Me.chkReinstall.CheckState = CheckState.Checked
+        Me.chkReinstall.Checked = true
+        Me.chkReinstall.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkReinstall.Depth = 0
-        Me.chkReinstall.MouseLocation = New Point(-1, -1)
-        Me.chkReinstall.MouseState = MouseState.HOVER
+        Me.chkReinstall.MouseLocation = New System.Drawing.Point(-1, -1)
+        Me.chkReinstall.MouseState = MaterialSkin.MouseState.HOVER
         Me.chkReinstall.Name = "chkReinstall"
-        Me.chkReinstall.Ripple = True
-        Me.chkReinstall.UseVisualStyleBackColor = True
+        Me.chkReinstall.Ripple = true
+        Me.chkReinstall.UseVisualStyleBackColor = true
         '
         'chkForce
         '
         resources.ApplyResources(Me.chkForce, "chkForce")
         Me.chkForce.Depth = 0
-        Me.chkForce.MouseLocation = New Point(-1, -1)
-        Me.chkForce.MouseState = MouseState.HOVER
+        Me.chkForce.MouseLocation = New System.Drawing.Point(-1, -1)
+        Me.chkForce.MouseState = MaterialSkin.MouseState.HOVER
         Me.chkForce.Name = "chkForce"
-        Me.chkForce.Ripple = True
-        Me.chkForce.UseVisualStyleBackColor = True
+        Me.chkForce.Ripple = true
+        Me.chkForce.UseVisualStyleBackColor = true
         '
         'btnOpenFileDialogTrigger
         '
         resources.ApplyResources(Me.btnOpenFileDialogTrigger, "btnOpenFileDialogTrigger")
         Me.btnOpenFileDialogTrigger.Depth = 0
-        Me.btnOpenFileDialogTrigger.MouseState = MouseState.HOVER
+        Me.btnOpenFileDialogTrigger.Icon = Nothing
+        Me.btnOpenFileDialogTrigger.MouseState = MaterialSkin.MouseState.HOVER
         Me.btnOpenFileDialogTrigger.Name = "btnOpenFileDialogTrigger"
-        Me.btnOpenFileDialogTrigger.Primary = False
-        Me.btnOpenFileDialogTrigger.UseVisualStyleBackColor = True
+        Me.btnOpenFileDialogTrigger.Primary = false
+        Me.btnOpenFileDialogTrigger.UseVisualStyleBackColor = true
         '
         'btnInstall
         '
-        Me.btnInstall.AllowDrop = True
+        Me.btnInstall.AllowDrop = true
         resources.ApplyResources(Me.btnInstall, "btnInstall")
         Me.btnInstall.Depth = 0
-        Me.btnInstall.ForeColor = Color.Green
-        Me.btnInstall.MouseState = MouseState.HOVER
+        Me.btnInstall.ForeColor = System.Drawing.Color.Green
+        Me.btnInstall.Icon = Nothing
+        Me.btnInstall.MouseState = MaterialSkin.MouseState.HOVER
         Me.btnInstall.Name = "btnInstall"
-        Me.btnInstall.Primary = True
-        Me.btnInstall.UseVisualStyleBackColor = True
+        Me.btnInstall.Primary = true
+        Me.btnInstall.UseVisualStyleBackColor = true
         '
         'pgbStatus
         '
         resources.ApplyResources(Me.pgbStatus, "pgbStatus")
         Me.pgbStatus.Depth = 0
-        Me.pgbStatus.MouseState = MouseState.HOVER
+        Me.pgbStatus.MouseState = MaterialSkin.MouseState.HOVER
         Me.pgbStatus.Name = "pgbStatus"
-        Me.pgbStatus.Style = ProgressBarStyle.Marquee
+        Me.pgbStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee
         '
         'lnkAbout
         '
-        Me.lnkAbout.ActiveLinkColor = Color.White
+        Me.lnkAbout.ActiveLinkColor = System.Drawing.Color.White
         resources.ApplyResources(Me.lnkAbout, "lnkAbout")
-        Me.lnkAbout.BackColor = Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(124, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lnkAbout.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lnkAbout.LinkBehavior = LinkBehavior.HoverUnderline
-        Me.lnkAbout.LinkColor = Color.White
+        Me.lnkAbout.BackColor = System.Drawing.Color.FromArgb(CType(CType(245,Byte),Integer), CType(CType(124,Byte),Integer), CType(CType(0,Byte),Integer))
+        Me.lnkAbout.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
+        Me.lnkAbout.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkAbout.LinkColor = System.Drawing.Color.White
         Me.lnkAbout.Name = "lnkAbout"
-        Me.lnkAbout.TabStop = True
-        Me.lnkAbout.VisitedLinkColor = Color.White
+        Me.lnkAbout.TabStop = true
+        Me.lnkAbout.VisitedLinkColor = System.Drawing.Color.White
         '
         'lnkHelp
         '
-        Me.lnkHelp.ActiveLinkColor = Color.White
+        Me.lnkHelp.ActiveLinkColor = System.Drawing.Color.White
         resources.ApplyResources(Me.lnkHelp, "lnkHelp")
-        Me.lnkHelp.BackColor = Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(124, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lnkHelp.ForeColor = Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.lnkHelp.LinkBehavior = LinkBehavior.HoverUnderline
-        Me.lnkHelp.LinkColor = Color.White
+        Me.lnkHelp.BackColor = System.Drawing.Color.FromArgb(CType(CType(245,Byte),Integer), CType(CType(124,Byte),Integer), CType(CType(0,Byte),Integer))
+        Me.lnkHelp.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
+        Me.lnkHelp.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkHelp.LinkColor = System.Drawing.Color.White
         Me.lnkHelp.Name = "lnkHelp"
-        Me.lnkHelp.TabStop = True
-        Me.lnkHelp.VisitedLinkColor = Color.White
+        Me.lnkHelp.TabStop = true
+        Me.lnkHelp.VisitedLinkColor = System.Drawing.Color.White
         '
         'Main
         '
-        Me.AllowDrop = True
+        Me.AllowDrop = true
         resources.ApplyResources(Me, "$this")
-        Me.AutoScaleMode = AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.lnkHelp)
         Me.Controls.Add(Me.lnkAbout)
         Me.Controls.Add(Me.pgbStatus)
@@ -152,10 +154,10 @@ Partial Class Main
         Me.Controls.Add(Me.txtFileLocation)
         Me.Controls.Add(Me.lblStatus)
         Me.Name = "Main"
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        Me.ResumeLayout(false)
+        Me.PerformLayout
 
-    End Sub
+End Sub
     Friend WithEvents lblStatus As MaterialLabel
     Friend WithEvents txtFileLocation As MaterialSingleLineTextField
     Friend WithEvents chkReinstall As MaterialCheckBox

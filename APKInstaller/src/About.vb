@@ -22,14 +22,14 @@ Public NotInheritable Class About
         TextBoxDescription.Font = LabelVersion.Font
         TextBoxDescription.Text = My.Application.Info.Description
 
-        chkPrerelease.Checked = My.Settings.prerelease
+        chkPrerelease.Checked = My.Settings.enableUpdates
         chkPrerelease.Location = New Point(131, 0)
 
         lblUpdateStatus.Text = AppUpdateManager.UpdateStatusText
     End Sub
 
     Private Sub chkPrerelease_CheckedChanged(sender As Object, e As EventArgs) Handles chkPrerelease.CheckedChanged
-        My.Settings.prerelease = chkPrerelease.Checked
+        My.Settings.enableUpdates = chkPrerelease.Checked
         AppUpdateManager.UpdateApp()
     End Sub
 

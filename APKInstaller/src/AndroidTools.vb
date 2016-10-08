@@ -58,7 +58,7 @@ Public NotInheritable Class AndroidTools
     ''' <summary>
     ''' Sets up both ADB and AAPT for later use
     ''' </summary>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Public Shared Sub SetupIfPossible()
         If Not File.Exists(_aaptCache) Then
             _aaptCache = Nothing
@@ -77,7 +77,7 @@ Public NotInheritable Class AndroidTools
 
     End Sub
 
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Private Shared Function SetupAdb() As String
         Dim windir = Environment.GetEnvironmentVariable("windir")
         If Not (File.Exists(Path.Combine(windir, "adb.exe")) Or File.Exists(Path.Combine(windir, "system32", "adb.exe"))) Then
@@ -157,8 +157,8 @@ Public NotInheritable Class AndroidTools
         Return _adbCache
     End Function
 
+    '<Log("App Installer Debug")>
     <SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId:="aapt")>
-    <Log("App Installer Debug")>
     Private Shared Function SetupAapt() As String
         Dim aaptPath = ""
 
@@ -193,8 +193,8 @@ Public NotInheritable Class AndroidTools
     ''' <param name="run">run this program before returning</param>
     ''' <param name="waitToReturn">wait for this program to return, run parameter must be true</param>
     ''' <returns>an adb process</returns>
+    '<Log("App Installer Debug")>
     <SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")>
-    <Log("App Installer Debug")>
     Public Shared Function RunAdb(args As String, redirectStdOut As Boolean, run As Boolean, waitToReturn As Boolean) As Process
         SetupIfPossible()
         Dim pAdb As New Process
@@ -227,7 +227,7 @@ Public NotInheritable Class AndroidTools
     ''' <param name="args">aapt arguments</param>
     ''' <param name="redirectStdOut">true if the standard output stream should be redirected, otherwise false</param>
     ''' <returns>an instance of an aapt process, not started</returns>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Friend Shared Function RunAapt(args As String, redirectStdOut As Boolean) As Process
         SetupIfPossible()
         Dim pAapt As New Process()
@@ -245,12 +245,12 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="apkFile">the location of the APK file</param>
     ''' <returns>The package name of the APK file, or nothing on failure</returns>
-    <Log("App Installer Debug")>
+    ''<Log("App Installer Debug")>
     Shared Function PackageName(apkFile As String) As String
         If apkFile Is Nothing Then
             Throw New ArgumentNullException(NameOf(apkFile))
         End If
-
+        apkFile = apkFile.Trim()
         Using process = RunAapt("dump badging """ & apkFile & """", True)
             process.Start()
 
@@ -284,7 +284,7 @@ Public NotInheritable Class AndroidTools
         End Using
     End Function
 
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Shared Function IsAndroidSdk(path As String) As Boolean
         Dim platformTools = IO.Path.Combine(path, "platform-tools")
         Dim tools = IO.Path.Combine(path, "tools")
@@ -308,7 +308,7 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="path">a delimited list of paths, or a single path location</param>
     ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Shared Function MostLikelyAndroidSdk(path As String) As String
         If path Is Nothing Then
             Throw New ArgumentNullException(NameOf(path))
@@ -322,7 +322,7 @@ Public NotInheritable Class AndroidTools
     ''' </summary>
     ''' <param name="paths">the locations in a string format</param>
     ''' <returns>Nothing if none of the paths result in an usable Android SDK, or the path of an Android SDK</returns>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Shared Function MostLikelyAndroidSdk(paths As String()) As String
         If paths Is Nothing Then
             Throw New ArgumentNullException(NameOf(paths))

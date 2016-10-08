@@ -241,19 +241,19 @@
     <value>Roboto, 10pt</value>
   </data>
   <data name="chkPrerelease.Location" type="System.Drawing.Point, System.Drawing">
-    <value>189, 4</value>
+    <value>10, 4</value>
   </data>
   <data name="chkPrerelease.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="chkPrerelease.Size" type="System.Drawing.Size, System.Drawing">
-    <value>156, 30</value>
+    <value>173, 30</value>
   </data>
   <data name="chkPrerelease.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
   <data name="chkPrerelease.Text" xml:space="preserve">
-    <value>Use Prereleases</value>
+    <value>Check for Updates</value>
   </data>
   <data name="&gt;&gt;chkPrerelease.Name" xml:space="preserve">
     <value>chkPrerelease</value>
@@ -369,6 +369,12 @@ Customize the application's assembly information in the Application pane of Proj
   <data name="OKButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
+  <data name="OKButton.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="OKButton.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
   <data name="OKButton.Location" type="System.Drawing.Point, System.Drawing">
     <value>247, 104</value>
   </data>
@@ -376,7 +382,7 @@ Customize the application's assembly information in the Application pane of Proj
     <value>4, 4, 4, 4</value>
   </data>
   <data name="OKButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>100, 25</value>
+    <value>45, 36</value>
   </data>
   <data name="OKButton.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>

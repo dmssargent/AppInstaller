@@ -1,11 +1,16 @@
 ﻿
 Imports System.Diagnostics.CodeAnalysis
 Imports System.IO
+Imports System.Net.Http
+Imports System.Net.Http.Headers
+Imports System.Text
 Imports System.Threading
 Imports APKInstaller.My.Resources
+Imports IWshRuntimeLibrary
 Imports MaterialSkin.Controls
 Imports Microsoft.Win32
 Imports Squirrel
+Imports Squirrel.UpdateManager
 
 ''' <summary>
 ''' Core Updating system of APKInstaller. This handles app installs, updates, and uninstalls
@@ -23,7 +28,8 @@ Public Class AppUpdateManager
     Private ReadOnly _gui As Form
     Private Shared _configured As Boolean = False
     'Private Shared _updateStatusText As String = "Everything is up-to-date"
-
+    Private Shared hasCheckedForUpdate As Boolean = False
+    Private Shared installerCode As Integer = -1
     'Private _updatesEnabled As Boolean
 
     ''' <summary>
@@ -66,16 +72,82 @@ Public Class AppUpdateManager
     End Sub
 
     Private Shared Async Sub GetUpdateManager()
-
         Try
-            Const updatePath = "https://github.com/dmssargent/AppInstaller"
-            ' todo: on release allow prerelease to toggle on and off
-            Dim githubMgr = Await UpdateManager.GitHubUpdateManager(updatePath, prerelease:=True)
+            'Const updatePath = "https://github.com/dmssargent/AppInstaller"
 
-            _updateManager = githubMgr
-
-
+            If My.Settings.enableUpdates
+                Dim githubMgr = Await GitHubUpdateManager("https://github.com/dmssargent/AppInstaller")
+                'Dim githubMgr = New UpdateManager("https://github.com/dmssargent/AppInstaller/releases/download/v0.1.7.1-rc/")
+                _updateManager = githubMgr
+                installerCode = 0
+            End If
         Catch e As Exception
+            installerCode = 1
+            Console.Write(e.ToString())
+        End Try
+
+        _configured = True
+    End Sub
+
+    Private Shared Async Function GitHubUpdateManager(repoUrl As String) As Task(Of UpdateManager)
+        Dim repoUri = New Uri(repoUrl)
+        Dim userAgent = New ProductInfoHeaderValue("Squirrel", "1.4.4.0")
+
+        If (repoUri.Segments.Length <> 3) Then
+            Throw New Exception("Repo URL must be to the root URL of the repo e.g. https://github.com/myuser/myrepo")
+        End If
+
+        Dim releasesApiBuilder = New StringBuilder("repos").Append(repoUri.AbsolutePath).Append("/releases")
+
+
+
+        Dim baseAddress As Uri
+
+        If (repoUri.Host.EndsWith("github.com", StringComparison.OrdinalIgnoreCase)) Then
+            baseAddress = New Uri("https://api.github.com/")
+        Else
+            ' if it's not github.com, it's probably an Enterprise server
+            ' now the problem with Enterprise is that the API doesn't come prefixed
+            ' it comes suffixed
+            ' so the API path of http://internal.github.server.local API location is
+            ' http://interal.github.server.local/api/v3. 
+            baseAddress = New Uri(String.Format("{0}{1}{2}/api/v3/", repoUri.Scheme, Uri.SchemeDelimiter, repoUri.Host))
+        End If
+
+        ' above ^^ notice the end slashes for the baseAddress, explained here: http : //stackoverflow.com/a/23438417/162694
+
+        Using client = New HttpClient() With {.BaseAddress = baseAddress}
+            client.DefaultRequestHeaders.UserAgent.Add(userAgent)
+            Dim releasesApi = releasesApiBuilder.ToString()
+            Dim response = Await client.GetAsync(releasesApi)
+            response.EnsureSuccessStatusCode()
+
+            Dim releases = Json.SimpleJson.DeserializeObject(Of List(Of Release))(Await response.Content.ReadAsStringAsync())
+            Dim latestRelease = releases.First()
+
+
+            Dim latestReleaseUrl = latestRelease.HtmlUrl.Replace("/tag/", "/download/")
+
+            Return New UpdateManager(latestReleaseUrl, Nothing, Nothing, Nothing)
+        End Using
+
+
+    End Function
+
+
+    Private Shared Sub GetBackupUpdateManager()
+        installerCode = -2
+        Try
+            'Const updatePath = "https://github.com/dmssargent/AppInstaller"
+
+            If My.Settings.enableUpdates
+                'Dim githubMgr = Await UpdateManager.GitHubUpdateManager("https://github.com/dmssargent/AppInstaller", prerelease:=True)
+                Dim githubMgr = New UpdateManager("https://github.com/dmssargent/AppInstaller/releases/download/v0.1.7.1-rc/")
+                _updateManager = githubMgr
+                installerCode = 0
+            End If
+        Catch e As Exception
+            installerCode = 2
             Console.Write(e.ToString())
         End Try
 
@@ -94,21 +166,55 @@ Public Class AppUpdateManager
         'MsgBox("Squirrel Handle")
         SquirrelAwareApp.HandleEvents(
                 onInitialInstall:=Sub(v) SquirrelInstall(),
-                onAppUpdate:=Sub(v) _updateManager.CreateShortcutForThisExe(),
+                onAppUpdate:=Sub(v)
+                                 SquirrelUninstall()
+                                 SquirrelInstall()
+                             End Sub,
                 onAppUninstall:=Sub(v) SquirrelUninstall()
             )
 
     End Sub
 
-    Private Shared Function VerifyState() As Boolean
-        If (_updateManager Is Nothing) Then
-            While Not _configured
-                Thread.Sleep(10)
-            End While
+    Shared Function VerifyState(Optional noThrow As Boolean = True) As Boolean
+        If Not My.Settings.enableUpdates
+            _UpdateStatusText = "Updates are disabled"
+        End If
 
-            If (_updateManager Is Nothing) Then
-                Return False
-            End If
+        If (_updateManager Is Nothing) And My.Settings.enableUpdates Then
+            Dim i = 0
+            While Not (_updateManager Is Nothing) And My.Settings.enableUpdates
+                Thread.Sleep(10)
+                i += 1
+                If installerCode = 1
+                    If noThrow
+                        _UpdateStatusText = "Updates are broken :("
+                        Return False
+                    End If
+                    Throw New InvalidOperationException("The update components are broken!")
+                ElseIf i > 100 And installerCode = -1
+                    GetBackupUpdateManager()
+                    Continue While ' for another loop to detect conditions
+                    'If noThrow
+                    '    _UpdateStatusText = "Updates are broken :("
+                    '    Return False
+                    'End If
+                    'Throw New TimeoutException("Check for update component timed out during init")
+                ElseIf i > 500 And installerCode = -2
+                    If noThrow
+                        _UpdateStatusText = "Updates are broken :("
+                        Return False
+                    End If
+                    Throw New TimeoutException("Check for update component (1st and 2nd) timed out during init")
+                ElseIf installerCode = 2
+                    If noThrow
+                        _UpdateStatusText = "Updates are really broken :("
+                        Return False
+                    End If
+                    Throw New InvalidOperationException("The update components (2nd) are broken!")
+                ElseIf installerCode = 0
+                    _UpdateStatusText = "Everything is up-to-date"
+                End If
+            End While
         End If
         Return True
     End Function
@@ -116,7 +222,23 @@ Public Class AppUpdateManager
     Private Shared Sub SquirrelInstall()
         'MsgBox("Squirrel Install")
         _updateManager.CreateShortcutForThisExe()
+        InstallStage2()
+    End Sub
 
+    ''' <summary>
+    ''' DO NOT CALL if Squirrel is working, verify this by calling VerifyState
+    ''' </summary>
+    Shared Sub NonSquirrelInstall()
+        Dim shell = New WshShell()
+        CreateExecutableShortcut(shell, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)))
+        Dim startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", My.Application.Info.CompanyName)
+        Directory.CreateDirectory(startMenuPath)
+        CreateExecutableShortcut(shell, startMenuPath)
+
+        InstallStage2()
+    End Sub
+
+    Private Shared Sub InstallStage2()
         ' Create a default icon
         Dim icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
         Using file As New FileStream(icon, FileMode.Create)
@@ -157,14 +279,13 @@ Public Class AppUpdateManager
         shellKey.Close()
 
         appClassKey.Close()
-
     End Sub
 
     Private Shared Sub SquirrelUninstall()
         _updateManager.RemoveShortcutForThisExe()
 
         Dim icon = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
-        File.Delete(icon)
+        IO.File.Delete(icon)
 
         Const appClassKey = "AppInstaller"
 
@@ -177,18 +298,41 @@ Public Class AppUpdateManager
         classes.DeleteSubKey(appClassKey)
     End Sub
 
+    Private Shared Sub CreateExecutableShortcut(shell As WshShell, shortcutPath As String)
+        If Not Directory.Exists(shortcutPath)
+            Throw New FileNotFoundException(shortcutPath)
+        End If
+        Dim shortcut As WshShortcut = CType(shell.CreateShortcut(Path.Combine(shortcutPath, "App Installer.lnk")), WshShortcut)
+        shortcut.IconLocation = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "APK.ico")
+        shortcut.TargetPath = Application.ExecutablePath
+        shortcut.Description = My.Application.Info.Description
+        shortcut.Arguments = ""
+        shortcut.Save
+    End Sub
+
 
 
     Private Async Sub StartUpdate()
+        If My.Settings.enableUpdates = False Or IO.File.Exists(Application.StartupPath & "noupdate")
+            Exit Sub
+        End If
+
         If Not VerifyState() Then
             Exit Sub
         End If
 
-        Dim updateInfo = Await _updateManager.CheckForUpdate
-        If (updateInfo.FutureReleaseEntry().Version.CompareTo(updateInfo.CurrentlyInstalledVersion.Version) > 0) Then
-            Await _updateManager.UpdateApp()
-            NotifyOfUpdate()
+        If Not hasCheckedForUpdate
+            Try 
+                Dim updateInfo = Await _updateManager.CheckForUpdate
+                If (updateInfo.ReleasesToApply.Count > 0) Then
+                    Await _updateManager.UpdateApp()
+                    NotifyOfUpdate()
+                End If
+            Catch ex As Exception
+                    Console.Write(ex.ToString)
+            End Try
         End If
+
     End Sub
 
     ''' <summary>

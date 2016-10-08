@@ -159,6 +159,9 @@
   <data name="txtFileLocation.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 517</value>
   </data>
+  <data name="txtFileLocation.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 2, 3, 2</value>
+  </data>
   <data name="txtFileLocation.Size" type="System.Drawing.Size, System.Drawing">
     <value>723, 28</value>
   </data>
@@ -187,7 +190,7 @@
     <value>Roboto, 10pt</value>
   </data>
   <data name="chkReinstall.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 498</value>
+    <value>9, 474</value>
   </data>
   <data name="chkReinstall.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -223,7 +226,7 @@
     <value>Roboto, 10pt</value>
   </data>
   <data name="chkForce.Location" type="System.Drawing.Point, System.Drawing">
-    <value>200, 498</value>
+    <value>197, 474</value>
   </data>
   <data name="chkForce.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -259,13 +262,13 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Location" type="System.Drawing.Point, System.Drawing">
-    <value>768, 517</value>
+    <value>767, 516</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 6, 4, 6</value>
   </data>
   <data name="btnOpenFileDialogTrigger.Size" type="System.Drawing.Size, System.Drawing">
-    <value>82, 36</value>
+    <value>91, 36</value>
   </data>
   <data name="btnOpenFileDialogTrigger.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -288,14 +291,23 @@
   <data name="btnInstall.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
   </data>
+  <data name="btnInstall.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
   <data name="btnInstall.Font" type="System.Drawing.Font, System.Drawing">
     <value>Open Sans Extrabold, 18pt, style=Bold</value>
   </data>
+  <data name="btnInstall.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="btnInstall.Location" type="System.Drawing.Point, System.Drawing">
-    <value>295, 375</value>
+    <value>277, 309</value>
+  </data>
+  <data name="btnInstall.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 2, 3, 2</value>
   </data>
   <data name="btnInstall.Size" type="System.Drawing.Size, System.Drawing">
-    <value>255, 78</value>
+    <value>272, 83</value>
   </data>
   <data name="btnInstall.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -322,7 +334,10 @@
     <value>Bottom, Left, Right</value>
   </data>
   <data name="pgbStatus.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 459</value>
+    <value>13, 452</value>
+  </data>
+  <data name="pgbStatus.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 2, 3, 2</value>
   </data>
   <data name="pgbStatus.Size" type="System.Drawing.Size, System.Drawing">
     <value>820, 5</value>
@@ -391,7 +406,7 @@
     <value>NoControl</value>
   </data>
   <data name="lnkHelp.Location" type="System.Drawing.Point, System.Drawing">
-    <value>794, 49</value>
+    <value>795, 49</value>
   </data>
   <data name="lnkHelp.Size" type="System.Drawing.Size, System.Drawing">
     <value>50, 24</value>
@@ -424,7 +439,7 @@
     <value>Zoom</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>846, 560</value>
+    <value>845, 560</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -473,7 +488,7 @@
 </value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>2, 2, 2, 2</value>
+    <value>3, 2, 3, 2</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>App Installer</value>

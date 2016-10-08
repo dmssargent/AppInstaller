@@ -4,7 +4,6 @@ Imports System.IO
 Imports System.Threading
 Imports APKInstaller.My.Resources
 Imports MaterialSkin.Controls
-Imports PostSharp.Patterns.Diagnostics
 
 ''' <summary>
 ''' Handler of installing Android packages
@@ -79,7 +78,7 @@ Public Class Installer
     ''' Adds files to be installed
     ''' </summary>
     ''' <param name="files">files to be installed</param>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Sub AddFilesToInstall(files() As String, clear As Boolean, notifyUser As Boolean)
         If files Is Nothing Then
             Throw New ArgumentNullException(NameOf(files))
@@ -114,7 +113,7 @@ Public Class Installer
         _filesToInstallDesc = _txtUserInput.Text
     End Sub
 
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Public Sub RemoveFile(path As String)
         _filesToInstall.Remove(path)
     End Sub
@@ -128,9 +127,9 @@ Public Class Installer
     ''' <param name="path">the file location for the APK file</param>
     ''' <param name="notifyUser">true will notify the user of the problem via dialogs, false will not</param>
     ''' <returns>true if the file is a valid APK, false otherwise</returns>
-    <Log("App Installer Debug")>
+    '<Log("App Installer Debug")>
     Public Shared Function ValidateFile(path As String, notifyUser As Boolean) As Boolean
-        If path Is Nothing Then
+         If path Is Nothing Then
             Throw New ArgumentNullException(NameOf(path))
         End If
 
@@ -147,7 +146,7 @@ Public Class Installer
         Try
             ' Check for the correct extension and that the file can be correctly parsed as an APK
             If path.ToUpper(CultureInfo.CurrentCulture).EndsWith(".APK", StringComparison.CurrentCultureIgnoreCase) And
-            AndroidTools.PackageName(path) Is "" Then
+            AndroidTools.PackageName(path.trim()) Is "" Then
                 If notifyUser Then
                     MsgBox("""" & path & """" & Strings.invalidApk,
                        CType(MsgBoxStyle.OkOnly + MsgBoxStyle.Exclamation, MsgBoxStyle), "Invalid File")
@@ -407,7 +406,7 @@ Public Class Installer
     End Function
 
     Shared Function ForceRemovePackage(ByVal apkFile As String) As Boolean
-        Using adb = AndroidTools.RunAdb("uninstall " & AndroidTools.PackageName(apkFile), False, True, True)
+        Using adb = AndroidTools.RunAdb("uninstall " & AndroidTools.PackageName(apkFile.trim()), False, True, True)
             Return adb.ExitCode = 0
         End Using
     End Function

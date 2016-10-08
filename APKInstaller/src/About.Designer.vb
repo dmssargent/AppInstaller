@@ -42,11 +42,11 @@ Partial Class About
         Me.TextBoxDescription = New System.Windows.Forms.TextBox()
         Me.OKButton = New MaterialSkin.Controls.MaterialRaisedButton()
         Me.LogoPictureBox = New System.Windows.Forms.PictureBox()
-        Me.TableLayoutPanel.SuspendLayout()
-        Me.Panel1.SuspendLayout()
-        Me.Panel2.SuspendLayout()
-        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SuspendLayout()
+        Me.TableLayoutPanel.SuspendLayout
+        Me.Panel1.SuspendLayout
+        Me.Panel2.SuspendLayout
+        CType(Me.LogoPictureBox,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.SuspendLayout
         '
         'TableLayoutPanel
         '
@@ -63,7 +63,7 @@ Partial Class About
         '
         Me.LabelCopyright.Depth = 0
         resources.ApplyResources(Me.LabelCopyright, "LabelCopyright")
-        Me.LabelCopyright.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelCopyright.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
         Me.LabelCopyright.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelCopyright.Name = "LabelCopyright"
         '
@@ -71,7 +71,7 @@ Partial Class About
         '
         Me.LabelCompanyName.Depth = 0
         resources.ApplyResources(Me.LabelCompanyName, "LabelCompanyName")
-        Me.LabelCompanyName.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelCompanyName.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
         Me.LabelCompanyName.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelCompanyName.Name = "LabelCompanyName"
         '
@@ -87,7 +87,7 @@ Partial Class About
         '
         resources.ApplyResources(Me.lblUpdateStatus, "lblUpdateStatus")
         Me.lblUpdateStatus.Depth = 0
-        Me.lblUpdateStatus.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.lblUpdateStatus.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
         Me.lblUpdateStatus.MouseState = MaterialSkin.MouseState.HOVER
         Me.lblUpdateStatus.Name = "lblUpdateStatus"
         '
@@ -98,14 +98,14 @@ Partial Class About
         Me.chkPrerelease.MouseLocation = New System.Drawing.Point(-1, -1)
         Me.chkPrerelease.MouseState = MaterialSkin.MouseState.HOVER
         Me.chkPrerelease.Name = "chkPrerelease"
-        Me.chkPrerelease.Ripple = True
-        Me.chkPrerelease.UseVisualStyleBackColor = True
+        Me.chkPrerelease.Ripple = true
+        Me.chkPrerelease.UseVisualStyleBackColor = true
         '
         'LabelVersion
         '
         Me.LabelVersion.Depth = 0
         resources.ApplyResources(Me.LabelVersion, "LabelVersion")
-        Me.LabelVersion.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.LabelVersion.ForeColor = System.Drawing.Color.FromArgb(CType(CType(222,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer), CType(CType(0,Byte),Integer))
         Me.LabelVersion.MouseState = MaterialSkin.MouseState.HOVER
         Me.LabelVersion.Name = "LabelVersion"
         '
@@ -123,24 +123,25 @@ Partial Class About
         Me.TextBoxDescription.Cursor = System.Windows.Forms.Cursors.Arrow
         resources.ApplyResources(Me.TextBoxDescription, "TextBoxDescription")
         Me.TextBoxDescription.Name = "TextBoxDescription"
-        Me.TextBoxDescription.ReadOnly = True
-        Me.TextBoxDescription.TabStop = False
+        Me.TextBoxDescription.ReadOnly = true
+        Me.TextBoxDescription.TabStop = false
         '
         'OKButton
         '
         resources.ApplyResources(Me.OKButton, "OKButton")
         Me.OKButton.Depth = 0
         Me.OKButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.OKButton.Icon = Nothing
         Me.OKButton.MouseState = MaterialSkin.MouseState.HOVER
         Me.OKButton.Name = "OKButton"
-        Me.OKButton.Primary = True
+        Me.OKButton.Primary = true
         '
         'LogoPictureBox
         '
         resources.ApplyResources(Me.LogoPictureBox, "LogoPictureBox")
         Me.LogoPictureBox.Image = Global.APKInstaller.My.Resources.Resources.FIRSTTech_IconVert_RGB
         Me.LogoPictureBox.Name = "LogoPictureBox"
-        Me.LogoPictureBox.TabStop = False
+        Me.LogoPictureBox.TabStop = false
         '
         'About
         '
@@ -148,19 +149,19 @@ Partial Class About
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.OKButton
         Me.Controls.Add(Me.TableLayoutPanel)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
+        Me.MaximizeBox = false
+        Me.MinimizeBox = false
         Me.Name = "About"
-        Me.ShowInTaskbar = False
-        Me.TableLayoutPanel.ResumeLayout(False)
-        Me.Panel1.ResumeLayout(False)
-        Me.Panel1.PerformLayout()
-        Me.Panel2.ResumeLayout(False)
-        Me.Panel2.PerformLayout()
-        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ResumeLayout(False)
+        Me.ShowInTaskbar = false
+        Me.TableLayoutPanel.ResumeLayout(false)
+        Me.Panel1.ResumeLayout(false)
+        Me.Panel1.PerformLayout
+        Me.Panel2.ResumeLayout(false)
+        Me.Panel2.PerformLayout
+        CType(Me.LogoPictureBox,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ResumeLayout(false)
 
-    End Sub
+End Sub
     Friend WithEvents LabelVersion As MaterialLabel
     Friend WithEvents LabelCompanyName As MaterialLabel
     Friend WithEvents OKButton As MaterialRaisedButton
